@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-export type Theme = "light" | "dark" | "hc" | "electric" | "industrial" | "eco";
+export type Theme = "light" | "dark" | "hc" | "electric" | "industrial" | "eco" | "emerald";
 
 export const THEMES: { id: Theme; label: string; swatch: string }[] = [
   { id: "light", label: "Светлая", swatch: "linear-gradient(135deg,#f4f6fb,#e6ecf6)" },
@@ -9,12 +9,13 @@ export const THEMES: { id: Theme; label: string; swatch: string }[] = [
   { id: "electric", label: "Electric Blue", swatch: "linear-gradient(135deg,#1b3bff,#22d3ee)" },
   { id: "industrial", label: "Industrial", swatch: "linear-gradient(135deg,#3a2c1c,#d18a3a)" },
   { id: "eco", label: "Eco Power", swatch: "linear-gradient(135deg,#0f7a3d,#5fd38a)" },
+  { id: "emerald", label: "Solid Emerald", swatch: "linear-gradient(135deg,#064e3b,#10b981)" },
 ];
 
 type Ctx = { theme: Theme; setTheme: (t: Theme) => void };
 const ThemeCtx = createContext<Ctx | null>(null);
 
-const ALL = ["light", "dark", "hc", "electric", "industrial", "eco"] as const;
+const ALL = ["light", "dark", "hc", "electric", "industrial", "eco", "emerald"] as const;
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("light");
