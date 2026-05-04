@@ -299,6 +299,47 @@
   --shadow-glow: 0 10px 40px -10px oklch(0.55 0.16 155 / 0.5);
 }
 
+/* ============ SOLID EMERALD (monochromatic deep green) ============ */
+.emerald {
+  --background: oklch(0.18 0.05 160);
+  --foreground: oklch(0.96 0.04 150);
+  --card: oklch(0.24 0.06 160);
+  --card-foreground: oklch(0.96 0.04 150);
+  --popover: oklch(0.24 0.06 160);
+  --popover-foreground: oklch(0.96 0.04 150);
+  --primary: oklch(0.7 0.18 155);
+  --primary-foreground: oklch(0.14 0.05 160);
+  --secondary: oklch(0.3 0.07 160);
+  --secondary-foreground: oklch(0.96 0.04 150);
+  --muted: oklch(0.27 0.06 160);
+  --muted-foreground: oklch(0.78 0.08 150);
+  --accent: oklch(0.82 0.18 145);
+  --accent-foreground: oklch(0.14 0.05 160);
+  --destructive: oklch(0.62 0.22 27);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.7 0.18 155 / 0.25);
+  --input: oklch(0.7 0.18 155 / 0.15);
+  --ring: oklch(0.7 0.18 155);
+  --sidebar: oklch(0.2 0.05 160 / 0.75);
+  --sidebar-foreground: oklch(0.95 0.04 150);
+  --sidebar-primary: oklch(0.7 0.18 155);
+  --sidebar-primary-foreground: oklch(0.14 0.05 160);
+  --sidebar-accent: oklch(0.3 0.07 160 / 0.6);
+  --sidebar-accent-foreground: oklch(0.95 0.04 150);
+  --sidebar-border: oklch(0.7 0.18 155 / 0.2);
+  --sidebar-ring: oklch(0.7 0.18 155);
+
+  --bg-gradient: radial-gradient(ellipse at 15% 5%, oklch(0.4 0.16 160 / 0.7), transparent 55%),
+                 radial-gradient(ellipse at 85% 95%, oklch(0.5 0.18 140 / 0.5), transparent 55%),
+                 linear-gradient(180deg, oklch(0.16 0.05 160), oklch(0.2 0.06 155));
+  --glass-bg: oklch(0.28 0.07 160 / 0.5);
+  --glass-border: oklch(0.7 0.18 155 / 0.3);
+  --shadow-neu: 8px 8px 24px oklch(0 0 0 / 0.55), -8px -8px 24px oklch(0.7 0.18 155 / 0.1);
+  --shadow-neu-sm: 4px 4px 10px oklch(0 0 0 / 0.5), -4px -4px 10px oklch(0.7 0.18 155 / 0.08);
+  --shadow-neu-inset: inset 4px 4px 8px oklch(0 0 0 / 0.5), inset -4px -4px 8px oklch(0.7 0.18 155 / 0.1);
+  --shadow-glow: 0 10px 40px -10px oklch(0.7 0.18 155 / 0.6);
+}
+
 /* ===== Subtle circuit-board background overlay (per-theme opacity) ===== */
 :root        { --circuit-opacity: 0.06; --circuit-color: oklch(0.4 0.12 255); }
 .dark        { --circuit-opacity: 0.07; --circuit-color: oklch(0.85 0.1 230); }
@@ -306,6 +347,7 @@
 .electric    { --circuit-opacity: 0.08; --circuit-color: oklch(0.85 0.18 220); }
 .industrial  { --circuit-opacity: 0.06; --circuit-color: oklch(0.78 0.16 60); }
 .eco         { --circuit-opacity: 0.07; --circuit-color: oklch(0.55 0.16 155); }
+.emerald     { --circuit-opacity: 0.08; --circuit-color: oklch(0.82 0.18 145); }
 
 @layer base {
   * { border-color: var(--color-border); }
