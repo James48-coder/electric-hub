@@ -6,6 +6,7 @@
 @custom-variant hc (&:is(.hc *));
 @custom-variant electric (&:is(.electric *));
 @custom-variant industrial (&:is(.industrial *));
+@custom-variant eco (&:is(.eco *));
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
