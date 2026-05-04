@@ -7,6 +7,7 @@
 @custom-variant electric (&:is(.electric *));
 @custom-variant industrial (&:is(.industrial *));
 @custom-variant eco (&:is(.eco *));
+@custom-variant emerald (&:is(.emerald *));
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
