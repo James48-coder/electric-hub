@@ -376,7 +376,8 @@
   }
   .dark body::before,
   .electric body::before,
-  .industrial body::before {
+  .industrial body::before,
+  .emerald body::before {
     mix-blend-mode: screen;
   }
   body > * { position: relative; z-index: 1; }
