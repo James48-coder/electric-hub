@@ -6,6 +6,7 @@
 @custom-variant hc (&:is(.hc *));
 @custom-variant electric (&:is(.electric *));
 @custom-variant industrial (&:is(.industrial *));
+@custom-variant eco (&:is(.eco *));
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -256,6 +257,55 @@
   --shadow-glow: 0 10px 40px -10px oklch(0.72 0.16 60 / 0.6);
 }
 
+/* ============ ECO POWER (safe grounding green) ============ */
+.eco {
+  --background: oklch(0.98 0.02 150);
+  --foreground: oklch(0.2 0.04 160);
+  --card: oklch(0.99 0.012 150);
+  --card-foreground: oklch(0.2 0.04 160);
+  --popover: oklch(0.99 0.012 150);
+  --popover-foreground: oklch(0.2 0.04 160);
+  --primary: oklch(0.55 0.16 155);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.94 0.03 150);
+  --secondary-foreground: oklch(0.22 0.05 160);
+  --muted: oklch(0.94 0.02 150);
+  --muted-foreground: oklch(0.45 0.04 160);
+  --accent: oklch(0.72 0.18 140);
+  --accent-foreground: oklch(0.18 0.04 160);
+  --destructive: oklch(0.6 0.22 27);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.55 0.16 155 / 0.25);
+  --input: oklch(0.92 0.03 150);
+  --ring: oklch(0.55 0.16 155);
+  --sidebar: oklch(0.97 0.02 150 / 0.7);
+  --sidebar-foreground: oklch(0.2 0.04 160);
+  --sidebar-primary: oklch(0.55 0.16 155);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.92 0.03 150 / 0.6);
+  --sidebar-accent-foreground: oklch(0.2 0.04 160);
+  --sidebar-border: oklch(0.55 0.16 155 / 0.2);
+  --sidebar-ring: oklch(0.55 0.16 155);
+
+  --bg-gradient: radial-gradient(ellipse at 15% 5%, oklch(0.85 0.12 150 / 0.55), transparent 55%),
+                 radial-gradient(ellipse at 85% 95%, oklch(0.82 0.14 130 / 0.45), transparent 55%),
+                 linear-gradient(180deg, oklch(0.98 0.02 150), oklch(0.95 0.03 145));
+  --glass-bg: oklch(1 0 0 / 0.55);
+  --glass-border: oklch(0.55 0.16 155 / 0.3);
+  --shadow-neu: 8px 8px 24px oklch(0.5 0.1 155 / 0.18), -8px -8px 24px oklch(1 0 0 / 0.9);
+  --shadow-neu-sm: 4px 4px 10px oklch(0.5 0.1 155 / 0.15), -4px -4px 10px oklch(1 0 0 / 0.8);
+  --shadow-neu-inset: inset 4px 4px 8px oklch(0.5 0.1 155 / 0.18), inset -4px -4px 8px oklch(1 0 0 / 0.85);
+  --shadow-glow: 0 10px 40px -10px oklch(0.55 0.16 155 / 0.5);
+}
+
+/* ===== Subtle circuit-board background overlay (per-theme opacity) ===== */
+:root        { --circuit-opacity: 0.06; --circuit-color: oklch(0.4 0.12 255); }
+.dark        { --circuit-opacity: 0.07; --circuit-color: oklch(0.85 0.1 230); }
+.hc          { --circuit-opacity: 0.05; --circuit-color: oklch(0.12 0 0); }
+.electric    { --circuit-opacity: 0.08; --circuit-color: oklch(0.85 0.18 220); }
+.industrial  { --circuit-opacity: 0.06; --circuit-color: oklch(0.78 0.16 60); }
+.eco         { --circuit-opacity: 0.07; --circuit-color: oklch(0.55 0.16 155); }
+
 @layer base {
   * { border-color: var(--color-border); }
   html, body { min-height: 100%; }
@@ -266,7 +316,27 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    position: relative;
   }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image: url("/circuit-bg.svg");
+    background-repeat: repeat;
+    background-size: 600px 600px;
+    opacity: var(--circuit-opacity, 0.06);
+    color: var(--circuit-color);
+    mix-blend-mode: multiply;
+  }
+  .dark body::before,
+  .electric body::before,
+  .industrial body::before {
+    mix-blend-mode: screen;
+  }
+  body > * { position: relative; z-index: 1; }
 }
 
 @utility glass {
