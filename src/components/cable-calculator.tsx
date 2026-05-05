@@ -47,13 +47,13 @@ function pickBreaker(current: number) {
 }
 
 export function CableCalculator() {
-  const [powerStr, setPowerStr] = useState("3");
+  const [powerInput, setPowerInput] = useState("3");
   const [unit, setUnit] = useState<PowerUnit>("kW");
   const [voltage, setVoltage] = useState<Voltage>("220");
   const [material, setMaterial] = useState<Material>("cu");
   const [laying, setLaying] = useState<Laying>("hidden");
 
-  const powerNum = parseFloat(powerStr.replace(",", "."));
+  const powerNum = parseFloat(powerInput.replace(",", "."));
   const invalid = !isFinite(powerNum) || powerNum <= 0;
   const powerW = invalid ? 0 : unit === "kW" ? powerNum * 1000 : powerNum;
 
@@ -82,15 +82,10 @@ export function CableCalculator() {
           <div className="flex gap-2">
             <Input
               id="power"
-              type="number"
-              min={0}
-              step="0.1"
+              type="text"
               inputMode="decimal"
-              value={powerStr}
-              onChange={(e) => {
-                const v = e.target.value;
-                if (v === "" || parseFloat(v) >= 0) setPowerStr(v);
-              }}
+              value={powerInput}
+              onChange={(e) => setPowerInput(e.target.value)}
               className="neu-inset flex-1 h-10 rounded-xl"
               placeholder="Введите мощность"
             />
@@ -108,7 +103,7 @@ export function CableCalculator() {
               </ToggleGroupItem>
             </ToggleGroup>
           </div>
-          {invalid && powerStr !== "" && (
+          {invalid && powerInput !== "" && (
             <p className="text-xs text-destructive">Введите положительное число</p>
           )}
         </div>
