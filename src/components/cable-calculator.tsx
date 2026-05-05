@@ -47,13 +47,13 @@ function pickBreaker(current: number) {
 }
 
 export function CableCalculator() {
-  const [powerStr, setPowerStr] = useState("3");
+  const [powerInput, setPowerInput] = useState("3");
   const [unit, setUnit] = useState<PowerUnit>("kW");
   const [voltage, setVoltage] = useState<Voltage>("220");
   const [material, setMaterial] = useState<Material>("cu");
   const [laying, setLaying] = useState<Laying>("hidden");
 
-  const powerNum = parseFloat(powerStr.replace(",", "."));
+  const powerNum = parseFloat(powerInput.replace(",", "."));
   const invalid = !isFinite(powerNum) || powerNum <= 0;
   const powerW = invalid ? 0 : unit === "kW" ? powerNum * 1000 : powerNum;
 
