@@ -1,7 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Send, Sparkles, FileText } from "lucide-react";
+import { Send, Sparkles, FileText, MapPin, Building2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { EstimatePaper } from "@/components/estimate-paper";
 
 export const Route = createFileRoute("/estimator")({
@@ -10,8 +17,18 @@ export const Route = createFileRoute("/estimator")({
 
 type Msg = { role: "user" | "ai"; text: string };
 
+const REGIONS = ["Москва", "Санкт-Петербург", "Краснодар", "Екатеринбург"];
+const OBJECT_TYPES = [
+  "Квартира/Новостройка",
+  "Вторичка",
+  "Частный дом",
+  "Коммерция",
+];
+
 function Page() {
   const [input, setInput] = useState("");
+  const [region, setRegion] = useState<string>("Москва");
+  const [objectType, setObjectType] = useState<string>("Квартира/Новостройка");
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "ai",
@@ -72,6 +89,50 @@ function Page() {
             ))}
           </div>
 
+          {/* Estimate Settings bar */}
+          <div className="neu-inset mb-2 rounded-2xl p-3">
+            <div className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              <FileText className="h-3 w-3" />
+              Настройки сметы
+            </div>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <div className="space-y-1">
+                <label className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                  <MapPin className="h-3 w-3" /> Регион
+                </label>
+                <Select value={region} onValueChange={setRegion}>
+                  <SelectTrigger className="neu-sm h-9 rounded-xl border-0 bg-card/60 text-sm">
+                    <SelectValue placeholder="Регион" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {REGIONS.map((r) => (
+                      <SelectItem key={r} value={r}>
+                        {r}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <label className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                  <Building2 className="h-3 w-3" /> Тип объекта
+                </label>
+                <Select value={objectType} onValueChange={setObjectType}>
+                  <SelectTrigger className="neu-sm h-9 rounded-xl border-0 bg-card/60 text-sm">
+                    <SelectValue placeholder="Тип объекта" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {OBJECT_TYPES.map((t) => (
+                      <SelectItem key={t} value={t}>
+                        {t}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
           <div className="flex items-center gap-2 pt-2">
             <Input
               value={input}
@@ -100,7 +161,7 @@ function Page() {
             <span className="text-xs text-muted-foreground">A4 · предпросмотр</span>
           </div>
           <div className="rounded-2xl bg-black/10 dark:bg-black/30">
-            <EstimatePaper />
+            <EstimatePaper region={region} objectType={objectType} />
           </div>
         </div>
       </div>
