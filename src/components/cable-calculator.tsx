@@ -179,9 +179,9 @@ export function CableCalculator() {
             label="Рекомендуемое сечение"
             value={
               result
-                ? result.section
-                  ? `${result.section} мм²`
-                  : "Вне диапазона"
+                ? result.rec.ok
+                  ? `${result.rec.section} мм²`
+                  : result.rec.message
                 : "—"
             }
             highlight
@@ -190,7 +190,11 @@ export function CableCalculator() {
             icon={<ShieldCheck className="h-5 w-5" />}
             label="Рекомендуемый автомат"
             value={
-              result ? (result.breaker ? `${result.breaker} А` : "Вне диапазона") : "—"
+              result
+                ? result.rec.ok
+                  ? `${result.rec.breaker} А`
+                  : "—"
+                : "—"
             }
           />
         </div>
