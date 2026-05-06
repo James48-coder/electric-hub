@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SchemesRouteImport } from './routes/schemes'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
+import { Route as EstimatorRouteImport } from './routes/estimator'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as CalculatorsRouteImport } from './routes/calculators'
 import { Route as IndexRouteImport } from './routes/index'
@@ -29,6 +30,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const KnowledgeRoute = KnowledgeRouteImport.update({
   id: '/knowledge',
   path: '/knowledge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EstimatorRoute = EstimatorRouteImport.update({
+  id: '/estimator',
+  path: '/estimator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChatRoute = ChatRouteImport.update({
@@ -51,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/calculators': typeof CalculatorsRoute
   '/chat': typeof ChatRoute
+  '/estimator': typeof EstimatorRoute
   '/knowledge': typeof KnowledgeRoute
   '/profile': typeof ProfileRoute
   '/schemes': typeof SchemesRoute
@@ -59,6 +66,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/calculators': typeof CalculatorsRoute
   '/chat': typeof ChatRoute
+  '/estimator': typeof EstimatorRoute
   '/knowledge': typeof KnowledgeRoute
   '/profile': typeof ProfileRoute
   '/schemes': typeof SchemesRoute
@@ -68,6 +76,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/calculators': typeof CalculatorsRoute
   '/chat': typeof ChatRoute
+  '/estimator': typeof EstimatorRoute
   '/knowledge': typeof KnowledgeRoute
   '/profile': typeof ProfileRoute
   '/schemes': typeof SchemesRoute
@@ -78,16 +87,25 @@ export interface FileRouteTypes {
     | '/'
     | '/calculators'
     | '/chat'
+    | '/estimator'
     | '/knowledge'
     | '/profile'
     | '/schemes'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/calculators' | '/chat' | '/knowledge' | '/profile' | '/schemes'
+  to:
+    | '/'
+    | '/calculators'
+    | '/chat'
+    | '/estimator'
+    | '/knowledge'
+    | '/profile'
+    | '/schemes'
   id:
     | '__root__'
     | '/'
     | '/calculators'
     | '/chat'
+    | '/estimator'
     | '/knowledge'
     | '/profile'
     | '/schemes'
@@ -97,6 +115,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CalculatorsRoute: typeof CalculatorsRoute
   ChatRoute: typeof ChatRoute
+  EstimatorRoute: typeof EstimatorRoute
   KnowledgeRoute: typeof KnowledgeRoute
   ProfileRoute: typeof ProfileRoute
   SchemesRoute: typeof SchemesRoute
@@ -123,6 +142,13 @@ declare module '@tanstack/react-router' {
       path: '/knowledge'
       fullPath: '/knowledge'
       preLoaderRoute: typeof KnowledgeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/estimator': {
+      id: '/estimator'
+      path: '/estimator'
+      fullPath: '/estimator'
+      preLoaderRoute: typeof EstimatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chat': {
@@ -153,6 +179,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CalculatorsRoute: CalculatorsRoute,
   ChatRoute: ChatRoute,
+  EstimatorRoute: EstimatorRoute,
   KnowledgeRoute: KnowledgeRoute,
   ProfileRoute: ProfileRoute,
   SchemesRoute: SchemesRoute,
