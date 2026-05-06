@@ -57,10 +57,10 @@ export function CableCalculator() {
 
   const result = useMemo(() => {
     if (invalid) return null;
+    // Для 3-фаз ток на фазу: I = P / (√3 · U_лин). Подбор сечения/автомата — по фазному току.
     const I = voltage === "220" ? powerW / 220 : powerW / (380 * 1.732);
-    const section = pickSection(I, material, laying);
-    const breaker = pickBreaker(I);
-    return { I, section, breaker };
+    const rec = recommend(I, material);
+    return { I, rec };
   }, [invalid, powerW, voltage, material, laying]);
 
   return (
