@@ -9,41 +9,39 @@ type Voltage = "220" | "380";
 type Material = "cu" | "al";
 type Laying = "open" | "hidden";
 
-// Допустимый длительный ток (А) по сечению (мм²) — упрощённо по ПУЭ табл. 1.3.4/1.3.5
-// [сечение, медь-открытая, медь-скрытая, алюминий-открытая, алюминий-скрытая]
-const TABLE: Array<{ s: number; cuO: number; cuH: number; alO: number; alH: number }> = [
-  { s: 1.5, cuO: 23, cuH: 19, alO: 0, alH: 0 },
-  { s: 2.5, cuO: 30, cuH: 27, alO: 24, alH: 20 },
-  { s: 4, cuO: 41, cuH: 38, alO: 32, alH: 28 },
-  { s: 6, cuO: 50, cuH: 46, alO: 39, alH: 36 },
-  { s: 10, cuO: 80, cuH: 70, alO: 60, alH: 50 },
-  { s: 16, cuO: 100, cuH: 85, alO: 75, alH: 65 },
-  { s: 25, cuO: 140, cuH: 115, alO: 105, alH: 90 },
-  { s: 35, cuO: 170, cuH: 135, alO: 130, alH: 105 },
-  { s: 50, cuO: 215, cuH: 175, alO: 165, alH: 135 },
-  { s: 70, cuO: 270, cuH: 215, alO: 210, alH: 165 },
+// Практические пороги с учётом тепловых характеристик автоматов и запаса прочности.
+// Медь, 220 В (1 фаза): шаги по току нагрузки.
+const CU_STEPS: Array<{ maxI: number; section: number; breaker: number }> = [
+  { maxI: 10, section: 1.5, breaker: 10 },
+  { maxI: 16, section: 2.5, breaker: 16 },
+  { maxI: 25, section: 4, breaker: 25 },
+  { maxI: 32, section: 6, breaker: 32 },
+  { maxI: 40, section: 10, breaker: 40 },
 ];
 
-const BREAKERS = [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100];
+// Алюминий: сдвиг сечения на одну ступень вверх при тех же порогах тока/автомата.
+const AL_STEPS: Array<{ maxI: number; section: number; breaker: number }> = [
+  { maxI: 10, section: 2.5, breaker: 10 },
+  { maxI: 16, section: 4, breaker: 16 },
+  { maxI: 25, section: 6, breaker: 25 },
+  { maxI: 32, section: 10, breaker: 32 },
+  { maxI: 40, section: 16, breaker: 40 },
+];
 
-function pickSection(current: number, material: Material, laying: Laying) {
-  for (const row of TABLE) {
-    const cap =
-      material === "cu"
-        ? laying === "open"
-          ? row.cuO
-          : row.cuH
-        : laying === "open"
-          ? row.alO
-          : row.alH;
-    if (cap > 0 && cap >= current) return row.s;
+const OUT_OF_RANGE = "Требуется индивидуальный проект";
+
+type Recommendation =
+  | { ok: true; section: number; breaker: number }
+  | { ok: false; message: string };
+
+function recommend(current: number, material: Material): Recommendation {
+  const steps = material === "cu" ? CU_STEPS : AL_STEPS;
+  for (const step of steps) {
+    if (current <= step.maxI) {
+      return { ok: true, section: step.section, breaker: step.breaker };
+    }
   }
-  return null;
-}
-
-function pickBreaker(current: number) {
-  for (const b of BREAKERS) if (b >= current) return b;
-  return null;
+  return { ok: false, message: OUT_OF_RANGE };
 }
 
 export function CableCalculator() {
