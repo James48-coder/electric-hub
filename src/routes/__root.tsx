@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { AppSidebar } from "@/components/app-sidebar";
 import { MobileNav } from "@/components/mobile-nav";
 import { Header } from "@/components/header";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -75,6 +76,7 @@ function RootComponent() {
           </main>
         </div>
         <MobileNav />
+        <Toaster />
       </div>
     </ThemeProvider>
   );

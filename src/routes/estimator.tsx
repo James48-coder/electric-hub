@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Send, Sparkles, FileText, MapPin, Building2 } from "lucide-react";
+import { Send, Sparkles, FileText, Building2, Wallet } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -10,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { EstimatePaper } from "@/components/estimate-paper";
+import { SmartRegionSelector } from "@/components/smart-region-selector";
 
 export const Route = createFileRoute("/estimator")({
   component: Page,
@@ -17,7 +19,7 @@ export const Route = createFileRoute("/estimator")({
 
 type Msg = { role: "user" | "ai"; text: string };
 
-const REGIONS = ["Москва", "Санкт-Петербург", "Краснодар", "Екатеринбург"];
+const REGIONS_DEFAULT = "Москва";
 const OBJECT_TYPES = [
   "Квартира/Новостройка",
   "Вторичка",
@@ -27,8 +29,9 @@ const OBJECT_TYPES = [
 
 function Page() {
   const [input, setInput] = useState("");
-  const [region, setRegion] = useState<string>("Москва");
+  const [region, setRegion] = useState<string>(REGIONS_DEFAULT);
   const [objectType, setObjectType] = useState<string>("Квартира/Новостройка");
+  const [useMyPrices, setUseMyPrices] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "ai",
@@ -95,24 +98,8 @@ function Page() {
               <FileText className="h-3 w-3" />
               Настройки сметы
             </div>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <div className="space-y-1">
-                <label className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                  <MapPin className="h-3 w-3" /> Регион
-                </label>
-                <Select value={region} onValueChange={setRegion}>
-                  <SelectTrigger className="neu-sm h-9 rounded-xl border-0 bg-card/60 text-sm">
-                    <SelectValue placeholder="Регион" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {REGIONS.map((r) => (
-                      <SelectItem key={r} value={r}>
-                        {r}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <SmartRegionSelector value={region} onChange={setRegion} />
               <div className="space-y-1">
                 <label className="flex items-center gap-1 text-[11px] text-muted-foreground">
                   <Building2 className="h-3 w-3" /> Тип объекта
@@ -131,6 +118,19 @@ function Page() {
                 </Select>
               </div>
             </div>
+
+            <label className="mt-3 flex cursor-pointer items-center justify-between gap-3 rounded-xl bg-card/40 px-3 py-2 neu-sm">
+              <span className="flex items-center gap-2 text-sm">
+                <Wallet className="h-4 w-4 text-primary" />
+                <span>
+                  <span className="font-medium">Использовать мои цены из профиля</span>
+                  <span className="ml-1 text-[11px] text-muted-foreground">
+                    {useMyPrices ? "Личный прайс-лист" : "Средние по региону"}
+                  </span>
+                </span>
+              </span>
+              <Switch checked={useMyPrices} onCheckedChange={setUseMyPrices} />
+            </label>
           </div>
 
           <div className="flex items-center gap-2 pt-2">
