@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Send, Sparkles, FileText, MapPin, Building2 } from "lucide-react";
+import { Send, Sparkles, FileText, Building2, Wallet } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -10,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { EstimatePaper } from "@/components/estimate-paper";
+import { SmartRegionSelector } from "@/components/smart-region-selector";
 
 export const Route = createFileRoute("/estimator")({
   component: Page,
@@ -17,7 +19,7 @@ export const Route = createFileRoute("/estimator")({
 
 type Msg = { role: "user" | "ai"; text: string };
 
-const REGIONS = ["Москва", "Санкт-Петербург", "Краснодар", "Екатеринбург"];
+const REGIONS_DEFAULT = "Москва";
 const OBJECT_TYPES = [
   "Квартира/Новостройка",
   "Вторичка",
