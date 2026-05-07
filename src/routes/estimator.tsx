@@ -131,6 +131,7 @@ function Page() {
               </span>
               <Switch checked={useMyPrices} onCheckedChange={setUseMyPrices} />
             </label>
+          </div>
 
           <div className="flex items-center gap-2 pt-2">
             <Input
