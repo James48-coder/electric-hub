@@ -26,12 +26,12 @@ export function EstimatePaper({ region, objectType }: EstimatePaperProps = {}) {
   const today = new Date().toLocaleDateString("ru-RU");
 
   return (
-    <div className="flex h-full items-start justify-center overflow-auto p-4 md:p-8">
+    <div className="flex h-full items-start justify-center overflow-auto p-2 sm:p-4 md:p-8">
       <div
         className="w-full max-w-[820px] bg-white text-neutral-900 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.45),0_10px_25px_-10px_rgba(0,0,0,0.35)] ring-1 ring-black/5"
-        style={{ aspectRatio: "1 / 1.414", minHeight: "min(90vh, 1100px)" }}
+        style={{ aspectRatio: "1 / 1.414" }}
       >
-        <div className="flex h-full flex-col p-8 md:p-12">
+        <div className="flex h-full flex-col p-4 sm:p-6 md:p-12">
           {/* Header */}
           <div className="flex items-start justify-between border-b-2 border-neutral-900 pb-4">
             <div>
