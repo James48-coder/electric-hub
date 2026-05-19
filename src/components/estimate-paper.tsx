@@ -26,37 +26,37 @@ export function EstimatePaper({ region, objectType }: EstimatePaperProps = {}) {
   const today = new Date().toLocaleDateString("ru-RU");
 
   return (
-    <div className="flex h-full items-start justify-center overflow-auto p-2 sm:p-4 md:p-8">
+    <div className="flex h-full w-full items-start justify-center">
       <div
-        className="w-full max-w-[820px] bg-white text-neutral-900 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.45),0_10px_25px_-10px_rgba(0,0,0,0.35)] ring-1 ring-black/5"
+        className="mx-auto w-full max-w-[820px] bg-white text-neutral-900 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.45),0_10px_25px_-10px_rgba(0,0,0,0.35)] ring-1 ring-black/5"
         style={{ aspectRatio: "1 / 1.414" }}
       >
         <div className="flex h-full flex-col p-4 sm:p-6 md:p-12">
           {/* Header */}
           <div className="flex items-start justify-between border-b-2 border-neutral-900 pb-4">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+              <h1 className="text-xl font-bold tracking-tight md:text-3xl">
                 Смета на электромонтажные работы
               </h1>
-              <p className="mt-1 text-sm text-neutral-600">
+              <p className="mt-1 text-xs md:text-sm text-neutral-600">
                 Объект: квартира, 2-комн. · Адрес: г. Москва
               </p>
               {(region || objectType) && (
-                <p className="mt-0.5 text-xs font-medium text-neutral-700">
+                <p className="mt-0.5 text-[10px] md:text-xs font-medium text-neutral-700">
                   {region ? `Регион: ${region}` : ""}
                   {region && objectType ? " | " : ""}
                   {objectType ? `Объект: ${objectType}` : ""}
                 </p>
               )}
             </div>
-            <div className="text-right text-xs text-neutral-600">
+            <div className="text-right text-[10px] md:text-xs text-neutral-600">
               <div>№ СМ-2026-001</div>
               <div>Дата: {today}</div>
             </div>
           </div>
 
           {/* Parties */}
-          <div className="mt-5 grid grid-cols-2 gap-6 text-xs text-neutral-700">
+          <div className="mt-5 grid grid-cols-2 gap-6 text-[10px] md:text-xs text-neutral-700">
             <div>
               <div className="font-semibold text-neutral-900">Исполнитель</div>
               <div>ВольтПро · ИНН 7700000000</div>
@@ -68,48 +68,50 @@ export function EstimatePaper({ region, objectType }: EstimatePaperProps = {}) {
           </div>
 
           {/* Table */}
-          <table className="mt-6 w-full border-collapse text-sm">
-            <thead>
-              <tr className="bg-neutral-100 text-left text-neutral-900">
-                <th className="border border-neutral-300 px-3 py-2 w-8">№</th>
-                <th className="border border-neutral-300 px-3 py-2">Наименование работ</th>
-                <th className="border border-neutral-300 px-3 py-2 w-16">Ед.</th>
-                <th className="border border-neutral-300 px-3 py-2 w-20 text-right">Кол-во</th>
-                <th className="border border-neutral-300 px-3 py-2 w-28 text-right">Цена, ₽</th>
-                <th className="border border-neutral-300 px-3 py-2 w-28 text-right">Сумма, ₽</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ITEMS.map((it, i) => (
-                <tr key={i} className="align-top">
-                  <td className="border border-neutral-300 px-3 py-2 text-neutral-600">{i + 1}</td>
-                  <td className="border border-neutral-300 px-3 py-2">{it.name}</td>
-                  <td className="border border-neutral-300 px-3 py-2">{it.unit}</td>
-                  <td className="border border-neutral-300 px-3 py-2 text-right tabular-nums">{it.qty}</td>
-                  <td className="border border-neutral-300 px-3 py-2 text-right tabular-nums">{fmt(it.price)}</td>
-                  <td className="border border-neutral-300 px-3 py-2 text-right tabular-nums">
-                    {fmt(it.qty * it.price)}
+          <div className="mt-6 w-full overflow-x-auto overflow-y-hidden">
+            <table className="w-full min-w-[500px] border-collapse text-xs md:text-sm md:min-w-0">
+              <thead>
+                <tr className="bg-neutral-100 text-left text-neutral-900">
+                  <th className="border border-neutral-300 px-3 py-2">№</th>
+                  <th className="border border-neutral-300 px-3 py-2">Наименование работ</th>
+                  <th className="border border-neutral-300 px-3 py-2">Ед.</th>
+                  <th className="border border-neutral-300 px-3 py-2 text-right">Кол-во</th>
+                  <th className="border border-neutral-300 px-3 py-2 text-right">Цена, ₽</th>
+                  <th className="border border-neutral-300 px-3 py-2 text-right">Сумма, ₽</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ITEMS.map((it, i) => (
+                  <tr key={i} className="align-top">
+                    <td className="border border-neutral-300 px-3 py-2 text-neutral-600">{i + 1}</td>
+                    <td className="border border-neutral-300 px-3 py-2 break-words">{it.name}</td>
+                    <td className="border border-neutral-300 px-3 py-2">{it.unit}</td>
+                    <td className="border border-neutral-300 px-3 py-2 text-right tabular-nums">{it.qty}</td>
+                    <td className="border border-neutral-300 px-3 py-2 text-right tabular-nums">{fmt(it.price)}</td>
+                    <td className="border border-neutral-300 px-3 py-2 text-right tabular-nums">
+                      {fmt(it.qty * it.price)}
+                    </td>
+                  </tr>
+                ))}
+                <tr>
+                  <td colSpan={5} className="border border-neutral-900 bg-neutral-100 px-3 py-3 text-right text-sm md:text-base font-bold">
+                    Итого
+                  </td>
+                  <td className="border border-neutral-900 bg-neutral-100 px-3 py-3 text-right text-sm md:text-base font-bold tabular-nums">
+                    {fmt(total)} ₽
                   </td>
                 </tr>
-              ))}
-              <tr>
-                <td colSpan={5} className="border border-neutral-900 bg-neutral-100 px-3 py-3 text-right text-base font-bold">
-                  Итого
-                </td>
-                <td className="border border-neutral-900 bg-neutral-100 px-3 py-3 text-right text-base font-bold tabular-nums">
-                  {fmt(total)} ₽
-                </td>
-              </tr>
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
 
-          <p className="mt-4 text-xs text-neutral-600">
+          <p className="mt-4 text-[10px] md:text-xs text-neutral-600">
             Расчёт является предварительным. Окончательная стоимость определяется после
             осмотра объекта и согласования объёма работ.
           </p>
 
           {/* Signatures */}
-          <div className="mt-auto grid grid-cols-2 gap-6 pt-10 text-xs text-neutral-700">
+          <div className="mt-auto grid grid-cols-2 gap-6 pt-10 text-[10px] md:text-xs text-neutral-700">
             <div>
               <div className="border-b border-neutral-400 pb-1">Исполнитель</div>
               <div className="mt-1 text-neutral-500">подпись / расшифровка</div>
