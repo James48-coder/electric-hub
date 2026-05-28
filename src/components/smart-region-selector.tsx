@@ -58,12 +58,12 @@ export function SmartRegionSelector({ value, onChange }: Props) {
   };
 
   return (
-    <div className="space-y-1">
-      <label className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
-        <span className="flex items-center gap-1">
-          <MapPin className="h-3 w-3" /> Регион
+    <div className="space-y-1.5 relative">
+      <label className="flex items-center justify-between gap-2 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+        <span className="flex items-center gap-1.5">
+          <MapPin className="h-3.5 w-3.5" /> Регион
         </span>
-        <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
+        <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
           <Radio className="h-2.5 w-2.5 animate-pulse" />
           Live Price Data
         </span>
@@ -77,14 +77,15 @@ export function SmartRegionSelector({ value, onChange }: Props) {
             setQuery(e.target.value);
             setOpen(true);
           }}
-          placeholder="Введите ваш город или регион для актуальных цен"
+          placeholder="Введите ваш город или регион..."
           className={cn(
-            "neu-sm h-9 w-full rounded-xl border-0 bg-card/60 px-3 text-sm",
-            "placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-ring/50",
+            "neu-sm h-10 w-full rounded-xl border-0 bg-card/60 px-3.5 text-sm",
+            "placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow",
           )}
         />
         {open && filtered.length > 0 && (
-          <div className="glass neu-sm absolute z-30 mt-1 max-h-64 w-full overflow-auto rounded-xl p-1">
+          /* ИСПРАВЛЕНИЕ ЗДЕСЬ: bg-popover делает фон плотным, z-50 кладет список поверх всего, shadow-md добавляет объем */
+          <div className="absolute left-0 top-full z-50 mt-1.5 max-h-64 w-full overflow-auto rounded-xl p-1 bg-popover shadow-md border border-border/40">
             {filtered.map((r) => {
               const active = r === value;
               return (
@@ -93,16 +94,16 @@ export function SmartRegionSelector({ value, onChange }: Props) {
                   type="button"
                   onClick={() => pick(r)}
                   className={cn(
-                    "flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-left text-sm transition",
-                    "hover:bg-primary/10",
-                    active && "bg-primary/15 text-primary",
+                    "flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors",
+                    "hover:bg-accent hover:text-accent-foreground",
+                    active && "bg-primary/10 text-primary font-medium",
                   )}
                 >
                   <span className="flex items-center gap-2">
-                    <MapPin className="h-3.5 w-3.5 opacity-70" />
+                    <MapPin className="h-4 w-4 opacity-70" />
                     {r}
                   </span>
-                  {active && <Check className="h-3.5 w-3.5" />}
+                  {active && <Check className="h-4 w-4 text-primary" />}
                 </button>
               );
             })}
