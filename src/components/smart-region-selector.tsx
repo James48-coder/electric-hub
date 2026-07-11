@@ -74,7 +74,9 @@ export function SmartRegionSelector({ value, onChange }: Props) {
           value={query}
           onFocus={() => setOpen(true)}
           onChange={(e) => {
+            // Теперь любой текст сразу уходит в смету на лету
             setQuery(e.target.value);
+            onChange(e.target.value); 
             setOpen(true);
           }}
           placeholder="Введите ваш город или регион..."
@@ -84,7 +86,6 @@ export function SmartRegionSelector({ value, onChange }: Props) {
           )}
         />
         {open && filtered.length > 0 && (
-          /* ИСПРАВЛЕНИЕ ЗДЕСЬ: bg-popover делает фон плотным, z-50 кладет список поверх всего, shadow-md добавляет объем */
           <div className="absolute left-0 top-full z-50 mt-1.5 max-h-64 w-full overflow-auto rounded-xl p-1 bg-popover shadow-md border border-border/40">
             {filtered.map((r) => {
               const active = r === value;
