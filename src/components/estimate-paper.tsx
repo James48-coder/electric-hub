@@ -5,6 +5,7 @@ type Item = {
   price: number;
 };
 
+// Это статичная заглушка. Она будет показываться до того, как ИИ сделает первый расчет.
 const ITEMS: Item[] = [
   { name: "Монтаж розетки скрытой установки", unit: "шт", qty: 12, price: 350 },
   { name: "Монтаж выключателя одноклавишного", unit: "шт", qty: 6, price: 320 },
@@ -19,10 +20,16 @@ const fmt = (n: number) => n.toLocaleString("ru-RU");
 type EstimatePaperProps = {
   region?: string;
   objectType?: string;
+  // Добавляем возможность передать сюда данные от ИИ
+  customItems?: Item[] | null; 
 };
 
-export function EstimatePaper({ region, objectType }: EstimatePaperProps = {}) {
-  const total = ITEMS.reduce((s, i) => s + i.qty * i.price, 0);
+export function EstimatePaper({ region, objectType, customItems }: EstimatePaperProps = {}) {
+  // МАГИЯ ЗДЕСЬ: Если нам передали customItems от ИИ - используем их. Иначе берем заглушку ITEMS.
+  const activeItems = customItems && customItems.length > 0 ? customItems : ITEMS;
+  
+  // Считаем общую сумму по активному списку (либо ИИ, либо заглушке)
+  const total = activeItems.reduce((s, i) => s + i.qty * i.price, 0);
   const today = new Date().toLocaleDateString("ru-RU");
 
   return (
@@ -74,7 +81,7 @@ export function EstimatePaper({ region, objectType }: EstimatePaperProps = {}) {
                 </tr>
               </thead>
               <tbody>
-                {ITEMS.map((it, i) => (
+                {activeItems.map((it, i) => (
                   <tr key={i} className="align-top">
                     <td className="border border-neutral-300 px-3 py-2 text-neutral-600">{i + 1}</td>
                     <td className="border border-neutral-300 px-3 py-2 break-words">{it.name}</td>
