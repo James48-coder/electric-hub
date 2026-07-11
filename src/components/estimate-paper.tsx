@@ -39,15 +39,8 @@ export function EstimatePaper({ region, objectType }: EstimatePaperProps = {}) {
                 Смета на электромонтажные работы
               </h1>
               <p className="mt-1 text-xs md:text-sm text-neutral-600">
-                Объект: квартира, 2-комн. · Адрес: г. Москва
+                Объект: {objectType || "Не указан"} · Адрес: {region ? `г. ${region}` : "Не указан"}
               </p>
-              {(region || objectType) && (
-                <p className="mt-0.5 text-[10px] md:text-xs font-medium text-neutral-700">
-                  {region ? `Регион: ${region}` : ""}
-                  {region && objectType ? " | " : ""}
-                  {objectType ? `Объект: ${objectType}` : ""}
-                </p>
-              )}
             </div>
             <div className="text-right text-[10px] md:text-xs text-neutral-600">
               <div>№ СМ-2026-001</div>
