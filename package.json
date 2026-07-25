@@ -9,7 +9,7 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."ф
+    "format": "prettier --write ."
   },
   "dependencies": {
     "html2canvas": "^1.4.1",
