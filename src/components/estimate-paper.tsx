@@ -36,7 +36,7 @@ export function EstimatePaper({ region, objectType, customItems }: EstimatePaper
     <div className="flex h-full w-full items-start justify-center">
       <div
         className="mx-auto w-full max-w-[820px] bg-white text-neutral-900 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.45),0_10px_25px_-10px_rgba(0,0,0,0.35)] ring-1 ring-black/5"
-        style={{ aspectRatio: "1 / 1.414" }}
+        style={{ minHeight: "1160px" }}
       >
         <div className="flex h-full flex-col p-4 sm:p-6 md:p-12">
           {/* Header */}
@@ -68,7 +68,7 @@ export function EstimatePaper({ region, objectType, customItems }: EstimatePaper
           </div>
 
           {/* Table */}
-          <div className="mt-6 w-full overflow-x-auto overflow-y-hidden">
+          <div className="mt-6 mb-8 w-full overflow-x-auto overflow-y-hidden">
             <table className="w-full min-w-[500px] border-collapse text-xs md:text-sm md:min-w-0">
               <thead>
                 <tr className="bg-neutral-100 text-left text-neutral-900">
@@ -105,20 +105,22 @@ export function EstimatePaper({ region, objectType, customItems }: EstimatePaper
             </table>
           </div>
 
-          <p className="mt-4 text-[10px] md:text-xs text-neutral-600">
-            Расчёт является предварительным. Окончательная стоимость определяется после
-            осмотра объекта и согласования объёма работ.
-          </p>
+          {/* Footer: Text & Signatures grouped together at the bottom */}
+          <div className="mt-auto">
+            <p className="text-[10px] md:text-xs text-neutral-600">
+              Расчёт является предварительным. Окончательная стоимость определяется после
+              осмотра объекта и согласования объёма работ.
+            </p>
 
-          {/* Signatures */}
-          <div className="mt-auto grid grid-cols-2 gap-6 pt-10 text-[10px] md:text-xs text-neutral-700">
-            <div>
-              <div className="border-b border-neutral-400 pb-1">Исполнитель</div>
-              <div className="mt-1 text-neutral-500">подпись / расшифровка</div>
-            </div>
-            <div>
-              <div className="border-b border-neutral-400 pb-1">Заказчик</div>
-              <div className="mt-1 text-neutral-500">подпись / расшифровка</div>
+            <div className="grid grid-cols-2 gap-6 pt-10 text-[10px] md:text-xs text-neutral-700">
+              <div>
+                <div className="border-b border-neutral-400 pb-1">Исполнитель</div>
+                <div className="mt-1 text-neutral-500">подпись / расшифровка</div>
+              </div>
+              <div>
+                <div className="border-b border-neutral-400 pb-1">Заказчик</div>
+                <div className="mt-1 text-neutral-500">подпись / расшифровка</div>
+              </div>
             </div>
           </div>
         </div>
