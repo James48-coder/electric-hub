@@ -39,11 +39,11 @@ function Estimator() {
   const [isLoading, setIsLoading] = useState(false);
   const [estimateData, setEstimateData] = useState<EstimateItem[] | null>(null);
   
-  const [region, setRegion] = useState(''); // Теперь это пустая строка для свободного ввода
+  const [region, setRegion] = useState(''); 
   const [objectType, setObjectType] = useState('apartment');
   const [useMyPrices, setUseMyPrices] = useState(false);
 
-  // --- УМНАЯ ГЕНЕРАЦИЯ СМЕТЫ (Реагирует на текст) ---
+  // --- УМНАЯ ГЕНЕРАЦИЯ СМЕТЫ ---
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
     setIsLoading(true);
@@ -52,7 +52,6 @@ function Estimator() {
       const text = prompt.toLowerCase();
       let generated: EstimateItem[] = [];
 
-      // Если в запросе есть слово "гараж" - выдаем смету на гараж
       if (text.includes('гараж')) {
         generated = [
           { id: '1', name: 'Прокладка кабеля ВВГнг-LS 3х1.5 (открыто)', unit: 'м', quantity: 15, pricePerUnit: 120, total: 1800 },
@@ -61,7 +60,6 @@ function Estimator() {
           { id: '4', name: 'Установка распредкоробки открытой проводки', unit: 'шт', quantity: 2, pricePerUnit: 400, total: 800 },
         ];
       } else {
-        // Стандартная смета по умолчанию (если это не гараж)
         generated = [
           { id: '1', name: 'Прокладка кабеля ВВГнг-LS 3х2.5 (штроба)', unit: 'м', quantity: 100, pricePerUnit: 150, total: 15000 },
           { id: '2', name: 'Установка подрозетника (бетон)', unit: 'шт', quantity: 25, pricePerUnit: 350, total: 8750 },
@@ -72,6 +70,16 @@ function Estimator() {
       setEstimateData(generated);
       setIsLoading(false);
     }, 1500);
+  };
+
+  // --- ЛОГИКА ИЗМЕНЕНИЯ ЦЕН ---
+  const handlePriceChange = (id: string, newPrice: string) => {
+    const numPrice = Number(newPrice) || 0;
+    setEstimateData(prev => prev?.map(item =>
+      item.id === id 
+        ? { ...item, pricePerUnit: numPrice, total: numPrice * item.quantity } 
+        : item
+    ) || null);
   };
 
   const handlePrint = () => {
@@ -131,7 +139,6 @@ function Estimator() {
               <div className="space-y-5">
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-slate-700">Регион / Город</Label>
-                  {/* Поле свободного ввода города */}
                   <input
                     type="text"
                     value={region}
@@ -160,7 +167,12 @@ function Estimator() {
                   <Label htmlFor="use-my-prices" className="text-sm font-medium text-slate-700 cursor-pointer">
                     Использовать мои цены
                   </Label>
-                  <Switch id="use-my-prices" checked={useMyPrices} onCheckedChange={setUseMyPrices} />
+                  <Switch 
+                    id="use-my-prices" 
+                    checked={useMyPrices} 
+                    onCheckedChange={setUseMyPrices} 
+                    disabled={!estimateData || tariff === 'GUEST'} 
+                  />
                 </div>
               </div>
             </div>
@@ -180,7 +192,6 @@ function Estimator() {
                 )}
               </div>
 
-              {/* Безопасный контейнер ввода, где кнопка не перекрывает текст */}
               <div className="flex items-end gap-2 bg-slate-50 border border-slate-200 rounded-xl p-2 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent transition-all">
                 <textarea
                   value={prompt}
@@ -269,11 +280,22 @@ function Estimator() {
                           <td className="px-4 py-4 text-center text-slate-500">{item.unit}</td>
                           <td className="px-4 py-4 text-center text-slate-800 font-semibold">{item.quantity}</td>
                           
+                          {/* КОЛОНКА ЦЕНЫ - Зависит от тарифа и свитча */}
                           <td className="px-4 py-4 text-right">
                             {tariff === 'GUEST' ? (
                               <span className="inline-flex items-center gap-1 text-slate-400 bg-slate-100 px-2 py-1 rounded text-xs whitespace-nowrap">
                                 <Lock className="w-3 h-3" /> Скрыто
                               </span>
+                            ) : useMyPrices ? (
+                              <div className="flex items-center justify-end gap-1">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  value={item.pricePerUnit || ''}
+                                  onChange={(e) => handlePriceChange(item.id, e.target.value)}
+                                  className="w-20 text-right bg-white border border-blue-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium text-blue-900"
+                                />
+                              </div>
                             ) : (
                               <span className="text-slate-600 whitespace-nowrap">{item.pricePerUnit.toLocaleString('ru-RU')} ₽</span>
                             )}
