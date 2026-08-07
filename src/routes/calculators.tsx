@@ -61,7 +61,8 @@ const CATEGORIES: Category[] = [
         title: "Падение напряжения",
         description: "Проверка ΔU на линии с учётом длины и тока.",
         icon: TrendingDown,
-        ready: true, // Сделали инструмент активным
+        warn: true,
+        ready: true,
       },
     ],
   },
@@ -142,7 +143,8 @@ function Page() {
       </div>
     );
   }
-if (openTool === "voltage-drop") {
+
+  if (openTool === "voltage-drop") {
     return (
       <div className="mx-auto w-full max-w-6xl py-6 space-y-6">
         <Button
@@ -165,7 +167,7 @@ if (openTool === "voltage-drop") {
       </div>
     );
   }
-  
+
   return (
     <div className="mx-auto w-full max-w-6xl py-6 space-y-8">
       <header className="space-y-2">
