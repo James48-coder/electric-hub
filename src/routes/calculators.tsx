@@ -61,7 +61,7 @@ const CATEGORIES: Category[] = [
         title: "Падение напряжения",
         description: "Проверка ΔU на линии с учётом длины и тока.",
         icon: TrendingDown,
-        warn: true,
+        ready: true, // Сделали инструмент активным
       },
     ],
   },
