@@ -13,6 +13,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { CableCalculator } from "@/components/cable-calculator";
+import VoltageDropCalculator from "@/components/VoltageDropCalculator";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/calculators")({
