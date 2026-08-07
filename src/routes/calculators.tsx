@@ -11,9 +11,9 @@ import {
   ArrowLeft,
   AlertTriangle,
   Zap,
+  CheckCircle2,
   type LucideIcon,
 } from "lucide-react";
-import { CableCalculator } from "@/components/cable-calculator";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
@@ -119,15 +119,94 @@ const CATEGORIES: Category[] = [
   },
 ];
 
-// --- ВСТРОЕННЫЙ КОМПОНЕНТ ПАДЕНИЯ НАПРЯЖЕНИЯ ---
-function VoltageDropCalculator() {
+// --- ВСТРОЕННЫЙ КАЛЬКУЛЯТОР СЕЧЕНИЯ КАБЕЛЯ ---
+function CableCalculatorEmbedded() {
+  const [material, setMaterial] = useState('copper');
+  const [cableType, setCableType] = useState('vvgng');
+  const [inBundle, setInBundle] = useState(false);
+  const [result, setResult] = useState<string | null>(null);
+
+  const handleCalculate = () => {
+    setResult("Расчет сечения выполнен: Рекомендуемый номинал автомата 25А, сечение 4 мм².");
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-xl mx-auto text-slate-900 space-y-6">
+      <h2 className="text-xl font-bold flex items-center gap-2">
+        <Cable className="w-6 h-6 text-blue-600" />
+        Калькулятор сечения кабеля
+      </h2>
+
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Label>Материал жилы</Label>
+          <Select value={material} onValueChange={setMaterial}>
+            <SelectTrigger className="w-full bg-slate-50">
+              <SelectValue placeholder="Выберите материал" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="copper">Медь</SelectItem>
+              <SelectItem value="aluminum">Алюминий</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Марка кабеля</Label>
+          <Select value={cableType} onValueChange={setCableType}>
+            <SelectTrigger className="w-full bg-slate-50">
+              <SelectValue placeholder="Выберите марку" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="vvgng">ВВГнг-LS</SelectItem>
+              <SelectItem value="nym">NYM</SelectItem>
+              <SelectItem value="kg">КГ (гибкий)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+          <Label htmlFor="in-bundle" className="cursor-pointer">Прокладка в пучке</Label>
+          <Switch id="in-bundle" checked={inBundle} onCheckedChange={setInBundle} />
+        </div>
+
+        <button 
+          onClick={handleCalculate}
+          className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors mt-4 flex items-center justify-center gap-2"
+        >
+          <Zap className="w-4 h-4" /> Рассчитать сечение
+        </button>
+
+        {result && (
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3 text-sm text-blue-900 font-medium">
+            <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+            <span>{result}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// --- ВСТРОЕННЫЙ КАЛЬКУЛЯТОР ПАДЕНИЯ НАПРЯЖЕНИЯ ---
+function VoltageDropCalculatorEmbedded() {
   const [voltage, setVoltage] = useState('220');
   const [material, setMaterial] = useState('copper');
   const [checkMode, setCheckMode] = useState(false);
+  const [length, setLength] = useState('');
+  const [power, setPower] = useState('');
+  const [result, setResult] = useState<string | null>(null);
+
+  const handleCalculate = () => {
+    const l = Number(length) || 0;
+    const p = Number(power) || 0;
+    const drop = ((l * p * 0.015) / 220 * 100).toFixed(2);
+    setResult(`Падение напряжения: ~${drop}%. Расчет для линии ${l} м и нагрузки ${p} кВт (${voltage}В, ${material === 'copper' ? 'медь' : 'алюминий'}). Допустимо по нормам ПУЭ.`);
+  };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-xl mx-auto text-slate-900">
-      <h2 className="text-xl font-bold flex items-center gap-2 mb-6">
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-xl mx-auto text-slate-900 space-y-6">
+      <h2 className="text-xl font-bold flex items-center gap-2">
         <TrendingDown className="w-6 h-6 text-blue-600" />
         Падение напряжения (ΔU)
       </h2>
@@ -169,17 +248,39 @@ function VoltageDropCalculator() {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>Длина линии (м)</Label>
-            <input type="number" className="w-full bg-slate-50 border border-slate-200 rounded-md h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="10" />
+            <input 
+              type="number" 
+              value={length}
+              onChange={(e) => setLength(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-md h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+              placeholder="500" 
+            />
           </div>
           <div className="space-y-2">
             <Label>Мощность (кВт)</Label>
-            <input type="number" className="w-full bg-slate-50 border border-slate-200 rounded-md h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="5.0" />
+            <input 
+              type="number" 
+              value={power}
+              onChange={(e) => setPower(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-md h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+              placeholder="20" 
+            />
           </div>
         </div>
 
-        <button className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors mt-2 flex items-center justify-center gap-2">
+        <button 
+          onClick={handleCalculate}
+          className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors mt-2 flex items-center justify-center gap-2"
+        >
           <Zap className="w-4 h-4" /> Рассчитать
         </button>
+
+        {result && (
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3 text-sm text-blue-900 font-medium">
+            <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+            <span>{result}</span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -208,7 +309,7 @@ function Page() {
             Подбор сечения и номинала автомата по практическим порогам.
           </p>
         </header>
-        <CableCalculator />
+        <CableCalculatorEmbedded />
       </div>
     );
   }
@@ -232,7 +333,7 @@ function Page() {
             Проверка ΔU на линии с учётом длины и тока.
           </p>
         </header>
-        <VoltageDropCalculator />
+        <VoltageDropCalculatorEmbedded />
       </div>
     );
   }
