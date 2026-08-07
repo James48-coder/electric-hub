@@ -142,7 +142,30 @@ function Page() {
       </div>
     );
   }
-
+if (openTool === "voltage-drop") {
+    return (
+      <div className="mx-auto w-full max-w-6xl py-6 space-y-6">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setOpenTool(null)}
+          className="gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" /> К списку калькуляторов
+        </Button>
+        <header className="space-y-1">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+            Падение напряжения
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            Проверка ΔU на линии с учётом длины и тока.
+          </p>
+        </header>
+        <VoltageDropCalculator />
+      </div>
+    );
+  }
+  
   return (
     <div className="mx-auto w-full max-w-6xl py-6 space-y-8">
       <header className="space-y-2">
