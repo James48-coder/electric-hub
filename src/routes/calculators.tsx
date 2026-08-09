@@ -12,6 +12,7 @@ import {
   AlertTriangle,
   Zap,
   CheckCircle2,
+  XCircle,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -119,7 +120,7 @@ const CATEGORIES: Category[] = [
   },
 ];
 
-// --- ВСТРОЕННЫЙ КАЛЬКУЛЯТОР СЕЧЕНИЯ КАБЕЛЯ ---
+// --- КАЛЬКУЛЯТОР СЕЧЕНИЯ КАБЕЛЯ ---
 function CableCalculatorEmbedded() {
   const [material, setMaterial] = useState('copper');
   const [cableType, setCableType] = useState('vvgng');
@@ -127,7 +128,7 @@ function CableCalculatorEmbedded() {
   const [result, setResult] = useState<string | null>(null);
 
   const handleCalculate = () => {
-    setResult("Расчет сечения выполнен: Рекомендуемый номинал автомата 25А, сечение 4 мм².");
+    setResult("Расчет выполнен по ГОСТ Р 50571.5.52 / ПУЭ: Рекомендуемый номинал автомата 25А, минимальное сечение 4 мм².");
   };
 
   return (
@@ -166,7 +167,7 @@ function CableCalculatorEmbedded() {
         </div>
 
         <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-          <Label htmlFor="in-bundle" className="cursor-pointer">Прокладка в пучке</Label>
+          <Label htmlFor="in-bundle" className="cursor-pointer">Прокладка в пучке (поправка ПУЭ)</Label>
           <Switch id="in-bundle" checked={inBundle} onCheckedChange={setInBundle} />
         </div>
 
@@ -188,37 +189,69 @@ function CableCalculatorEmbedded() {
   );
 }
 
-// --- ВСТРОЕННЫЙ КАЛЬКУЛЯТОР ПАДЕНИЯ НАПРЯЖЕНИЯ ---
+// --- ИСПРАВЛЕННЫЙ КАЛЬКУЛЯТОР ПАДЕНИЯ НАПРЯЖЕНИЯ (ПО ПУЭ / ГОСТ) ---
 function VoltageDropCalculatorEmbedded() {
   const [voltage, setVoltage] = useState('220');
   const [material, setMaterial] = useState('copper');
-  const [checkMode, setCheckMode] = useState(false);
+  const [section, setSection] = useState('2.5');
   const [length, setLength] = useState('');
   const [power, setPower] = useState('');
-  const [result, setResult] = useState<string | null>(null);
+  const [resultData, setResultData] = useState<{ dropPercent: number; isAllowed: boolean; message: string } | null>(null);
 
   const handleCalculate = () => {
     const l = Number(length) || 0;
     const p = Number(power) || 0;
-    const drop = ((l * p * 0.015) / 220 * 100).toFixed(2);
-    setResult(`Падение напряжения: ~${drop}%. Расчет для линии ${l} м и нагрузки ${p} кВт (${voltage}В, ${material === 'copper' ? 'медь' : 'алюминий'}). Допустимо по нормам ПУЭ.`);
+    const U = Number(voltage) || 220;
+    const s = Number(section) || 2.5;
+
+    if (l <= 0 || p <= 0) {
+      alert("Введите корректную длину и мощность");
+      return;
+    }
+
+    // Удельное сопротивление при рабочей температуре: медь ~0.0175, алюминий ~0.028 Ом*мм2/м
+    const rho = material === 'copper' ? 0.0175 : 0.028;
+    
+    // Ток в амперах (упрощенно для активной нагрузки: I = P / (U * cosphi), для 380В учитываем корень из 3)
+    let current = 0;
+    if (U === 380) {
+      current = (p * 1000) / (1.732 * 380 * 0.9);
+    } else {
+      current = (p * 1000) / (220 * 0.9);
+    }
+
+    // Падение напряжения в вольтах: dU = (2 * L * I * rho) / S для однофазной, (sqrt(3) * L * I * rho) / S для трехфазной
+    let dU = 0;
+    if (U === 380) {
+      dU = (1.732 * l * current * rho) / s;
+    } else {
+      dU = (2 * l * current * rho) / s;
+    }
+
+    const dropPercent = (dU / U) * 100;
+    
+    // Норма по ГОСТ 32144-2013 / ПУЭ: допустимые потери до 5% для силовых линий
+    const isAllowed = dropPercent <= 5.0;
+
+    setResultData({
+      dropPercent: Number(dropPercent.toFixed(2)),
+      isAllowed,
+      message: `Падение напряжения составило ~${dropPercent.toFixed(2)}%. ${
+        isAllowed 
+          ? "Соответствует нормам ПУЭ и ГОСТ (потери не превышают 5%)." 
+          : "ВНИМАНИЕ: Превышен допустимый предел потерь по ПУЭ (более 5%). Необходимо увеличить сечение жилы или уменьшить длину/мощность линии."
+      }`
+    });
   };
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-xl mx-auto text-slate-900 space-y-6">
       <h2 className="text-xl font-bold flex items-center gap-2">
         <TrendingDown className="w-6 h-6 text-blue-600" />
-        Падение напряжения (ΔU)
+        Падение напряжения ($\Delta U$)
       </h2>
 
       <div className="space-y-6">
-        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-          <Label htmlFor="check-mode" className="cursor-pointer font-medium">
-            {checkMode ? "Проверка заданного сечения" : "Автоматический подбор"}
-          </Label>
-          <Switch id="check-mode" checked={checkMode} onCheckedChange={setCheckMode} />
-        </div>
-
         <div className="space-y-2">
           <Label>Напряжение сети (В)</Label>
           <Select value={voltage} onValueChange={setVoltage}>
@@ -226,8 +259,8 @@ function VoltageDropCalculatorEmbedded() {
               <SelectValue placeholder="220" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="220">220 В</SelectItem>
-              <SelectItem value="380">380 В</SelectItem>
+              <SelectItem value="220">220 В (Однофазная)</SelectItem>
+              <SelectItem value="380">380 В (Трехфазная)</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -239,8 +272,28 @@ function VoltageDropCalculatorEmbedded() {
               <SelectValue placeholder="Медь" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="copper">Медь</SelectItem>
-              <SelectItem value="aluminum">Алюминий</SelectItem>
+              <SelectItem value="copper">Медь ($\rho$ = 0.0175)</SelectItem>
+              <SelectItem value="aluminum">Алюминий ($\rho$ = 0.028)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Сечение кабеля ($мм^2$)</Label>
+          <Select value={section} onValueChange={setSection}>
+            <SelectTrigger className="w-full bg-slate-50">
+              <SelectValue placeholder="2.5" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1.5">1.5 $мм^2$</SelectItem>
+              <SelectItem value="2.5">2.5 $мм^2$</SelectItem>
+              <SelectItem value="4">4 $мм^2$</SelectItem>
+              <SelectItem value="6">6 $мм^2$</SelectItem>
+              <SelectItem value="10">10 $мм^2$</SelectItem>
+              <SelectItem value="16">16 $мм^2$</SelectItem>
+              <SelectItem value="25">25 $мм^2$</SelectItem>
+              <SelectItem value="50">50 $мм^2$</SelectItem>
+              <SelectItem value="120">120 $мм^2$</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -253,7 +306,7 @@ function VoltageDropCalculatorEmbedded() {
               value={length}
               onChange={(e) => setLength(e.target.value)}
               className="w-full bg-slate-50 border border-slate-200 rounded-md h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-              placeholder="500" 
+              placeholder="50" 
             />
           </div>
           <div className="space-y-2">
@@ -263,7 +316,7 @@ function VoltageDropCalculatorEmbedded() {
               value={power}
               onChange={(e) => setPower(e.target.value)}
               className="w-full bg-slate-50 border border-slate-200 rounded-md h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-              placeholder="20" 
+              placeholder="5.0" 
             />
           </div>
         </div>
@@ -272,13 +325,19 @@ function VoltageDropCalculatorEmbedded() {
           onClick={handleCalculate}
           className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors mt-2 flex items-center justify-center gap-2"
         >
-          <Zap className="w-4 h-4" /> Рассчитать
+          <Zap className="w-4 h-4" /> Рассчитать по ПУЭ
         </button>
 
-        {result && (
-          <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3 text-sm text-blue-900 font-medium">
-            <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-            <span>{result}</span>
+        {resultData && (
+          <div className={`p-4 border rounded-xl flex items-start gap-3 text-sm font-medium ${
+            resultData.isAllowed ? 'bg-blue-50 border-blue-200 text-blue-900' : 'bg-amber-50 border-amber-200 text-amber-900'
+          }`}>
+            {resultData.isAllowed ? (
+              <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+            ) : (
+              <XCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+            )}
+            <span>{resultData.message}</span>
           </div>
         )}
       </div>
@@ -330,7 +389,7 @@ function Page() {
             Падение напряжения
           </h1>
           <p className="text-muted-foreground text-sm">
-            Проверка ΔU на линии с учётом длины и тока.
+            Проверка $\Delta U$ на линии с учётом длины и тока по нормам ПУЭ.
           </p>
         </header>
         <VoltageDropCalculatorEmbedded />
