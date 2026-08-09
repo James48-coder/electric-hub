@@ -85,6 +85,7 @@ const CATEGORIES: Category[] = [
         title: "Расчёт контура заземления",
         description: "Сопротивление растеканию по типу грунта и электродов.",
         icon: Sigma,
+        ready: true,
       },
     ],
   },
@@ -189,7 +190,7 @@ function CableCalculatorEmbedded() {
   );
 }
 
-// --- ИСПРАВЛЕННЫЙ КАЛЬКУЛЯТОР ПАДЕНИЯ НАПРЯЖЕНИЯ (ПО ПУЭ / ГОСТ) ---
+// --- КАЛЬКУЛЯТОР ПАДЕНИЯ НАПРЯЖЕНИЯ (ПО ПУЭ / ГОСТ) ---
 function VoltageDropCalculatorEmbedded() {
   const [voltage, setVoltage] = useState('220');
   const [material, setMaterial] = useState('copper');
@@ -209,10 +210,7 @@ function VoltageDropCalculatorEmbedded() {
       return;
     }
 
-    // Удельное сопротивление при рабочей температуре: медь ~0.0175, алюминий ~0.028 Ом*мм2/м
     const rho = material === 'copper' ? 0.0175 : 0.028;
-    
-    // Ток в амперах (упрощенно для активной нагрузки: I = P / (U * cosphi), для 380В учитываем корень из 3)
     let current = 0;
     if (U === 380) {
       current = (p * 1000) / (1.732 * 380 * 0.9);
@@ -220,7 +218,6 @@ function VoltageDropCalculatorEmbedded() {
       current = (p * 1000) / (220 * 0.9);
     }
 
-    // Падение напряжения в вольтах: dU = (2 * L * I * rho) / S для однофазной, (sqrt(3) * L * I * rho) / S для трехфазной
     let dU = 0;
     if (U === 380) {
       dU = (1.732 * l * current * rho) / s;
@@ -229,8 +226,6 @@ function VoltageDropCalculatorEmbedded() {
     }
 
     const dropPercent = (dU / U) * 100;
-    
-    // Норма по ГОСТ 32144-2013 / ПУЭ: допустимые потери до 5% для силовых линий
     const isAllowed = dropPercent <= 5.0;
 
     setResultData({
@@ -345,6 +340,116 @@ function VoltageDropCalculatorEmbedded() {
   );
 }
 
+// --- КАЛЬКУЛЯТОР КОНТУРА ЗАЗЕМЛЕНИЯ (ПО ПУЭ) ---
+function GroundingCalculatorEmbedded() {
+  const [soilType, setSoilType] = useState('loam'); // суглинок по умолчанию
+  const [rodLength, setRodLength] = useState('3');
+  const [rodCount, setRodCount] = useState('3');
+  const [resultData, setResultData] = useState<{ resistance: number; isAllowed: boolean; message: string } | null>(null);
+
+  const handleCalculate = () => {
+    const L = Number(rodLength) || 3;
+    const N = Number(rodCount) || 3;
+
+    // Удельное сопротивление грунта (Ом*м) по справочникам
+    let rho = 100;
+    let soilName = "Суглинок";
+    if (soilType === 'clay') { rho = 60; soilName = "Глина"; }
+    else if (soilType === 'sand') { rho = 500; soilName = "Песок"; }
+    else if (soilType === 'chernozem') { rho = 40; soilName = "Чернозем"; }
+    else if (soilType === 'rock') { rho = 1000; soilName = "Скальный грунт"; }
+
+    // Упрощенная инженерная оценка сопротивления одиночного вертикального электрода и группы с коэффициентом использования
+    // R1 approx (rho / (2 * pi * L)) * ln(4*L / d)
+    const singleResistance = (rho / (2 * 3.14 * L)) * Math.log((4 * L) / 0.02); // диаметр стержня примем 20 мм (0.02 м)
+    // Учет количества электродов в ряду (коэффициент экранировки грубо возьмем 0.85 для N штук)
+    const totalResistance = singleResistance / (N * 0.85);
+
+    // Требование ПУЭ (п. 1.7.101): для электроустановок напряжением до 1000В сопротивление заземляющего устройства должно быть не более 4 Ом
+    const isAllowed = totalResistance <= 4.0;
+
+    setResultData({
+      resistance: Number(totalResistance.toFixed(2)),
+      isAllowed,
+      message: `Ориентировочное сопротивление контура: ~${totalResistance.toFixed(2)} Ом (грунт: ${soilName}, стержни: ${N} шт. по ${L} м). ${
+        isAllowed 
+          ? "Норма выполнена! Сопротивление не превышает 4 Ом по требованиям ПУЭ для сети 380/220В." 
+          : "ВНИМАНИЕ: Сопротивление выше нормы ПУЭ (4 Ом). Рекомендуется увеличить количество электродов или их длину."
+      }`
+    });
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-xl mx-auto text-slate-900 space-y-6">
+      <h2 className="text-xl font-bold flex items-center gap-2">
+        <Sigma className="w-6 h-6 text-blue-600" />
+        Расчёт контура заземления
+      </h2>
+
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Label>Тип грунта</Label>
+          <Select value={soilType} onValueChange={setSoilType}>
+            <SelectTrigger className="w-full bg-slate-50">
+              <SelectValue placeholder="Суглинок" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="chernozem">Чернозем ($\rho \approx$ 40 Ом·м)</SelectItem>
+              <SelectItem value="clay">Глина ($\rho \approx$ 60 Ом·м)</SelectItem>
+              <SelectItem value="loam">Суглинок ($\rho \approx$ 100 Ом·м)</SelectItem>
+              <SelectItem value="sand">Песок ($\rho \approx$ 500 Ом·м)</SelectItem>
+              <SelectItem value="rock">Скальный грунт ($\rho \approx$ 1000 Ом·м)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Длина электрода (м)</Label>
+            <input 
+              type="number" 
+              value={rodLength}
+              onChange={(e) => setRodLength(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-md h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+              placeholder="3" 
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Кол-во электродов (шт)</Label>
+            <input 
+              type="number" 
+              value={rodCount}
+              onChange={(e) => setRodCount(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-md h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+              placeholder="3" 
+            />
+          </div>
+        </div>
+
+        <button 
+          onClick={handleCalculate}
+          className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors mt-2 flex items-center justify-center gap-2"
+        >
+          <Zap className="w-4 h-4" /> Рассчитать заземление по ПУЭ
+        </button>
+
+        {resultData && (
+          <div className={`p-4 border rounded-xl flex items-start gap-3 text-sm font-medium ${
+            resultData.isAllowed ? 'bg-blue-50 border-blue-200 text-blue-900' : 'bg-amber-50 border-amber-200 text-amber-900'
+          }`}>
+            {resultData.isAllowed ? (
+              <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+            ) : (
+              <XCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+            )}
+            <span>{resultData.message}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function Page() {
   const [activeCat, setActiveCat] = useState<string>("basic");
   const [openTool, setOpenTool] = useState<ToolId | null>(null);
@@ -393,6 +498,30 @@ function Page() {
           </p>
         </header>
         <VoltageDropCalculatorEmbedded />
+      </div>
+    );
+  }
+
+  if (openTool === "grounding") {
+    return (
+      <div className="mx-auto w-full max-w-6xl py-6 space-y-6">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setOpenTool(null)}
+          className="gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" /> К списку калькуляторов
+        </Button>
+        <header className="space-y-1">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+            Расчёт контура заземления
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            Сопротивление растеканию по типу грунта и электродов согласно ПУЭ.
+          </p>
+        </header>
+        <GroundingCalculatorEmbedded />
       </div>
     );
   }
