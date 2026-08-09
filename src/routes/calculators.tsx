@@ -243,7 +243,7 @@ function VoltageDropCalculatorEmbedded() {
     <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-xl mx-auto text-slate-900 space-y-6">
       <h2 className="text-xl font-bold flex items-center gap-2">
         <TrendingDown className="w-6 h-6 text-blue-600" />
-        Падение напряжения ($\Delta U$)
+        Падение напряжения (ΔU)
       </h2>
 
       <div className="space-y-6">
@@ -267,28 +267,28 @@ function VoltageDropCalculatorEmbedded() {
               <SelectValue placeholder="Медь" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="copper">Медь ($\rho$ = 0.0175)</SelectItem>
-              <SelectItem value="aluminum">Алюминий ($\rho$ = 0.028)</SelectItem>
+              <SelectItem value="copper">Медь (ρ = 0.0175)</SelectItem>
+              <SelectItem value="aluminum">Алюминий (ρ = 0.028)</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label>Сечение кабеля ($мм^2$)</Label>
+          <Label>Сечение кабеля (мм²)</Label>
           <Select value={section} onValueChange={setSection}>
             <SelectTrigger className="w-full bg-slate-50">
               <SelectValue placeholder="2.5" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="1.5">1.5 $мм^2$</SelectItem>
-              <SelectItem value="2.5">2.5 $мм^2$</SelectItem>
-              <SelectItem value="4">4 $мм^2$</SelectItem>
-              <SelectItem value="6">6 $мм^2$</SelectItem>
-              <SelectItem value="10">10 $мм^2$</SelectItem>
-              <SelectItem value="16">16 $мм^2$</SelectItem>
-              <SelectItem value="25">25 $мм^2$</SelectItem>
-              <SelectItem value="50">50 $мм^2$</SelectItem>
-              <SelectItem value="120">120 $мм^2$</SelectItem>
+              <SelectItem value="1.5">1.5 мм²</SelectItem>
+              <SelectItem value="2.5">2.5 мм²</SelectItem>
+              <SelectItem value="4">4 мм²</SelectItem>
+              <SelectItem value="6">6 мм²</SelectItem>
+              <SelectItem value="10">10 мм²</SelectItem>
+              <SelectItem value="16">16 мм²</SelectItem>
+              <SelectItem value="25">25 мм²</SelectItem>
+              <SelectItem value="50">50 мм²</SelectItem>
+              <SelectItem value="120">120 мм²</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -342,7 +342,7 @@ function VoltageDropCalculatorEmbedded() {
 
 // --- КАЛЬКУЛЯТОР КОНТУРА ЗАЗЕМЛЕНИЯ (ПО ПУЭ) ---
 function GroundingCalculatorEmbedded() {
-  const [soilType, setSoilType] = useState('loam'); // суглинок по умолчанию
+  const [soilType, setSoilType] = useState('loam');
   const [rodLength, setRodLength] = useState('3');
   const [rodCount, setRodCount] = useState('3');
   const [resultData, setResultData] = useState<{ resistance: number; isAllowed: boolean; message: string } | null>(null);
@@ -351,7 +351,6 @@ function GroundingCalculatorEmbedded() {
     const L = Number(rodLength) || 3;
     const N = Number(rodCount) || 3;
 
-    // Удельное сопротивление грунта (Ом*м) по справочникам
     let rho = 100;
     let soilName = "Суглинок";
     if (soilType === 'clay') { rho = 60; soilName = "Глина"; }
@@ -359,13 +358,9 @@ function GroundingCalculatorEmbedded() {
     else if (soilType === 'chernozem') { rho = 40; soilName = "Чернозем"; }
     else if (soilType === 'rock') { rho = 1000; soilName = "Скальный грунт"; }
 
-    // Упрощенная инженерная оценка сопротивления одиночного вертикального электрода и группы с коэффициентом использования
-    // R1 approx (rho / (2 * pi * L)) * ln(4*L / d)
-    const singleResistance = (rho / (2 * 3.14 * L)) * Math.log((4 * L) / 0.02); // диаметр стержня примем 20 мм (0.02 м)
-    // Учет количества электродов в ряду (коэффициент экранировки грубо возьмем 0.85 для N штук)
+    const singleResistance = (rho / (2 * 3.14 * L)) * Math.log((4 * L) / 0.02);
     const totalResistance = singleResistance / (N * 0.85);
 
-    // Требование ПУЭ (п. 1.7.101): для электроустановок напряжением до 1000В сопротивление заземляющего устройства должно быть не более 4 Ом
     const isAllowed = totalResistance <= 4.0;
 
     setResultData({
@@ -394,11 +389,11 @@ function GroundingCalculatorEmbedded() {
               <SelectValue placeholder="Суглинок" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="chernozem">Чернозем ($\rho \approx$ 40 Ом·м)</SelectItem>
-              <SelectItem value="clay">Глина ($\rho \approx$ 60 Ом·м)</SelectItem>
-              <SelectItem value="loam">Суглинок ($\rho \approx$ 100 Ом·м)</SelectItem>
-              <SelectItem value="sand">Песок ($\rho \approx$ 500 Ом·м)</SelectItem>
-              <SelectItem value="rock">Скальный грунт ($\rho \approx$ 1000 Ом·м)</SelectItem>
+              <SelectItem value="chernozem">Чернозем (ρ ≈ 40 Ом·м)</SelectItem>
+              <SelectItem value="clay">Глина (ρ ≈ 60 Ом·м)</SelectItem>
+              <SelectItem value="loam">Суглинок (ρ ≈ 100 Ом·м)</SelectItem>
+              <SelectItem value="sand">Песок (ρ ≈ 500 Ом·м)</SelectItem>
+              <SelectItem value="rock">Скальный грунт (ρ ≈ 1000 Ом·м)</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -494,7 +489,7 @@ function Page() {
             Падение напряжения
           </h1>
           <p className="text-muted-foreground text-sm">
-            Проверка $\Delta U$ на линии с учётом длины и тока по нормам ПУЭ.
+            Проверка ΔU на линии с учётом длины и тока по нормам ПУЭ.
           </p>
         </header>
         <VoltageDropCalculatorEmbedded />
