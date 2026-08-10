@@ -120,6 +120,7 @@ const CATEGORIES: Category[] = [
         title: "Цветовая маркировка и RJ45",
         description: "Маркировка жил, T568A/B и распиновка коннекторов.",
         icon: Palette,
+        ready: true,
       },
     ],
   },
@@ -859,6 +860,88 @@ function ThreeWayCalculatorEmbedded() {
   );
 }
 
+// --- СПРАВОЧНИК ЦВЕТОВОЙ МАРКИРОВКИ И RJ45 (ПО ГОСТ / TIA-568) ---
+function ColorCodesCalculatorEmbedded() {
+  const [standard, setStandard] = useState('T568B');
+
+  const t568b = [
+    { pin: 1, color: "Бело-оранжевый", desc: "Передача данных (+)" },
+    { pin: 2, color: "Оранжевый", desc: "Передача данных (-)" },
+    { pin: 3, color: "Бело-зеленый", desc: "Прием данных (+)" },
+    { pin: 4, color: "Синий", desc: "Резерв / Телефония" },
+    { pin: 5, color: "Бело-синий", desc: "Резерв / Телефония" },
+    { pin: 6, color: "Зеленый", desc: "Прием данных (-)" },
+    { pin: 7, color: "Бело-коричневый", desc: "Резерв" },
+    { pin: 8, color: "Коричневый", desc: "Резерв" },
+  ];
+
+  const t568a = [
+    { pin: 1, color: "Бело-зеленый", desc: "Прием данных (+)" },
+    { pin: 2, color: "Зеленый", desc: "Прием данных (-)" },
+    { pin: 3, color: "Бело-оранжевый", desc: "Передача данных (+)" },
+    { pin: 4, color: "Синий", desc: "Резерв / Телефония" },
+    { pin: 5, color: "Бело-синий", desc: "Резерв / Телефония" },
+    { pin: 6, color: "Оранжевый", desc: "Передача данных (-)" },
+    { pin: 7, color: "Бело-коричневый", desc: "Резерв" },
+    { pin: 8, color: "Коричневый", desc: "Резерв" },
+  ];
+
+  const currentPins = standard === 'T568B' ? t568b : t568a;
+
+  return (
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-xl mx-auto text-slate-900 space-y-6">
+      <h2 className="text-xl font-bold flex items-center gap-2">
+        <Palette className="w-6 h-6 text-blue-600" />
+        Цветовая маркировка и RJ45
+      </h2>
+
+      <div className="space-y-6">
+        <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl space-y-2">
+          <h3 className="font-semibold text-slate-900">Маркировка жил по ГОСТ Р 50462 (Электропроводка)</h3>
+          <ul className="text-sm space-y-1 text-slate-700">
+            <li>• <strong className="text-amber-700">Фаза (L):</strong> Коричневый, черный, серый (или белый)</li>
+            <li>• <strong className="text-blue-700">Нейтраль (N):</strong> Голубой / синий</li>
+            <li>• <strong className="text-emerald-700">Защитный проводник (PE):</strong> Желто-зеленый</li>
+          </ul>
+        </div>
+
+        <div className="space-y-4 pt-2 border-t border-slate-100">
+          <div className="flex items-center justify-between">
+            <Label className="font-semibold">Стандарт обжима витой пары (RJ45)</Label>
+            <Select value={standard} onValueChange={setStandard}>
+              <SelectTrigger className="w-36 bg-slate-50 h-9">
+                <SelectValue placeholder="T568B" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="T568B">T568B (Основной)</SelectItem>
+                <SelectItem value="T568A">T568A</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="border border-slate-200 rounded-xl overflow-hidden text-sm">
+            <div className="bg-slate-100 px-4 py-2 font-semibold text-slate-700 flex justify-between">
+              <span>Пин (Контакт)</span>
+              <span>Цвет жилы</span>
+              <span>Назначение</span>
+            </div>
+            <div className="divide-y divide-slate-100">
+              {currentPins.map((item) => (
+                <div key={item.pin} className="px-4 py-2 flex justify-between items-center hover:bg-slate-50">
+                  <span className="font-mono font-bold text-blue-600">#{item.pin}</span>
+                  <span className="font-medium text-slate-800">{item.color}</span>
+                  <span className="text-xs text-slate-500">{item.desc}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <p className="text-xs text-slate-500">💡 <em>При обжиме патч-корда «прямым» кабелем (для подключения ПК к роутеру) с обоих концов используется одинаковый стандарт (чаще всего T568B).</em></p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Page() {
   const [activeCat, setActiveCat] = useState<string>("basic");
   const [openTool, setOpenTool] = useState<ToolId | null>(null);
@@ -1003,6 +1086,30 @@ function Page() {
           </p>
         </header>
         <ThreeWayCalculatorEmbedded />
+      </div>
+    );
+  }
+
+  if (openTool === "color-codes") {
+    return (
+      <div className="mx-auto w-full max-w-6xl py-6 space-y-6">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setOpenTool(null)}
+          className="gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" /> К списку калькуляторов
+        </Button>
+        <header className="space-y-1">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+            Цветовая маркировка и RJ45
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            Маркировка жил по ГОСТ и стандарты обжима интернет-кабеля (T568A/B).
+          </p>
+        </header>
+        <ColorCodesCalculatorEmbedded />
       </div>
     );
   }
