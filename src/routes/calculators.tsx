@@ -76,7 +76,7 @@ const CATEGORIES: Category[] = [
     tools: [
       {
         id: "conduit-fill",
-        title: "Заполняемость гофры/лотка",
+        title: "Заполняемость гофры/трубы",
         description: "Допустимое количество кабелей в трассе по нормам.",
         icon: Workflow,
         ready: true,
@@ -446,37 +446,48 @@ function GroundingCalculatorEmbedded() {
   );
 }
 
-// --- КАЛЬКУЛЯТОР ЗАПОЛНЯЕМОСТИ ГОФРЫ / ЛОТКА (ПО ПУЭ) ---
+// --- КАЛЬКУЛЯТОР ЗАПОЛНЯЕМОСТИ ГОФРЫ / ТРУБЫ (ПО ПУЭ) ---
 function ConduitFillCalculatorEmbedded() {
-  const [conduitSize, setConduitSize] = useState('20'); // диаметр гофры в мм
-  const [cableType, setCableType] = useState('vvgng-3x25'); // тип кабеля
-  const [cableCount, setCableCount] = useState('3'); // количество кабелей
+  const [conduitSize, setConduitSize] = useState('20'); // выбор из списка или 'custom'
+  const [customConduit, setCustomConduit] = useState('25'); // ручной ввод диаметра трубы
+  
+  const [cableType, setCableType] = useState('vvgng-3x25'); // выбор из списка или 'custom'
+  const [customCableDiameter, setCustomCableDiameter] = useState('10'); // ручной ввод диаметра кабеля
+  
+  const [cableCount, setCableCount] = useState('3');
   const [resultData, setResultData] = useState<{ fillPercent: number; isAllowed: boolean; message: string } | null>(null);
 
   const handleCalculate = () => {
-    const dConduit = Number(conduitSize) || 20;
+    // Определяем диаметр трубы
+    let dConduit = 20;
+    if (conduitSize === 'custom') {
+      dConduit = Number(customConduit) || 20;
+    } else {
+      dConduit = Number(conduitSize) || 20;
+    }
+
     const nCables = Number(cableCount) || 1;
 
-    // Внутренний диаметр трубы (примерно 80% от номинала для гофры)
+    // Внутренний диаметр трубы (примерно 80% от номинала для гофры/трубы)
     const innerDiameter = dConduit * 0.8;
     const conduitArea = 3.14 * Math.pow(innerDiameter / 2, 2);
 
-    // Ориентировочный внешний диаметр кабелей в мм
-    let cableOuterDiameter = 10; // по умолчанию
-    if (cableType === 'vvgng-2x15') cableOuterDiameter = 8.5;
-    else if (cableType === 'vvgng-3x15') cableOuterDiameter = 9.5;
-    else if (cableType === 'vvgng-3x25') cableOuterDiameter = 10.5;
-    else if (cableType === 'vvgng-3x4') cableOuterDiameter = 12.0;
-    else if (cableType === 'vvgng-5x6') cableOuterDiameter = 15.0;
+    // Определяем внешний диаметр кабеля
+    let cableOuterDiameter = 10;
+    if (cableType === 'custom') {
+      cableOuterDiameter = Number(customCableDiameter) || 10;
+    } else {
+      if (cableType === 'vvgng-2x15') cableOuterDiameter = 8.5;
+      else if (cableType === 'vvgng-3x15') cableOuterDiameter = 9.5;
+      else if (cableType === 'vvgng-3x25') cableOuterDiameter = 10.5;
+      else if (cableType === 'vvgng-3x4') cableOuterDiameter = 12.0;
+      else if (cableType === 'vvgng-5x6') cableOuterDiameter = 15.0;
+    }
 
-    // Площадь одного кабеля по внешнему диаметру
     const singleCableArea = 3.14 * Math.pow(cableOuterDiameter / 2, 2);
     const totalCablesArea = singleCableArea * nCables;
 
-    // Процент заполнения
     const fillPercent = (totalCablesArea / conduitArea) * 100;
-
-    // По ПУЭ (гл. 2.1) заполнение труб/гофры обычно рекомендуется до 35-40% максимум для удобства протяжки
     const isAllowed = fillPercent <= 35.0;
 
     setResultData({
@@ -485,7 +496,7 @@ function ConduitFillCalculatorEmbedded() {
       message: `Заполнение сечения трубы: ~${fillPercent.toFixed(1)}%. ${
         isAllowed 
           ? "Норма соблюдена! Заполнение не превышает 35% по рекомендациям ПУЭ, кабели пройдут свободно." 
-          : "ВНИМАНИЕ: Превышен рекомендуемый коэффициент заполнения (более 35% по ПУЭ). Протянуть такую линию будет тяжело, рекомендуется взять гофру большего диаметра."
+          : "ВНИМАНИЕ: Превышен рекомендуемый коэффициент заполнения (более 35% по ПУЭ). Протянуть такую линию будет тяжело, рекомендуется взять трубу большего диаметра."
       }`
     });
   };
@@ -494,12 +505,12 @@ function ConduitFillCalculatorEmbedded() {
     <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-xl mx-auto text-slate-900 space-y-6">
       <h2 className="text-xl font-bold flex items-center gap-2">
         <Workflow className="w-6 h-6 text-blue-600" />
-        Заполняемость гофры / лотка
+        Заполняемость гофры / трубы
       </h2>
 
       <div className="space-y-6">
         <div className="space-y-2">
-          <Label>Диаметр гофры / трубы (мм)</Label>
+          <Label>Диаметр трубы / гофры (мм)</Label>
           <Select value={conduitSize} onValueChange={setConduitSize}>
             <SelectTrigger className="w-full bg-slate-50">
               <SelectValue placeholder="20 мм" />
@@ -511,9 +522,23 @@ function ConduitFillCalculatorEmbedded() {
               <SelectItem value="32">32 мм</SelectItem>
               <SelectItem value="40">40 мм</SelectItem>
               <SelectItem value="50">50 мм</SelectItem>
+              <SelectItem value="custom">✏️ Свой размер (вручную)</SelectItem>
             </SelectContent>
           </Select>
         </div>
+
+        {conduitSize === 'custom' && (
+          <div className="space-y-2 p-3 bg-slate-50 rounded-xl border border-slate-100">
+            <Label>Введите диаметр трубы вручную (мм)</Label>
+            <input 
+              type="number" 
+              value={customConduit}
+              onChange={(e) => setCustomConduit(e.target.value)}
+              className="w-full bg-white border border-slate-200 rounded-md h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+              placeholder="Например: 35" 
+            />
+          </div>
+        )}
 
         <div className="space-y-2">
           <Label>Марка и сечение кабеля</Label>
@@ -527,9 +552,23 @@ function ConduitFillCalculatorEmbedded() {
               <SelectItem value="vvgng-3x25">ВВГнг-LS 3х2.5</SelectItem>
               <SelectItem value="vvgng-3x4">ВВГнг-LS 3х4.0</SelectItem>
               <SelectItem value="vvgng-5x6">ВВГнг-LS 5х6.0</SelectItem>
+              <SelectItem value="custom">✏️ Свой диаметр кабеля (вручную)</SelectItem>
             </SelectContent>
           </Select>
         </div>
+
+        {cableType === 'custom' && (
+          <div className="space-y-2 p-3 bg-slate-50 rounded-xl border border-slate-100">
+            <Label>Введите внешний диаметр кабеля (мм)</Label>
+            <input 
+              type="number" 
+              value={customCableDiameter}
+              onChange={(e) => setCustomCableDiameter(e.target.value)}
+              className="w-full bg-white border border-slate-200 rounded-md h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+              placeholder="Например: 11.5" 
+            />
+          </div>
+        )}
 
         <div className="space-y-2">
           <Label>Количество кабелей (шт)</Label>
@@ -655,7 +694,7 @@ function Page() {
         </Button>
         <header className="space-y-1">
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-            Заполняемость гофры / лотка
+            Заполняемость гофры / трубы
           </h1>
           <p className="text-muted-foreground text-sm">
             Допустимое количество кабелей в трассе по нормам ПУЭ.
