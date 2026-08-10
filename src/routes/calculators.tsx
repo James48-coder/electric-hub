@@ -13,6 +13,7 @@ import {
   Zap,
   CheckCircle2,
   XCircle,
+  BookOpen,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -112,6 +113,7 @@ const CATEGORIES: Category[] = [
         title: "Проходные выключатели",
         description: "Схемы управления светом из 2-х и 3-х мест.",
         icon: ToggleRight,
+        ready: true,
       },
       {
         id: "color-codes",
@@ -735,13 +737,11 @@ function MotorCapsCalculatorEmbedded() {
       return;
     }
 
-    // Рабочая емкость (мкФ): треугольник ~66 мкФ/кВт, звезда ~35 мкФ/кВт
     let workCap = connectionType === 'delta' ? p * 66 : p * 35;
     workCap = Number(workCap.toFixed(1));
 
     let startCap = null;
     if (heavyStart) {
-      // Пусковая емкость обычно в 2.5 раза больше рабочей
       startCap = Number((workCap * 2.5).toFixed(1));
     }
 
@@ -804,6 +804,56 @@ function MotorCapsCalculatorEmbedded() {
             <span>{resultData.message}</span>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+// --- СПРАВОЧНИК / СХЕМЫ ПРОХОДНЫХ ВЫКЛЮЧАТЕЛЕЙ (ПО ПУЭ) ---
+function ThreeWayCalculatorEmbedded() {
+  const [places, setPlaces] = useState('2');
+
+  return (
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-xl mx-auto text-slate-900 space-y-6">
+      <h2 className="text-xl font-bold flex items-center gap-2">
+        <ToggleRight className="w-6 h-6 text-blue-600" />
+        Схемы проходных выключателей
+      </h2>
+
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Label>Количество мест управления светом</Label>
+          <Select value={places} onValueChange={setPlaces}>
+            <SelectTrigger className="w-full bg-slate-50">
+              <SelectValue placeholder="2 места" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="2">Из 2-х мест (2 проходных выключателя)</SelectItem>
+              <SelectItem value="3">Из 3-х и более мест (2 проходных + перекрестные)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl space-y-3 text-sm text-blue-900">
+          <div className="flex items-center gap-2 font-bold text-blue-950">
+            <BookOpen className="w-5 h-5 text-blue-600 shrink-0" />
+            <span>Инструкция по монтажу по нормам ПУЭ</span>
+          </div>
+          
+          {places === '2' ? (
+            <div className="space-y-2">
+              <p><strong>Компоненты:</strong> Два одноклавишных проходных выключателя (переключателя на два направления).</p>
+              <p><strong>Правила ПУЭ:</strong> Фазный провод от автомата защиты (10А) заводится на общий контакт первого проходного выключателя. От двух парных контактов первого выключателя идут две линии (межвыключательныe жилы) ко второму проходному выключателю. С общего контакта второго выключателя фаза уходит на светильник (лампа), а нулевой проводник (N) и заземление (PE) идут напрямую к светильнику.</p>
+              <p className="text-xs text-blue-800 bg-blue-100 p-2 rounded-lg">💡 <em>Рекомендуемый кабель для линии управления: ВВГнг-LS 3х1.5 мм² или 2х1.5 мм² (с обязательным разрывом фазы).</em></p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <p><strong>Компоненты:</strong> Два крайних проходных выключателя и один (или более) промежуточный перекрестный (крестовый) выключатель.</p>
+              <p><strong>Правила ПУЭ:</strong> Между крайними проходными устанавливается крестовый выключатель, который меняет местами перекрестные жилы. Фаза также приходит на общий контакт первого проходного, а с общего контакта последнего уходит на светильник.</p>
+              <p className="text-xs text-blue-800 bg-blue-100 p-2 rounded-lg">💡 <em>Для подключения крестового выключателя требуется 4-жильный кабель (или две пары двухжильных) между узлами коммутации.</em></p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -929,6 +979,30 @@ function Page() {
           </p>
         </header>
         <MotorCapsCalculatorEmbedded />
+      </div>
+    );
+  }
+
+  if (openTool === "three-way") {
+    return (
+      <div className="mx-auto w-full max-w-6xl py-6 space-y-6">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setOpenTool(null)}
+          className="gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" /> К списку калькуляторов
+        </Button>
+        <header className="space-y-1">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+            Проходные выключатели
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            Схемы и правила монтажа управления светом из 2-х и более мест.
+          </p>
+        </header>
+        <ThreeWayCalculatorEmbedded />
       </div>
     );
   }
