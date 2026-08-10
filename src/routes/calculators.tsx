@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   XCircle,
   BookOpen,
+  Lightbulb,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -32,7 +33,8 @@ type ToolId =
   | "grounding"
   | "motor-caps"
   | "three-way"
-  | "color-codes";
+  | "color-codes"
+  | "lighting-calc";
 
 type Tool = {
   id: ToolId;
@@ -87,6 +89,13 @@ const CATEGORIES: Category[] = [
         title: "Расчёт контура заземления",
         description: "Сопротивление растеканию по типу грунта и электродов.",
         icon: Sigma,
+        ready: true,
+      },
+      {
+        id: "lighting-calc",
+        title: "Расчёт освещенности",
+        description: "Определение светового потока и числа светильников по СП 52.13330.",
+        icon: Lightbulb,
         ready: true,
       },
     ],
@@ -546,20 +555,16 @@ function GroundingCalculatorEmbedded() {
 function ConduitFillCalculatorEmbedded() {
   const [conduitSize, setConduitSize] = useState('20');
   const [customConduit, setCustomConduit] = useState('25');
-  
   const [cableType, setCableType] = useState('vvgng-3x25');
-  
   const [customBrand, setCustomBrand] = useState('ВВГнг-LS');
   const [customCores, setCustomCores] = useState('3');
   const [customSection, setCustomSection] = useState('2.5');
-
   const [cableCount, setCableCount] = useState('3');
   const [resultData, setResultData] = useState<{ fillPercent: number; isAllowed: boolean; message: string } | null>(null);
 
   const handleCalculate = () => {
     let dConduit = conduitSize === 'custom' ? (Number(customConduit) || 20) : (Number(conduitSize) || 20);
     const nCables = Number(cableCount) || 1;
-
     const innerDiameter = dConduit * 0.8;
     const conduitArea = 3.14 * Math.pow(innerDiameter / 2, 2);
 
@@ -581,7 +586,6 @@ function ConduitFillCalculatorEmbedded() {
 
     const singleCableArea = 3.14 * Math.pow(cableOuterDiameter / 2, 2);
     const totalCablesArea = singleCableArea * nCables;
-
     const fillPercent = (totalCablesArea / conduitArea) * 100;
     const isAllowed = fillPercent <= 35.0;
 
@@ -716,6 +720,95 @@ function ConduitFillCalculatorEmbedded() {
             ) : (
               <XCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
             )}
+            <span>{resultData.message}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// --- ПУНКТ 1 (ИЗ НОВОГО СПИСКА): РАСЧЁТ ОСВЕЩЕННОСТИ ПОМЕЩЕНИЯ (ПО СП 52.13330) ---
+function LightingCalculatorEmbedded() {
+  const [roomType, setRoomType] = useState('living'); // living=150, office=300, corridor=75, garage=200
+  const [area, setArea] = useState('');
+  const [resultData, setResultData] = useState<{ lumens: number; watts: number; count10w: number; message: string } | null>(null);
+
+  const handleCalculate = () => {
+    const s = Number(area) || 0;
+    if (s <= 0) {
+      alert("Введите корректную площадь помещения");
+      return;
+    }
+
+    let lux = 150;
+    let roomName = "Жилая комната / кухня";
+    if (roomType === 'office') { lux = 300; roomName = "Кабинет / офис / рабочая зона"; }
+    else if (roomType === 'corridor') { lux = 75; roomName = "Коридор / санузел"; }
+    else if (roomType === 'garage') { lux = 200; roomName = "Гараж / мастерская"; }
+
+    // Расчет требуемого светового потока (лм) с коэффициентом запаса k=1.4 и коэффициентом использования
+    // Ф = (E * S * k) / u, условно для бытовых помещений: лм = lux * area * 1.5
+    const totalLumens = Math.round(lux * s * 1.4);
+
+    // Световая отдача современных LED ламп/светильников примерно 90 лм/Вт
+    const totalWatts = Math.round(totalLumens / 90);
+
+    // Рекомендуемое количество точечных светильников по 10 Вт (или эквивалент)
+    const count10w = Math.max(1, Math.ceil(totalWatts / 10));
+
+    setResultData({
+      lumens: totalLumens,
+      watts: totalWatts,
+      count10w,
+      message: `Для помещения "${roomName}" площадью ${s} м² (норма СП 52.13330: ${lux} лк) требуется суммарный световой поток ~${totalLumens} лм. Общая мощность LED-источников: ~${totalWatts} Вт. Рекомендуется установить около ${count10w} светильников мощностью по 10 Вт.`
+    });
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-xl mx-auto text-slate-900 space-y-6">
+      <h2 className="text-xl font-bold flex items-center gap-2">
+        <Lightbulb className="w-6 h-6 text-blue-600" />
+        Расчёт освещенности помещения
+      </h2>
+
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Label>Назначение помещения</Label>
+          <Select value={roomType} onValueChange={setRoomType}>
+            <SelectTrigger className="w-full bg-slate-50">
+              <SelectValue placeholder="Жилая комната / кухня" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="living">Жилая комната / кухня (150 лк)</SelectItem>
+              <SelectItem value="office">Кабинет / офис (300 лк)</SelectItem>
+              <SelectItem value="corridor">Коридор / санузел (75 лк)</SelectItem>
+              <SelectItem value="garage">Гараж / мастерская (200 лк)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Площадь помещения (м²)</Label>
+          <input 
+            type="number" 
+            value={area}
+            onChange={(e) => setArea(e.target.value)}
+            className="w-full bg-slate-50 border border-slate-200 rounded-md h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+            placeholder="20" 
+          />
+        </div>
+
+        <button 
+          onClick={handleCalculate}
+          className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors mt-2 flex items-center justify-center gap-2"
+        >
+          <Zap className="w-4 h-4" /> Рассчитать освещенность по СП
+        </button>
+
+        {resultData && (
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3 text-sm text-blue-900 font-medium">
+            <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
             <span>{resultData.message}</span>
           </div>
         )}
@@ -949,21 +1042,12 @@ function Page() {
   if (openTool === "cable-section") {
     return (
       <div className="mx-auto w-full max-w-6xl py-6 space-y-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setOpenTool(null)}
-          className="gap-2"
-        >
+        <Button variant="ghost" size="sm" onClick={() => setOpenTool(null)} className="gap-2">
           <ArrowLeft className="h-4 w-4" /> К списку калькуляторов
         </Button>
         <header className="space-y-1">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-            Сечение кабеля по мощности
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            Подбор сечения и номинала автомата по нормам ПУЭ.
-          </p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Сечение кабеля по мощности</h1>
+          <p className="text-muted-foreground text-sm">Подбор сечения и номинала автомата по нормам ПУЭ.</p>
         </header>
         <CableCalculatorEmbedded />
       </div>
@@ -973,21 +1057,12 @@ function Page() {
   if (openTool === "voltage-drop") {
     return (
       <div className="mx-auto w-full max-w-6xl py-6 space-y-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setOpenTool(null)}
-          className="gap-2"
-        >
+        <Button variant="ghost" size="sm" onClick={() => setOpenTool(null)} className="gap-2">
           <ArrowLeft className="h-4 w-4" /> К списку калькуляторов
         </Button>
         <header className="space-y-1">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-            Падение напряжения
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            Проверка ΔU на линии с учётом длины и тока по нормам ПУЭ.
-          </p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Падение напряжения</h1>
+          <p className="text-muted-foreground text-sm">Проверка ΔU на линии с учётом длины и тока по нормам ПУЭ.</p>
         </header>
         <VoltageDropCalculatorEmbedded />
       </div>
@@ -997,21 +1072,12 @@ function Page() {
   if (openTool === "grounding") {
     return (
       <div className="mx-auto w-full max-w-6xl py-6 space-y-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setOpenTool(null)}
-          className="gap-2"
-        >
+        <Button variant="ghost" size="sm" onClick={() => setOpenTool(null)} className="gap-2">
           <ArrowLeft className="h-4 w-4" /> К списку калькуляторов
         </Button>
         <header className="space-y-1">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-            Расчёт контура заземления
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            Сопротивление растеканию по типу грунта и электродов согласно ПУЭ.
-          </p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Расчёт контура заземления</h1>
+          <p className="text-muted-foreground text-sm">Сопротивление растеканию по типу грунта и электродов согласно ПУЭ.</p>
         </header>
         <GroundingCalculatorEmbedded />
       </div>
@@ -1021,23 +1087,29 @@ function Page() {
   if (openTool === "conduit-fill") {
     return (
       <div className="mx-auto w-full max-w-6xl py-6 space-y-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setOpenTool(null)}
-          className="gap-2"
-        >
+        <Button variant="ghost" size="sm" onClick={() => setOpenTool(null)} className="gap-2">
           <ArrowLeft className="h-4 w-4" /> К списку калькуляторов
         </Button>
         <header className="space-y-1">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-            Заполняемость гофры / трубы
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            Допустимое количество кабелей в трассе по нормам ПУЭ.
-          </p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Заполняемость гофры / трубы</h1>
+          <p className="text-muted-foreground text-sm">Допустимое количество кабелей в трассе по нормам ПУЭ.</p>
         </header>
         <ConduitFillCalculatorEmbedded />
+      </div>
+    );
+  }
+
+  if (openTool === "lighting-calc") {
+    return (
+      <div className="mx-auto w-full max-w-6xl py-6 space-y-6">
+        <Button variant="ghost" size="sm" onClick={() => setOpenTool(null)} className="gap-2">
+          <ArrowLeft className="h-4 w-4" /> К списку калькуляторов
+        </Button>
+        <header className="space-y-1">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Расчёт освещенности помещения</h1>
+          <p className="text-muted-foreground text-sm">Определение светового потока и количества светильников по СП 52.13330.</p>
+        </header>
+        <LightingCalculatorEmbedded />
       </div>
     );
   }
@@ -1045,21 +1117,12 @@ function Page() {
   if (openTool === "motor-caps") {
     return (
       <div className="mx-auto w-full max-w-6xl py-6 space-y-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setOpenTool(null)}
-          className="gap-2"
-        >
+        <Button variant="ghost" size="sm" onClick={() => setOpenTool(null)} className="gap-2">
           <ArrowLeft className="h-4 w-4" /> К списку калькуляторов
         </Button>
         <header className="space-y-1">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-            Подбор конденсаторов для двигателя
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            Расчёт емкости пускового и рабочего конденсатора для подключения 3Ф двигателя в однофазную сеть.
-          </p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Подбор конденсаторов для двигателя</h1>
+          <p className="text-muted-foreground text-sm">Расчёт емкости пускового и рабочего конденсатора для 3Ф двигателя в сеть 220 В.</p>
         </header>
         <MotorCapsCalculatorEmbedded />
       </div>
@@ -1069,21 +1132,12 @@ function Page() {
   if (openTool === "three-way") {
     return (
       <div className="mx-auto w-full max-w-6xl py-6 space-y-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setOpenTool(null)}
-          className="gap-2"
-        >
+        <Button variant="ghost" size="sm" onClick={() => setOpenTool(null)} className="gap-2">
           <ArrowLeft className="h-4 w-4" /> К списку калькуляторов
         </Button>
         <header className="space-y-1">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-            Проходные выключатели
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            Схемы и правила монтажа управления светом из 2-х и более мест.
-          </p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Проходные выключатели</h1>
+          <p className="text-muted-foreground text-sm">Схемы и правила монтажа управления светом из 2-х и более мест.</p>
         </header>
         <ThreeWayCalculatorEmbedded />
       </div>
@@ -1093,21 +1147,12 @@ function Page() {
   if (openTool === "color-codes") {
     return (
       <div className="mx-auto w-full max-w-6xl py-6 space-y-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setOpenTool(null)}
-          className="gap-2"
-        >
+        <Button variant="ghost" size="sm" onClick={() => setOpenTool(null)} className="gap-2">
           <ArrowLeft className="h-4 w-4" /> К списку калькуляторов
         </Button>
         <header className="space-y-1">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-            Цветовая маркировка и RJ45
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            Маркировка жил по ГОСТ и стандарты обжима интернет-кабеля (T568A/B).
-          </p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Цветовая маркировка и RJ45</h1>
+          <p className="text-muted-foreground text-sm">Маркировка жил по ГОСТ и стандарты обжима интернет-кабеля (T568A/B).</p>
         </header>
         <ColorCodesCalculatorEmbedded />
       </div>
