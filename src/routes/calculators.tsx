@@ -448,40 +448,42 @@ function GroundingCalculatorEmbedded() {
 
 // --- КАЛЬКУЛЯТОР ЗАПОЛНЯЕМОСТИ ГОФРЫ / ТРУБЫ (ПО ПУЭ) ---
 function ConduitFillCalculatorEmbedded() {
-  const [conduitSize, setConduitSize] = useState('20'); // выбор из списка или 'custom'
-  const [customConduit, setCustomConduit] = useState('25'); // ручной ввод диаметра трубы
+  const [conduitSize, setConduitSize] = useState('20');
+  const [customConduit, setCustomConduit] = useState('25');
   
-  const [cableType, setCableType] = useState('vvgng-3x25'); // выбор из списка или 'custom'
-  const [customCableDiameter, setCustomCableDiameter] = useState('10'); // ручной ввод диаметра кабеля
+  const [cableType, setCableType] = useState('vvgng-3x25');
   
+  // Поля для ручного ввода параметров кабеля
+  const [customBrand, setCustomBrand] = useState('ВВГнг-LS');
+  const [customCores, setCustomCores] = useState('3');
+  const [customSection, setCustomSection] = useState('2.5');
+
   const [cableCount, setCableCount] = useState('3');
   const [resultData, setResultData] = useState<{ fillPercent: number; isAllowed: boolean; message: string } | null>(null);
 
   const handleCalculate = () => {
-    // Определяем диаметр трубы
-    let dConduit = 20;
-    if (conduitSize === 'custom') {
-      dConduit = Number(customConduit) || 20;
-    } else {
-      dConduit = Number(conduitSize) || 20;
-    }
-
+    let dConduit = conduitSize === 'custom' ? (Number(customConduit) || 20) : (Number(conduitSize) || 20);
     const nCables = Number(cableCount) || 1;
 
-    // Внутренний диаметр трубы (примерно 80% от номинала для гофры/трубы)
+    // Внутренний диаметр трубы (80% от номинала)
     const innerDiameter = dConduit * 0.8;
     const conduitArea = 3.14 * Math.pow(innerDiameter / 2, 2);
 
-    // Определяем внешний диаметр кабеля
     let cableOuterDiameter = 10;
+    let cableDesc = "";
+
     if (cableType === 'custom') {
-      cableOuterDiameter = Number(customCableDiameter) || 10;
+      const cores = Number(customCores) || 3;
+      const sec = Number(customSection) || 2.5;
+      // Инженерная формула примерного внешнего диаметра кабеля по числу жил и сечению
+      cableOuterDiameter = Math.sqrt(cores * sec) * 1.6 + 4.0;
+      cableDesc = `${customBrand} ${cores}х${sec}`;
     } else {
-      if (cableType === 'vvgng-2x15') cableOuterDiameter = 8.5;
-      else if (cableType === 'vvgng-3x15') cableOuterDiameter = 9.5;
-      else if (cableType === 'vvgng-3x25') cableOuterDiameter = 10.5;
-      else if (cableType === 'vvgng-3x4') cableOuterDiameter = 12.0;
-      else if (cableType === 'vvgng-5x6') cableOuterDiameter = 15.0;
+      if (cableType === 'vvgng-2x15') { cableOuterDiameter = 8.5; cableDesc = "ВВГнг-LS 2х1.5"; }
+      else if (cableType === 'vvgng-3x15') { cableOuterDiameter = 9.5; cableDesc = "ВВГнг-LS 3х1.5"; }
+      else if (cableType === 'vvgng-3x25') { cableOuterDiameter = 10.5; cableDesc = "ВВГнг-LS 3х2.5"; }
+      else if (cableType === 'vvgng-3x4') { cableOuterDiameter = 12.0; cableDesc = "ВВГнг-LS 3х4.0"; }
+      else if (cableType === 'vvgng-5x6') { cableOuterDiameter = 15.0; cableDesc = "ВВГнг-LS 5х6.0"; }
     }
 
     const singleCableArea = 3.14 * Math.pow(cableOuterDiameter / 2, 2);
@@ -493,7 +495,7 @@ function ConduitFillCalculatorEmbedded() {
     setResultData({
       fillPercent: Number(fillPercent.toFixed(1)),
       isAllowed,
-      message: `Заполнение сечения трубы: ~${fillPercent.toFixed(1)}%. ${
+      message: `Расчет для кабеля (${cableDesc}): заполнение трубы составило ~${fillPercent.toFixed(1)}%. ${
         isAllowed 
           ? "Норма соблюдена! Заполнение не превышает 35% по рекомендациям ПУЭ, кабели пройдут свободно." 
           : "ВНИМАНИЕ: Превышен рекомендуемый коэффициент заполнения (более 35% по ПУЭ). Протянуть такую линию будет тяжело, рекомендуется взять трубу большего диаметра."
@@ -552,21 +554,45 @@ function ConduitFillCalculatorEmbedded() {
               <SelectItem value="vvgng-3x25">ВВГнг-LS 3х2.5</SelectItem>
               <SelectItem value="vvgng-3x4">ВВГнг-LS 3х4.0</SelectItem>
               <SelectItem value="vvgng-5x6">ВВГнг-LS 5х6.0</SelectItem>
-              <SelectItem value="custom">✏️ Свой диаметр кабеля (вручную)</SelectItem>
+              <SelectItem value="custom">✏️ Свой вариант (вручную)</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         {cableType === 'custom' && (
-          <div className="space-y-2 p-3 bg-slate-50 rounded-xl border border-slate-100">
-            <Label>Введите внешний диаметр кабеля (мм)</Label>
-            <input 
-              type="number" 
-              value={customCableDiameter}
-              onChange={(e) => setCustomCableDiameter(e.target.value)}
-              className="w-full bg-white border border-slate-200 rounded-md h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-              placeholder="Например: 11.5" 
-            />
+          <div className="space-y-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
+            <div className="space-y-1">
+              <Label className="text-xs">Марка кабеля</Label>
+              <input 
+                type="text" 
+                value={customBrand}
+                onChange={(e) => setCustomBrand(e.target.value)}
+                className="w-full bg-white border border-slate-200 rounded-md h-9 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                placeholder="Например: NYM" 
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs">Количество жил (шт)</Label>
+                <input 
+                  type="number" 
+                  value={customCores}
+                  onChange={(e) => setCustomCores(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-md h-9 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                  placeholder="3" 
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Сечение жилы (мм²)</Label>
+                <input 
+                  type="number" 
+                  value={customSection}
+                  onChange={(e) => setCustomSection(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-md h-9 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                  placeholder="2.5" 
+                />
+              </div>
+            </div>
           </div>
         )}
 
