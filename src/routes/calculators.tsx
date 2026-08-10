@@ -99,6 +99,7 @@ const CATEGORIES: Category[] = [
         title: "Подбор конденсаторов для двигателя",
         description: "Ёмкость пускового и рабочего конденсатора 1Ф/3Ф.",
         icon: Cpu,
+        ready: true,
       },
     ],
   },
@@ -122,30 +123,117 @@ const CATEGORIES: Category[] = [
   },
 ];
 
-// --- КАЛЬКУЛЯТОР СЕЧЕНИЯ КАБЕЛЯ ---
+// --- КАЛЬКУЛЯТОР СЕЧЕНИЯ КАБЕЛЯ (ПО ПУЭ ГЛ. 1.3) ---
 function CableCalculatorEmbedded() {
+  const [voltage, setVoltage] = useState('220');
   const [material, setMaterial] = useState('copper');
-  const [cableType, setCableType] = useState('vvgng');
-  const [inBundle, setInBundle] = useState(false);
-  const [result, setResult] = useState<string | null>(null);
+  const [installMethod, setInstallMethod] = useState('pipe');
+  const [power, setPower] = useState('');
+  const [resultData, setResultData] = useState<{ section: number; current: number; breaker: number; message: string } | null>(null);
 
   const handleCalculate = () => {
-    setResult("Расчет выполнен по ГОСТ Р 50571.5.52 / ПУЭ: Рекомендуемый номинал автомата 25А, минимальное сечение 4 мм².");
+    const p = Number(power) || 0;
+    const U = Number(voltage) || 220;
+
+    if (p <= 0) {
+      alert("Введите корректную мощность");
+      return;
+    }
+
+    let current = 0;
+    if (U === 380) {
+      current = (p * 1000) / (1.732 * 380 * 0.9);
+    } else {
+      current = (p * 1000) / (220 * 0.9);
+    }
+
+    const copperTable = [
+      { s: 1.5, open: 19, pipe: 15 },
+      { s: 2.5, open: 27, pipe: 21 },
+      { s: 4.0, open: 38, pipe: 28 },
+      { s: 6.0, open: 46, pipe: 36 },
+      { s: 10.0, open: 70, pipe: 50 },
+      { s: 16.0, open: 85, pipe: 65 },
+      { s: 25.0, open: 115, pipe: 85 },
+      { s: 35.0, open: 135, pipe: 100 },
+      { s: 50.0, open: 175, pipe: 135 },
+    ];
+
+    const aluminumTable = [
+      { s: 2.5, open: 21, pipe: 16 },
+      { s: 4.0, open: 28, pipe: 22 },
+      { s: 6.0, open: 35, pipe: 28 },
+      { s: 10.0, open: 50, pipe: 38 },
+      { s: 16.0, open: 65, pipe: 50 },
+      { s: 25.0, open: 85, pipe: 65 },
+      { s: 35.0, open: 105, pipe: 80 },
+      { s: 50.0, open: 135, pipe: 100 },
+    ];
+
+    const table = material === 'copper' ? copperTable : aluminumTable;
+
+    let selectedItem = null;
+    for (const item of table) {
+      const allowableCurrent = installMethod === 'open' ? item.open : item.pipe;
+      if (allowableCurrent >= current) {
+        selectedItem = item;
+        break;
+      }
+    }
+
+    if (!selectedItem) {
+      alert("Слишком большая мощность! Требуется сечение более 50 мм².");
+      return;
+    }
+
+    const breakers = [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100];
+    const maxSafeCurrent = installMethod === 'open' ? selectedItem.open : selectedItem.pipe;
+    
+    let selectedBreaker = breakers[0];
+    for (const b of breakers) {
+      if (b <= maxSafeCurrent && b >= current) {
+        selectedBreaker = b;
+      }
+    }
+    if (current > selectedBreaker) {
+      const higherB = breakers.find(b => b >= current);
+      if (higherB) selectedBreaker = higherB;
+    }
+
+    setResultData({
+      section: selectedItem.s,
+      current: Number(current.toFixed(1)),
+      breaker: selectedBreaker,
+      message: `Для нагрузки ${p} кВт (${U}В, ${material === 'copper' ? 'медь' : 'алюминий'}) расчетный ток составил ~${current.toFixed(1)} А. По нормам ПУЭ рекомендуется минимальное сечение кабеля ${selectedItem.s} мм² и защитный автомат номиналом ${selectedBreaker} А.`
+    });
   };
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-xl mx-auto text-slate-900 space-y-6">
       <h2 className="text-xl font-bold flex items-center gap-2">
         <Cable className="w-6 h-6 text-blue-600" />
-        Калькулятор сечения кабеля
+        Сечение кабеля по мощности
       </h2>
 
       <div className="space-y-6">
         <div className="space-y-2">
+          <Label>Напряжение сети (В)</Label>
+          <Select value={voltage} onValueChange={setVoltage}>
+            <SelectTrigger className="w-full bg-slate-50">
+              <SelectValue placeholder="220 В" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="220">220 В (Однофазная)</SelectItem>
+              <SelectItem value="380">380 В (Трехфазная)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
           <Label>Материал жилы</Label>
           <Select value={material} onValueChange={setMaterial}>
             <SelectTrigger className="w-full bg-slate-50">
-              <SelectValue placeholder="Выберите материал" />
+              <SelectValue placeholder="Медь" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="copper">Медь</SelectItem>
@@ -155,35 +243,40 @@ function CableCalculatorEmbedded() {
         </div>
 
         <div className="space-y-2">
-          <Label>Марка кабеля</Label>
-          <Select value={cableType} onValueChange={setCableType}>
+          <Label>Способ прокладки</Label>
+          <Select value={installMethod} onValueChange={setInstallMethod}>
             <SelectTrigger className="w-full bg-slate-50">
-              <SelectValue placeholder="Выберите марку" />
+              <SelectValue placeholder="В трубе / в стене" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="vvgng">ВВГнг-LS</SelectItem>
-              <SelectItem value="nym">NYM</SelectItem>
-              <SelectItem value="kg">КГ (гибкий)</SelectItem>
+              <SelectItem value="pipe">В трубе / в стене (скрыто)</SelectItem>
+              <SelectItem value="open">Открыто (на лотке / в коробе)</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-          <Label htmlFor="in-bundle" className="cursor-pointer">Прокладка в пучке (поправка ПУЭ)</Label>
-          <Switch id="in-bundle" checked={inBundle} onCheckedChange={setInBundle} />
+        <div className="space-y-2">
+          <Label>Мощность нагрузки (кВт)</Label>
+          <input 
+            type="number" 
+            value={power}
+            onChange={(e) => setPower(e.target.value)}
+            className="w-full bg-slate-50 border border-slate-200 rounded-md h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+            placeholder="5.5" 
+          />
         </div>
 
         <button 
           onClick={handleCalculate}
-          className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors mt-4 flex items-center justify-center gap-2"
+          className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors mt-2 flex items-center justify-center gap-2"
         >
-          <Zap className="w-4 h-4" /> Рассчитать сечение
+          <Zap className="w-4 h-4" /> Рассчитать сечение по ПУЭ
         </button>
 
-        {result && (
+        {resultData && (
           <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3 text-sm text-blue-900 font-medium">
             <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-            <span>{result}</span>
+            <span>{resultData.message}</span>
           </div>
         )}
       </div>
@@ -453,7 +546,6 @@ function ConduitFillCalculatorEmbedded() {
   
   const [cableType, setCableType] = useState('vvgng-3x25');
   
-  // Поля для ручного ввода параметров кабеля
   const [customBrand, setCustomBrand] = useState('ВВГнг-LS');
   const [customCores, setCustomCores] = useState('3');
   const [customSection, setCustomSection] = useState('2.5');
@@ -465,7 +557,6 @@ function ConduitFillCalculatorEmbedded() {
     let dConduit = conduitSize === 'custom' ? (Number(customConduit) || 20) : (Number(conduitSize) || 20);
     const nCables = Number(cableCount) || 1;
 
-    // Внутренний диаметр трубы (80% от номинала)
     const innerDiameter = dConduit * 0.8;
     const conduitArea = 3.14 * Math.pow(innerDiameter / 2, 2);
 
@@ -475,7 +566,6 @@ function ConduitFillCalculatorEmbedded() {
     if (cableType === 'custom') {
       const cores = Number(customCores) || 3;
       const sec = Number(customSection) || 2.5;
-      // Инженерная формула примерного внешнего диаметра кабеля по числу жил и сечению
       cableOuterDiameter = Math.sqrt(cores * sec) * 1.6 + 4.0;
       cableDesc = `${customBrand} ${cores}х${sec}`;
     } else {
@@ -631,6 +721,94 @@ function ConduitFillCalculatorEmbedded() {
   );
 }
 
+// --- КАЛЬКУЛЯТОР ПОДБОРА КОНДЕНСАТОРОВ ДЛЯ ДВИГАТЕЛЯ ---
+function MotorCapsCalculatorEmbedded() {
+  const [powerKw, setPowerKw] = useState('');
+  const [connectionType, setConnectionType] = useState('delta');
+  const [heavyStart, setHeavyStart] = useState(false);
+  const [resultData, setResultData] = useState<{ workCap: number; startCap: number | null; message: string } | null>(null);
+
+  const handleCalculate = () => {
+    const p = Number(powerKw) || 0;
+    if (p <= 0) {
+      alert("Введите корректную мощность двигателя");
+      return;
+    }
+
+    // Рабочая емкость (мкФ): треугольник ~66 мкФ/кВт, звезда ~35 мкФ/кВт
+    let workCap = connectionType === 'delta' ? p * 66 : p * 35;
+    workCap = Number(workCap.toFixed(1));
+
+    let startCap = null;
+    if (heavyStart) {
+      // Пусковая емкость обычно в 2.5 раза больше рабочей
+      startCap = Number((workCap * 2.5).toFixed(1));
+    }
+
+    setResultData({
+      workCap,
+      startCap,
+      message: `Для двигателя ${p} кВт (схема: ${connectionType === 'delta' ? 'Треугольник' : 'Звезда'}): рабочая емкость составляет ~${workCap} мкФ.${heavyStart ? ` Пусковая емкость (для тяжелого пуска) ~${startCap} мкФ (подключается кнопкой с возвратом).` : ''} Используйте конденсаторы переменного тока (AC) на напряжение не менее 400–450 В.`
+    });
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-xl mx-auto text-slate-900 space-y-6">
+      <h2 className="text-xl font-bold flex items-center gap-2">
+        <Cpu className="w-6 h-6 text-blue-600" />
+        Подбор конденсаторов для двигателя
+      </h2>
+
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Label>Схема подключения в сети 220 В</Label>
+          <Select value={connectionType} onValueChange={setConnectionType}>
+            <SelectTrigger className="w-full bg-slate-50">
+              <SelectValue placeholder="Треугольник" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="delta">Треугольник (Δ) — полная мощность</SelectItem>
+              <SelectItem value="star">Звезда (Y) — сниженная мощность</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Мощность электродвигателя (кВт)</Label>
+          <input 
+            type="number" 
+            value={powerKw}
+            onChange={(e) => setPowerKw(e.target.value)}
+            className="w-full bg-slate-50 border border-slate-200 rounded-md h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+            placeholder="1.5" 
+          />
+        </div>
+
+        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+          <Label htmlFor="heavy-start" className="cursor-pointer font-medium">
+            Тяжелый пуск (нужен пусковой конденсатор)
+          </Label>
+          <Switch id="heavy-start" checked={heavyStart} onCheckedChange={setHeavyStart} />
+        </div>
+
+        <button 
+          onClick={handleCalculate}
+          className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors mt-2 flex items-center justify-center gap-2"
+        >
+          <Zap className="w-4 h-4" /> Рассчитать емкость конденсаторов
+        </button>
+
+        {resultData && (
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3 text-sm text-blue-900 font-medium">
+            <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+            <span>{resultData.message}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function Page() {
   const [activeCat, setActiveCat] = useState<string>("basic");
   const [openTool, setOpenTool] = useState<ToolId | null>(null);
@@ -651,7 +829,7 @@ function Page() {
             Сечение кабеля по мощности
           </h1>
           <p className="text-muted-foreground text-sm">
-            Подбор сечения и номинала автомата по практическим порогам.
+            Подбор сечения и номинала автомата по нормам ПУЭ.
           </p>
         </header>
         <CableCalculatorEmbedded />
@@ -727,6 +905,30 @@ function Page() {
           </p>
         </header>
         <ConduitFillCalculatorEmbedded />
+      </div>
+    );
+  }
+
+  if (openTool === "motor-caps") {
+    return (
+      <div className="mx-auto w-full max-w-6xl py-6 space-y-6">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setOpenTool(null)}
+          className="gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" /> К списку калькуляторов
+        </Button>
+        <header className="space-y-1">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+            Подбор конденсаторов для двигателя
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            Расчёт емкости пускового и рабочего конденсатора для подключения 3Ф двигателя в однофазную сеть.
+          </p>
+        </header>
+        <MotorCapsCalculatorEmbedded />
       </div>
     );
   }
