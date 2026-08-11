@@ -14,7 +14,7 @@ import {
   Zap,
   X
 } from "lucide-react";
-import "../index.css";
+import "../styles.css";
 
 export const Route = createRootRoute({
   component: RootLayout,
@@ -38,7 +38,6 @@ export function RootLayout() {
   const [lang, setLang] = useState<"RU" | "EN">("RU");
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // Закрытие выпадающих списков при клике вне их области
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -56,10 +55,8 @@ export function RootLayout() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-blue-500 selection:text-white">
-      {/* Верхняя панель управления */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-slate-950/80 border-b border-slate-800/80 px-6 py-3 flex items-center justify-between gap-4">
         
-        {/* Поисковая строка */}
         <div ref={searchRef} className="relative flex-1 max-w-xl">
           <div className="relative flex items-center">
             <Search className="absolute left-4 w-4 h-4 text-slate-400" />
@@ -84,7 +81,6 @@ export function RootLayout() {
             )}
           </div>
 
-          {/* Выпадающий список результатов поиска */}
           {isSearchOpen && searchQuery.trim() && (
             <div className="absolute top-14 left-0 right-0 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 max-h-80 overflow-y-auto">
               {filteredResults.length > 0 ? (
@@ -113,10 +109,7 @@ export function RootLayout() {
           )}
         </div>
 
-        {/* Правая панель: Уведомления, Язык, Тема */}
         <div className="flex items-center gap-3">
-          
-          {/* Кнопка уведомлений */}
           <div className="relative">
             <button
               onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
@@ -126,7 +119,6 @@ export function RootLayout() {
               <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
             </button>
 
-            {/* Выпадающий блок уведомлений */}
             {isNotificationsOpen && (
               <div className="absolute right-0 top-12 w-80 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-4 z-50 space-y-3">
                 <div className="flex items-center justify-between border-b border-slate-800 pb-2">
@@ -151,7 +143,6 @@ export function RootLayout() {
             )}
           </div>
 
-          {/* Переключатель языка RU / EN */}
           <div className="flex bg-slate-900 border border-slate-800 rounded-full p-1 text-xs font-semibold">
             <button
               onClick={() => setLang("RU")}
@@ -167,16 +158,13 @@ export function RootLayout() {
             </button>
           </div>
 
-          {/* Кнопка смены темы */}
           <button className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
             <Palette className="w-4 h-4" />
           </button>
         </div>
       </header>
 
-      {/* Основной макет с боковым меню и контентом */}
       <div className="flex flex-1">
-        {/* Боковая навигация */}
         <aside className="w-64 border-r border-slate-800/80 p-6 flex flex-col justify-between hidden md:flex">
           <div className="space-y-8">
             <div className="flex items-center gap-3 px-2">
@@ -222,7 +210,6 @@ export function RootLayout() {
           </div>
         </aside>
 
-        {/* Область вывода страниц */}
         <main className="flex-1 p-6 md:p-8 overflow-y-auto">
           <Outlet />
         </main>
