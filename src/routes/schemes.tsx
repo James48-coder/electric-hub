@@ -153,8 +153,8 @@ export function SchemesPage() {
   return (
     <div className="mx-auto w-full max-w-6xl py-6 space-y-8 text-slate-100">
       <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Электрические схемы</h1>
-        <p className="text-muted-foreground">Визуальные руководства и схемы электромонтажа</p>
+        <h1 className="text-3xl font-bold tracking-tight">Описание схем</h1>
+        <p className="text-muted-foreground">Практические руководства и правила электромонтажа</p>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
