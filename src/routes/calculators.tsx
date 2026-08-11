@@ -17,6 +17,7 @@ import {
   Lightbulb,
   ShieldAlert,
   Calculator,
+  Activity,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -38,7 +39,8 @@ type ToolId =
   | "color-codes"
   | "lighting-calc"
   | "uzo-calc"
-  | "load-calc";
+  | "load-calc"
+  | "loop-check";
 
 type Tool = {
   id: ToolId;
@@ -127,6 +129,13 @@ const CATEGORIES: Category[] = [
         title: "Расчёт суммарной нагрузки",
         description: "Суммарная мощность и ток с коэффициентом одновременности по СП 256.",
         icon: Calculator,
+        ready: true,
+      },
+      {
+        id: "loop-check",
+        title: "Петля «фаза-ноль» и ток КЗ",
+        description: "Проверка срабатывания автомата при коротком замыкании.",
+        icon: Activity,
         ready: true,
       },
     ],
@@ -927,7 +936,7 @@ function UzoCalculatorEmbedded() {
   );
 }
 
-// --- ПУНКТ 3 (ИЗ НОВОГО СПИСКА): РАСЧЁТ СУММАРНОЙ НАГРУЗКИ С КОЭФФИЦИЕНТОМ ОДНОВРЕМЕННОСТИ (СП 256) ---
+// --- РАСЧЁТ СУММАРНОЙ НАГРУЗКИ С КОЭФФИЦИЕНТОМ ОДНОВРЕМЕННОСТИ (СП 256) ---
 function LoadCalculatorEmbedded() {
   const [voltage, setVoltage] = useState('220');
   const [lighting, setLighting] = useState('');
@@ -949,8 +958,6 @@ function LoadCalculatorEmbedded() {
       return;
     }
 
-    // Расчет по СП 256.1325800 с коэффициентами одновременности:
-    // Освещение: 0.8, Розетки: 0.3, Кухня/плита: 0.7, Климат/бойлер: 0.8
     const pCalc = (l * 0.8) + (sock * 0.3) + (kit * 0.7) + (clim * 0.8);
 
     let current = 0;
@@ -1056,6 +1063,138 @@ function LoadCalculatorEmbedded() {
         {resultData && (
           <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3 text-sm text-blue-900 font-medium">
             <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+            <span>{resultData.message}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// --- ПУНКТ 4 (ИЗ НОВОГО СПИСКА): ПРОВЕРКА ПЕТЛИ «ФАЗА-НОЛЬ» И ТОКА КЗ ---
+function LoopCheckCalculatorEmbedded() {
+  const [material, setMaterial] = useState('copper');
+  const [section, setSection] = useState('2.5');
+  const [length, setLength] = useState('');
+  const [breakerRating, setBreakerRating] = useState('16'); // номинал автомата
+  const [resultData, setResultData] = useState<{ loopResistance: number; isc: number; isTripValid: boolean; message: string } | null>(null);
+
+  const handleCalculate = () => {
+    const l = Number(length) || 0;
+    const s = Number(section) || 2.5;
+    const bAmps = Number(breakerRating) || 16;
+
+    if (l <= 0) {
+      alert("Введите корректную длину линии");
+      return;
+    }
+
+    // Удельное сопротивление жилы при рабочей температуре (~60-70°C): медь ~0.0225 Ом*мм2/м, алюминий ~0.036 Ом*мм2/м
+    const rho = material === 'copper' ? 0.0225 : 0.036;
+
+    // Сопротивление петли фаза-ноль: R = (2 * rho * L) / S (учитываем прямой и обратный проводники)
+    const loopResistance = (2 * rho * l) / s;
+
+    // Ожидаемый ток короткого замыкания: Isc = U / R_loop (при напряжении 220В)
+    const isc = 220 / loopResistance;
+
+    // Для автоматического выключателя характеристики C мгновенный расцепитель срабатывает при токе (5...10) * In. 
+    // Возьмем критический порог 5 * In для надежного мгновенного отключения.
+    const requiredIsc = bAmps * 5;
+    const isTripValid = isc >= requiredIsc;
+
+    setResultData({
+      loopResistance: Number(loopResistance.toFixed(3)),
+      isc: Number(isc.toFixed(1)),
+      isTripValid,
+      message: `Сопротивление петли фаза-ноль: ~${loopResistance.toFixed(3)} Ом. Ожидаемый ток КЗ на конце линии: ~${isc.toFixed(1)} А. ${
+        isTripValid 
+          ? `Условие надежного срабатывания выполнено (ток КЗ превышает 5×In автомата — ${requiredIsc} А). Защита сработает мгновенно.` 
+          : `ВНИМАНИЕ: Ток КЗ недостаточен для мгновенного срабатывания автомата (${bAmps} А требует минимум ${requiredIsc} А). Линия слишком длинная или сечение (${s} мм²) слишком мало!`
+      }`
+    });
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-xl mx-auto text-slate-900 space-y-6">
+      <h2 className="text-xl font-bold flex items-center gap-2">
+        <Activity className="w-6 h-6 text-blue-600" />
+        Петля «фаза-ноль» и ток КЗ
+      </h2>
+
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Label>Материал проводников</Label>
+          <Select value={material} onValueChange={setMaterial}>
+            <SelectTrigger className="w-full bg-slate-50">
+              <SelectValue placeholder="Медь" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="copper">Медь</SelectItem>
+              <SelectItem value="aluminum">Алюминий</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Сечение жилы (мм²)</Label>
+            <Select value={section} onValueChange={setSection}>
+              <SelectTrigger className="w-full bg-slate-50">
+                <SelectValue placeholder="2.5" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1.5">1.5 мм²</SelectItem>
+                <SelectItem value="2.5">2.5 мм²</SelectItem>
+                <SelectItem value="4">4 мм²</SelectItem>
+                <SelectItem value="6">6 мм²</SelectItem>
+                <SelectItem value="10">10 мм²</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Длина линии (м)</Label>
+            <input 
+              type="number" 
+              value={length}
+              onChange={(e) => setLength(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-md h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+              placeholder="30" 
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Номинал защитного автомата (А)</Label>
+          <Select value={breakerRating} onValueChange={setBreakerRating}>
+            <SelectTrigger className="w-full bg-slate-50">
+              <SelectValue placeholder="16 А" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="10">10 А</SelectItem>
+              <SelectItem value="16">16 А</SelectItem>
+              <SelectItem value="25">25 А</SelectItem>
+              <SelectItem value="32">32 А</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <button 
+          onClick={handleCalculate}
+          className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors mt-2 flex items-center justify-center gap-2"
+        >
+          <Zap className="w-4 h-4" /> Проверить петлю фаза-ноль
+        </button>
+
+        {resultData && (
+          <div className={`p-4 border rounded-xl flex items-start gap-3 text-sm font-medium ${
+            resultData.isTripValid ? 'bg-blue-50 border-blue-200 text-blue-900' : 'bg-amber-50 border-amber-200 text-amber-900'
+          }`}>
+            {resultData.isTripValid ? (
+              <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+            ) : (
+              <XCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+            )}
             <span>{resultData.message}</span>
           </div>
         )}
@@ -1402,6 +1541,21 @@ function Page() {
           <p className="text-muted-foreground text-sm">Расчет мощности и вводного автомата с коэффициентами одновременности по СП 256.</p>
         </header>
         <LoadCalculatorEmbedded />
+      </div>
+    );
+  }
+
+  if (openTool === "loop-check") {
+    return (
+      <div className="mx-auto w-full max-w-6xl py-6 space-y-6">
+        <Button variant="ghost" size="sm" onClick={() => setOpenTool(null)} className="gap-2">
+          <ArrowLeft className="h-4 w-4" /> К списку калькуляторов
+        </Button>
+        <header className="space-y-1">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Петля «фаза-ноль» и ток КЗ</h1>
+          <p className="text-muted-foreground text-sm">Проверка мгновенного срабатывания защиты при коротком замыкании.</p>
+        </header>
+        <LoopCheckCalculatorEmbedded />
       </div>
     );
   }
