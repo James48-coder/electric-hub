@@ -120,7 +120,7 @@ const KNOWLEDGE_DOCS: DocItem[] = [
     hasTable: true,
     content: [
       "Цветовая гамма проводов и кабелей в электроустановках переменного тока согласно стандарту:",
-      "• Фазные проводники (L): коричневый, черный, серый.",
+      "• Фазные проводники (L): коричневый, черный, серый, белый.",
       "• Нейтральный рабочий проводник (N): голубой / синий.",
       "• Защитный проводник (PE / заземление): желто-зеленый."
     ]
@@ -369,7 +369,7 @@ export function KnowledgePage() {
                     <span>Цвет изоляции</span>
                   </div>
                   <div className="divide-y divide-slate-800">
-                    <div className="px-4 py-2 flex justify-between"><span>Фаза</span><span>L</span><span className="text-amber-400">Коричневый / Черный</span></div>
+                    <div className="px-4 py-2 flex justify-between"><span>Фаза</span><span>L</span><span className="text-amber-400">Коричневый / Черный / Белый</span></div>
                     <div className="px-4 py-2 flex justify-between"><span>Нейтраль</span><span>N</span><span className="text-blue-400">Голубой / Синий</span></div>
                     <div className="px-4 py-2 flex justify-between"><span>Заземление</span><span>PE</span><span className="text-emerald-400">Желто-зеленый</span></div>
                   </div>
