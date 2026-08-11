@@ -15,6 +15,7 @@ import {
   XCircle,
   BookOpen,
   Lightbulb,
+  ShieldAlert,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,8 @@ type ToolId =
   | "motor-caps"
   | "three-way"
   | "color-codes"
-  | "lighting-calc";
+  | "lighting-calc"
+  | "uzo-calc";
 
 type Tool = {
   id: ToolId;
@@ -109,6 +111,13 @@ const CATEGORIES: Category[] = [
         title: "Подбор конденсаторов для двигателя",
         description: "Ёмкость пускового и рабочего конденсатора 1Ф/3Ф.",
         icon: Cpu,
+        ready: true,
+      },
+      {
+        id: "uzo-calc",
+        title: "Подбор УЗО / Диф. автомата",
+        description: "Выбор тока утечки и номинала по правилам ПУЭ гл. 7.1.",
+        icon: ShieldAlert,
         ready: true,
       },
     ],
@@ -728,9 +737,9 @@ function ConduitFillCalculatorEmbedded() {
   );
 }
 
-// --- ПУНКТ 1 (ИЗ НОВОГО СПИСКА): РАСЧЁТ ОСВЕЩЕННОСТИ ПОМЕЩЕНИЯ (ПО СП 52.13330) ---
+// --- РАСЧЁТ ОСВЕЩЕННОСТИ ПОМЕЩЕНИЯ (ПО СП 52.13330) ---
 function LightingCalculatorEmbedded() {
-  const [roomType, setRoomType] = useState('living'); // living=150, office=300, corridor=75, garage=200
+  const [roomType, setRoomType] = useState('living');
   const [area, setArea] = useState('');
   const [resultData, setResultData] = useState<{ lumens: number; watts: number; count10w: number; message: string } | null>(null);
 
@@ -747,14 +756,8 @@ function LightingCalculatorEmbedded() {
     else if (roomType === 'corridor') { lux = 75; roomName = "Коридор / санузел"; }
     else if (roomType === 'garage') { lux = 200; roomName = "Гараж / мастерская"; }
 
-    // Расчет требуемого светового потока (лм) с коэффициентом запаса k=1.4 и коэффициентом использования
-    // Ф = (E * S * k) / u, условно для бытовых помещений: лм = lux * area * 1.5
     const totalLumens = Math.round(lux * s * 1.4);
-
-    // Световая отдача современных LED ламп/светильников примерно 90 лм/Вт
     const totalWatts = Math.round(totalLumens / 90);
-
-    // Рекомендуемое количество точечных светильников по 10 Вт (или эквивалент)
     const count10w = Math.max(1, Math.ceil(totalWatts / 10));
 
     setResultData({
@@ -804,6 +807,106 @@ function LightingCalculatorEmbedded() {
           className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors mt-2 flex items-center justify-center gap-2"
         >
           <Zap className="w-4 h-4" /> Рассчитать освещенность по СП
+        </button>
+
+        {resultData && (
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3 text-sm text-blue-900 font-medium">
+            <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+            <span>{resultData.message}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// --- ПУНКТ 2 (ИЗ НОВОГО СПИСКА): ВЫБОР НОМИНАЛА И ТИПА УЗО / ДИФ. АВТОМАТА (ПО ПУЭ ГЛ. 7.1) ---
+function UzoCalculatorEmbedded() {
+  const [zoneType, setZoneType] = useState('sockets'); // bathroom=10mA, sockets=30mA, fire=300mA
+  const [breakerRating, setBreakerRating] = useState('16'); // номинал защитного автомата
+  const [resultData, setResultData] = useState<{ leakage: number; recommendedUzo: number; typeUzo: string; message: string } | null>(null);
+
+  const handleCalculate = () => {
+    const bAmps = Number(breakerRating) || 16;
+
+    let leakage = 30;
+    let zoneDesc = "Розеточная группа общего назначения";
+    if (zoneType === 'bathroom') {
+      leakage = 10;
+      zoneDesc = "Влажная зона (ванная комната, душевая)";
+    } else if (zoneType === 'fire') {
+      leakage = 300;
+      zoneDesc = "Противопожарное вводное УЗО";
+    }
+
+    // Правило ПУЭ: номинал УЗО по току должен быть не менее номинала защитного автомата (на ступень выше)
+    const standardUzoRatings = [16, 25, 40, 63, 80];
+    let recommendedUzo = 25;
+    for (const r of standardUzoRatings) {
+      if (r >= bAmps) {
+        recommendedUzo = r;
+        break;
+      }
+    }
+    // Если автомат равен номиналу УЗО, по правилам безопасности лучше взять на ступень выше
+    if (recommendedUzo === bAmps) {
+      const idx = standardUzoRatings.indexOf(bAmps);
+      if (idx !== -1 && idx < standardUzoRatings.length - 1) {
+        recommendedUzo = standardUzoRatings[idx + 1];
+      }
+    }
+
+    setResultData({
+      leakage,
+      recommendedUzo,
+      typeUzo: zoneType === 'bathroom' || zoneType === 'sockets' ? 'Тип A (рекомендуется для электроники)' : 'Тип AC / A',
+      message: `Для зоны (${zoneDesc}) с защитным автоматом ${bAmps} А требуется УЗО (или дифавтомат) с током утечки не более ${leakage} мА и номинальным током не менее ${recommendedUzo} А. Рекомендуемый тип: ${zoneType === 'bathroom' || zoneType === 'sockets' ? 'Тип A (реагирует на переменный и пульсирующий постоянный ток)' : 'Тип AC'}.`
+    });
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-xl mx-auto text-slate-900 space-y-6">
+      <h2 className="text-xl font-bold flex items-center gap-2">
+        <ShieldAlert className="w-6 h-6 text-blue-600" />
+        Подбор УЗО / Дифференциального автомата
+      </h2>
+
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Label>Назначение линии / помещение</Label>
+          <Select value={zoneType} onValueChange={setZoneType}>
+            <SelectTrigger className="w-full bg-slate-50">
+              <SelectValue placeholder="Розеточная группа" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="sockets">Розеточная группа / бытовые приборы (30 мА)</SelectItem>
+              <SelectItem value="bathroom">Ванная комната / мокрая зона (10 мА)</SelectItem>
+              <SelectItem value="fire">Вводное противопожарное УЗО (300 мА)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Номинал защитного автомата в линии (А)</Label>
+          <Select value={breakerRating} onValueChange={setBreakerRating}>
+            <SelectTrigger className="w-full bg-slate-50">
+              <SelectValue placeholder="16 А" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="10">10 А</SelectItem>
+              <SelectItem value="16">16 А</SelectItem>
+              <SelectItem value="25">25 А</SelectItem>
+              <SelectItem value="32">32 А</SelectItem>
+              <SelectItem value="40">40 А</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <button 
+          onClick={handleCalculate}
+          className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors mt-2 flex items-center justify-center gap-2"
+        >
+          <Zap className="w-4 h-4" /> Рассчитать УЗО по ПУЭ
         </button>
 
         {resultData && (
@@ -1125,6 +1228,21 @@ function Page() {
           <p className="text-muted-foreground text-sm">Расчёт емкости пускового и рабочего конденсатора для 3Ф двигателя в сеть 220 В.</p>
         </header>
         <MotorCapsCalculatorEmbedded />
+      </div>
+    );
+  }
+
+  if (openTool === "uzo-calc") {
+    return (
+      <div className="mx-auto w-full max-w-6xl py-6 space-y-6">
+        <Button variant="ghost" size="sm" onClick={() => setOpenTool(null)} className="gap-2">
+          <ArrowLeft className="h-4 w-4" /> К списку калькуляторов
+        </Button>
+        <header className="space-y-1">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Подбор УЗО / Дифференциального автомата</h1>
+          <p className="text-muted-foreground text-sm">Выбор тока утечки и номинала по правилам ПУЭ гл. 7.1.</p>
+        </header>
+        <UzoCalculatorEmbedded />
       </div>
     );
   }
