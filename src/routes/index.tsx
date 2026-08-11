@@ -1,140 +1,120 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Calculator, Network, MessageSquare, ArrowRight, Zap, Shield, Gauge } from "lucide-react";
+import { Zap, Shield, Clock, Calculator, Network, MessageSquare, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "ВольтПро — Главная" },
-      { name: "description", content: "Ваш помощник в электромонтаже: расчёты, схемы, консультации." },
-    ],
-  }),
-  component: Index,
+  component: HomePage,
 });
 
-const TOOLS = [
-  {
-    to: "/calculators",
-    icon: Calculator,
-    title: "Калькуляторы",
-    desc: "Сечение кабеля, падение напряжения, защита, заземление.",
-    accent: "from-primary/30 to-primary/0",
-  },
-  {
-    to: "/schemes",
-    icon: Network,
-    title: "Готовые схемы",
-    desc: "Однолинейные, освещение, щиты — редактируй и экспортируй.",
-    accent: "from-accent/30 to-accent/0",
-  },
-  {
-    to: "/chat",
-    icon: MessageSquare,
-    title: "Чат с ИИ",
-    desc: "Подскажет по ПУЭ, ГОСТ и поможет с расчётом на объекте.",
-    accent: "from-primary/30 to-accent/20",
-  },
-] as const;
-
-const STATS = [
-  { icon: Zap, label: "Расчётов в день", value: "1 240+" },
-  { icon: Shield, label: "Соответствие ПУЭ", value: "100%" },
-  { icon: Gauge, label: "Среднее время", value: "< 8 сек" },
-];
-
-function Index() {
+export function HomePage() {
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
-      {/* HERO */}
-      <section className="glass relative overflow-hidden rounded-3xl p-8 sm:p-12">
-        <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-primary/30 blur-3xl animate-float" />
-        <div className="pointer-events-none absolute -bottom-24 -left-10 h-72 w-72 rounded-full bg-accent/25 blur-3xl animate-float" />
-
-        <div className="relative max-w-2xl">
-          <span className="glass inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium text-muted-foreground">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-            MVP · Версия для профессионалов
-          </span>
-          <h1 className="mt-5 text-balance text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-            Ваш помощник в электромонтаже:{" "}
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              расчёты, схемы, консультации
-            </span>
-          </h1>
-          <p className="mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
-            Все инструменты электрика в одном месте — быстро, точно и под рукой даже на стройплощадке.
-          </p>
-
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Link
-              to="/calculators"
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground glow transition hover:scale-[1.02] active:scale-[0.99]"
-            >
-              Начать расчёт <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              to="/knowledge"
-              className="neu-sm inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition hover:scale-[1.02]"
-            >
-              База знаний
-            </Link>
+    <div className="mx-auto w-full max-w-6xl py-6 space-y-8 text-slate-100">
+      {/* Верхний блок статистики со скриншота */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="glass neu rounded-2xl p-6 border border-slate-800/80 bg-slate-900/40">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 grid place-items-center">
+              <Zap className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold">1240+</div>
+              <div className="text-xs text-slate-400">расчётов в день</div>
+            </div>
           </div>
         </div>
 
-        <div className="relative mt-10 grid grid-cols-3 gap-3">
-          {STATS.map((s) => {
-            const Icon = s.icon;
-            return (
-              <div key={s.label} className="neu-sm rounded-2xl p-4">
-                <Icon className="h-4 w-4 text-primary" />
-                <div className="mt-2 text-lg font-bold sm:text-2xl">{s.value}</div>
-                <div className="text-[11px] uppercase tracking-wide text-muted-foreground sm:text-xs">
-                  {s.label}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* QUICK TOOLS */}
-      <section>
-        <div className="mb-4 flex items-end justify-between">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight">Быстрые инструменты</h2>
-            <p className="text-sm text-muted-foreground">Открывайте нужное в один клик.</p>
+        <div className="glass neu rounded-2xl p-6 border border-slate-800/80 bg-slate-900/40">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 grid place-items-center">
+              <Shield className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold">100%</div>
+              <div className="text-xs text-slate-400">соответствие ПУЭ</div>
+            </div>
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {TOOLS.map((t) => {
-            const Icon = t.icon;
-            return (
-              <Link
-                key={t.to}
-                to={t.to}
-                className="group glass relative overflow-hidden rounded-2xl p-6 transition hover:-translate-y-1 hover:glow"
-              >
-                <div
-                  className={
-                    "pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br opacity-60 blur-2xl transition group-hover:opacity-100 " +
-                    t.accent
-                  }
-                />
-                <div className="relative">
-                  <div className="neu flex h-12 w-12 items-center justify-center rounded-2xl">
-                    <Icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <h3 className="mt-5 text-lg font-bold">{t.title}</h3>
-                  <p className="mt-1.5 text-sm text-muted-foreground">{t.desc}</p>
-                  <div className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
-                    Открыть <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
+        <div className="glass neu rounded-2xl p-6 border border-slate-800/80 bg-slate-900/40">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 grid place-items-center">
+              <Clock className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold">&lt; 8 сек</div>
+              <div className="text-xs text-slate-400">среднее время</div>
+            </div>
+          </div>
         </div>
-      </section>
+      </div>
+
+      <header className="space-y-1">
+        <h2 className="text-2xl font-bold tracking-tight">Быстрые инструменты</h2>
+        <p className="text-xs text-slate-400">Открывайте нужное в один клик.</p>
+      </header>
+
+      {/* Карточки быстрых инструментов */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Link
+          to="/calculators"
+          className="group glass neu rounded-2xl p-6 text-left border border-slate-800/80 bg-slate-900/40 hover:bg-slate-900/70 transition-all hover:-translate-y-0.5 hover:shadow-xl flex flex-col justify-between"
+        >
+          <div className="space-y-4">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 grid place-items-center">
+              <Calculator className="w-5 h-5" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="font-bold text-lg">Калькуляторы</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Сечение кабеля, падение напряжения, защита, заземление.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center text-sm font-semibold text-blue-400 group-hover:translate-x-1 transition-transform pt-4 mt-4 border-t border-slate-800/80">
+            Открыть <ArrowRight className="w-4 h-4 ml-1" />
+          </div>
+        </Link>
+
+        {/* Обновленная карточка схем */}
+        <Link
+          to="/schemes"
+          className="group glass neu rounded-2xl p-6 text-left border border-slate-800/80 bg-slate-900/40 hover:bg-slate-900/70 transition-all hover:-translate-y-0.5 hover:shadow-xl flex flex-col justify-between"
+        >
+          <div className="space-y-4">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 grid place-items-center">
+              <Network className="w-5 h-5" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="font-bold text-lg">Описание схем</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Практические руководства и правила электромонтажа
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center text-sm font-semibold text-blue-400 group-hover:translate-x-1 transition-transform pt-4 mt-4 border-t border-slate-800/80">
+            Открыть <ArrowRight className="w-4 h-4 ml-1" />
+          </div>
+        </Link>
+
+        <Link
+          to="/chat"
+          className="group glass neu rounded-2xl p-6 text-left border border-slate-800/80 bg-slate-900/40 hover:bg-slate-900/70 transition-all hover:-translate-y-0.5 hover:shadow-xl flex flex-col justify-between"
+        >
+          <div className="space-y-4">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 grid place-items-center">
+              <MessageSquare className="w-5 h-5" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="font-bold text-lg">Чат с ИИ</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Подскажет по ПУЭ, ГОСТ и поможет с расчётом на объекте.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center text-sm font-semibold text-blue-400 group-hover:translate-x-1 transition-transform pt-4 mt-4 border-t border-slate-800/80">
+            Открыть <ArrowRight className="w-4 h-4 ml-1" />
+          </div>
+        </Link>
+      </div>
     </div>
   );
 }
