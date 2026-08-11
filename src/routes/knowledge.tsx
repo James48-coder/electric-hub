@@ -1,323 +1,317 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
 import {
-  Search,
   BookOpen,
-  ShieldAlert,
+  Search,
+  X,
   FileText,
+  Shield,
   Zap,
-  Cable,
-  Flame,
-  Plug,
-  Building2,
-  Wrench,
-  ArrowRight,
-  Sparkles,
-  Library,
+  CheckCircle2,
+  ExternalLink,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/knowledge")({
-  head: () => ({
-    meta: [
-      { title: "База знаний — нормы ПУЭ, ГОСТ, СНиП | ВольтПро" },
-      {
-        name: "description",
-        content:
-          "Поиск по нормативным документам для электриков: ПУЭ, ГОСТ, СНиП. Заземление, кабельные линии, защита.",
-      },
-      { property: "og:title", content: "База знаний — ВольтПро" },
-      {
-        property: "og:description",
-        content: "Удобная библиотека норм и правил для электромонтажа.",
-      },
-    ],
-  }),
-  component: Page,
+  component: KnowledgePage,
 });
 
-type Tag = "ПУЭ" | "ГОСТ" | "СНиП" | "Заземление" | "Кабельные линии" | "Пожарная безопасность";
-
-type Doc = {
+type DocItem = {
   id: string;
   title: string;
-  description: string;
-  icon: LucideIcon;
-  tags: Tag[];
-  popular?: boolean;
+  subtitle: string;
+  category: string;
+  tags: string[];
+  content: string[];
 };
 
-const DOCS: Doc[] = [
+const KNOWLEDGE_DOCS: DocItem[] = [
   {
-    id: "pue7",
+    id: "pue-7",
     title: "ПУЭ 7-е издание",
-    description: "Правила устройства электроустановок — основной документ для проектирования и монтажа.",
-    icon: BookOpen,
+    subtitle: "Правила устройства электроустановок — основной документ для проектирования и монтажа.",
+    category: "ПУЭ",
     tags: ["ПУЭ"],
-    popular: true,
+    content: [
+      "ПУЭ (Правила устройства электроустановок) — главный нормативный документ для каждого электромонтажника в РФ.",
+      "Основные разделы: общие правила, устройство электрооборудования, заземление и защитные меры безопасности, электропроводки и кабельные линии.",
+      "Ключевые требования: обязательное применение трехпроводной системы питания (L, N, PE) в новых зданиях, запрет на скрытую прокладку алюминиевой проводки в жилых домах сечением менее 2.5 мм² (с 2001 года только медь для розеточных групп), нормативы по сечениям кабелей и защитным аппаратам."
+    ]
   },
   {
     id: "gost-31565",
     title: "ГОСТ 31565-2012",
-    description: "Требования пожарной безопасности к кабельным изделиям, классы пожарной опасности.",
-    icon: Flame,
+    subtitle: "Требования пожарной безопасности к кабельным изделиям, классы пожарной опасности.",
+    category: "ГОСТ",
     tags: ["ГОСТ", "Кабельные линии", "Пожарная безопасность"],
-    popular: true,
+    content: [
+      "Стандарт определяет классификацию кабельных изделий по пожарной опасности.",
+      "Маркировка кабелей по исполнению:",
+      "• Без индекса — не распространяют горение при одиночной прокладке.",
+      "• нг (נג) — не распространяют горение при пучковой прокладке.",
+      "• нг-LS (Low Smoke) — не распространяют горение при пучковой прокладке, с пониженным дымо- и газовыделением (стандарт для жилых помещений).",
+      "• нг-FRLS — огнестойкие, с пониженным дымовыделением (для систем пожаротушения, эвакуационного освещения)."
+    ]
   },
   {
-    id: "snip-31-110",
+    id: "sp-256",
     title: "СП 256.1325800.2016",
-    description: "Электроустановки жилых и общественных зданий — правила проектирования и монтажа.",
-    icon: Building2,
-    tags: ["СНиП"],
-    popular: true,
+    subtitle: "Электроустановки жилых и общественных зданий — правила проектирования и монтажа.",
+    category: "СНиП",
+    tags: ["СНиП", "ПУЭ"],
+    content: [
+      "Свод правил регламентирует расчет электрических нагрузок, проектирование групповых сетей в квартирах и домах.",
+      "Основные положения: учет коэффициентов одновременности для бытовых электроприборов, требования к размещению розеток и выключателей в жилых комнатах, кухнях и санузлах.",
+      "Нормативы высоты установки: выключатели обычно на высоте 900 мм (или 300 мм по евростандарту), розеточные группы — 300 мм от пола, на кухне — на высоте 1100 мм."
+    ]
   },
   {
-    id: "grounding",
+    id: "grounding-systems",
     title: "Заземление и зануление",
-    description: "Системы TN-C, TN-S, TN-C-S, TT, IT. Сопротивление контура и проверка.",
-    icon: ShieldAlert,
+    subtitle: "Системы TN-C, TN-S, TN-C-S, TT, IT. Сопротивление контура и проверка.",
+    category: "Заземление",
     tags: ["ПУЭ", "Заземление"],
-    popular: true,
+    content: [
+      "Системы заземления электроустановок зданий по классификации ГОСТ Р 50571.1:",
+      "• TN-C — совмещенный нулевой защитный и рабочий проводник (PEN) на всем протяжении. Устаревшая система.",
+      "• TN-S — раздельные защитный (PE) и рабочий (N) проводники от самого источника питания.",
+      "• TN-C-S — разделение PEN-проводника на PE и N на вводе в здание (самый частый вариант в частном секторе и МКД при реконструкции).",
+      "• TT — глухозаземленная нейтраль источника, а открытые проводящие части заземлены через независимый местный контур (обязательно применение УЗО)."
+    ]
   },
   {
-    id: "gost-r-50571",
+    id: "gost-50571",
     title: "ГОСТ Р 50571",
-    description: "Электроустановки низковольтные. Защита от поражения электрическим током.",
-    icon: ShieldAlert,
-    tags: ["ГОСТ"],
+    subtitle: "Электроустановки низковольтные. Защита от поражения электрическим током.",
+    category: "ГОСТ",
+    tags: ["ГОСТ", "Заземление"],
+    content: [
+      "Комплекс стандартов на проектирование и монтаж низковольтных электроустановок до 1000 В.",
+      "Основные требования: обеспечение базовой защиты (изоляция токоведущих частей) и защиты при повреждении (автоматическое отключение питания, защитное заземление, уравнивание потенциалов).",
+      "Обязательное выполнение дополнительной системы уравнивания потенциалов в ванных и душевых комнатах."
+    ]
   },
   {
-    id: "cable-lines",
+    id: "cable-lines-1kv",
     title: "Кабельные линии до 1 кВ",
-    description: "Прокладка, выбор сечения, защита от КЗ и перегрузок согласно ПУЭ гл. 2.1.",
-    icon: Cable,
+    subtitle: "Прокладка, выбор сечения, защита от КЗ и перегрузок согласно ПУЭ гл. 2.1.",
+    category: "Кабельные линии",
     tags: ["ПУЭ", "Кабельные линии"],
+    content: [
+      "Правила прокладки кабелей и проводов в трубах, коробах, лотках и открыто.",
+      "Допустимые радиусы изгиба кабелей (обычно не менее 10-15 диаметров кабеля для предотвращения повреждения изоляции).",
+      "Правила совместной прокладки силовых линий и слаботочных сетей (во избежание электромагнитных помех выдерживается расстояние не менее 100–500 мм)."
+    ]
   },
   {
-    id: "snip-3-05",
+    id: "snip-30506",
     title: "СНиП 3.05.06-85",
-    description: "Электротехнические устройства — правила производства и приёмки работ.",
-    icon: Wrench,
+    subtitle: "Электротехнические устройства — правила производства и приёмки работ.",
+    category: "СНиП",
     tags: ["СНиП"],
+    content: [
+      "Нормативный документ на монтажные и пусконаладочные работы в электротехнических устройствах.",
+      "Требования к качеству контактных соединений (опрессовка, сварка, пайка или сжим), контроль изоляции мегаомметром перед подачей напряжения, допуски при скрытой прокладке трасс."
+    ]
   },
   {
-    id: "gost-r-50462",
+    id: "gost-50462",
     title: "ГОСТ Р 50462-2009",
-    description: "Идентификация проводников по цветам и буквенно-цифровым обозначениям.",
-    icon: FileText,
+    subtitle: "Идентификация проводников по цветам и буквенно-цифровым обозначениям.",
+    category: "ГОСТ",
     tags: ["ГОСТ", "Кабельные линии"],
+    content: [
+      "Цветовая гамма проводов и кабелей в электроустановках переменного тока:",
+      "• Фазные проводники (L): коричневый, черный, серый.",
+      "• Нейтральный рабочий проводник (N): голубой / синий.",
+      "• Защитный проводник (PE / заземление): желто-зеленый."
+    ]
   },
   {
-    id: "rcd",
+    id: "uzo-diff",
     title: "УЗО и дифавтоматы",
-    description: "Выбор номинала, селективность, требования ПУЭ гл. 7.1 для жилых помещений.",
-    icon: Plug,
-    tags: ["ПУЭ"],
+    subtitle: "Выбор номинала, селективность, требования ПУЭ гл. 7.1 для жилых помещений.",
+    category: "ПУЭ",
+    tags: ["ПУЭ", "Заземление"],
+    content: [
+      "Устройство защитного отключения (УЗО) отключает сеть при утечке тока на землю (повреждение изоляции, прикосновение человека к фазе).",
+      "Номиналы тока утечки: 10 мА — для влажных зон (ванная), 30 мА — для обычных розеточных групп, 300 мА — противопожарное вводное.",
+      "Правило выбора по току: номинал УЗО должен быть на ступень выше номинала защитного автомата (автомат 16А — УЗО 25А)."
+    ]
   },
   {
-    id: "lightning",
+    id: "co-153",
     title: "СО 153-34.21.122-2003",
-    description: "Инструкция по устройству молниезащиты зданий и промышленных коммуникаций.",
-    icon: Zap,
+    subtitle: "Инструкция по устройству молниезащиты зданий и промышленных коммуникаций.",
+    category: "СНиП",
     tags: ["СНиП", "Заземление"],
+    content: [
+      "Требования к проектированию и монтажу систем молниезащиты (молниеприемники, токоотводы, заземлители).",
+      "Расчет зон защиты для жилых зданий, требования к сечению токоотводов и надежности сварных соединений контура заземления молниезащиты."
+    ]
   },
   {
     id: "gost-iec-60364",
     title: "ГОСТ IEC 60364",
-    description: "Серия стандартов на электроустановки зданий, гармонизированная с МЭК.",
-    icon: FileText,
+    subtitle: "Серия стандартов на электроустановки зданий, гармонизированная с МЭК.",
+    category: "ГОСТ",
     tags: ["ГОСТ"],
+    content: [
+      "Международные и гармонизированные с ними российские стандарты безопасности низковольтных электроустановок зданий.",
+      "Определяют общие характеристики, выбор электрооборудования в зависимости от внешних воздействий и условий среды."
+    ]
   },
   {
-    id: "fire-safety",
+    id: "fz-123",
     title: "ФЗ-123 «Технический регламент»",
-    description: "Требования пожарной безопасности к электропроводке и распределительным сетям.",
-    icon: Flame,
+    subtitle: "Требования пожарной безопасности к электропроводке и распределительным сетям.",
+    category: "Пожарная безопасность",
     tags: ["Пожарная безопасность"],
-  },
+    content: [
+      "Федеральный закон о требованиях пожарной безопасности.",
+      "Регламентирует предел огнестойкости кабельных линий, требования к материалам распределительных щитов, коробов и кабельных каналов в зданиях различного назначения."
+    ]
+  }
 ];
 
-const FILTERS: ("Все" | Tag)[] = [
-  "Все",
-  "ПУЭ",
-  "ГОСТ",
-  "СНиП",
-  "Заземление",
-  "Кабельные линии",
-  "Пожарная безопасность",
-];
+export function KnowledgePage() {
+  const [activeTab, setActiveTab] = useState("Все");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDoc, setSelectedDoc] = useState<DocItem | null>(null);
 
-function Page() {
-  const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<(typeof FILTERS)[number]>("Все");
+  const tabs = ["Все", "ПУЭ", "ГОСТ", "СНиП", "Заземление", "Кабельные линии", "Пожарная безопасность"];
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return DOCS.filter((d) => {
-      const matchesFilter = filter === "Все" || d.tags.includes(filter as Tag);
-      if (!matchesFilter) return false;
-      if (!q) return true;
-      return (
-        d.title.toLowerCase().includes(q) ||
-        d.description.toLowerCase().includes(q) ||
-        d.tags.some((t) => t.toLowerCase().includes(q))
-      );
-    });
-  }, [query, filter]);
-
-  const popular = filtered.filter((d) => d.popular);
-  const all = filtered;
+  const filteredDocs = KNOWLEDGE_DOCS.filter((doc) => {
+    const matchesTab = activeTab === "Все" || doc.tags.includes(activeTab);
+    const matchesSearch = doc.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          doc.subtitle.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesTab && matchesSearch;
+  });
 
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-8 py-6">
-      {/* Hero / Search */}
-      <section className="glass relative overflow-hidden rounded-3xl p-6 md:p-10">
-        <div className="mb-5 flex items-center gap-3">
-          <div className="neu flex h-12 w-12 items-center justify-center rounded-2xl">
-            <Library className="h-6 w-6 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight md:text-3xl">База знаний</h1>
-            <p className="text-sm text-muted-foreground">Нормы, правила и стандарты под рукой</p>
-          </div>
-        </div>
+    <div className="mx-auto w-full max-w-6xl py-6 space-y-8 text-slate-100">
+      <header className="space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight">База знаний</h1>
+        <p className="text-muted-foreground">Нормы, правила и стандарты под рукой</p>
+      </header>
 
-        <div className="neu-inset flex items-center gap-3 rounded-2xl px-4 py-3 md:px-5 md:py-4">
-          <Search className="h-5 w-5 shrink-0 text-muted-foreground" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Поиск по нормам и правилам..."
-            className="w-full bg-transparent text-base outline-none placeholder:text-muted-foreground md:text-lg"
-          />
-          {query && (
-            <button
-              onClick={() => setQuery("")}
-              className="rounded-lg px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
-            >
-              Очистить
-            </button>
-          )}
-        </div>
-
-        <div className="mt-4 flex flex-wrap gap-2">
-          {FILTERS.map((f) => {
-            const active = filter === f;
-            return (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={
-                  "rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-300 " +
-                  (active
-                    ? "bg-primary text-primary-foreground glow scale-[1.03]"
-                    : "neu-sm text-foreground/85 hover:scale-[1.03] hover:text-primary")
-                }
-              >
-                {f}
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Frequently searched */}
-      {popular.length > 0 && (
-        <section>
-          <SectionHeader icon={Sparkles} title="Часто ищут" subtitle="Документы, к которым обращаются чаще всего" />
-          <DocGrid docs={popular} />
-        </section>
-      )}
-
-      {/* Full database */}
-      <section>
-        <SectionHeader
-          icon={Library}
-          title="Полная база"
-          subtitle={`${all.length} ${pluralize(all.length, ["документ", "документа", "документов"])}`}
+      {/* Search Input */}
+      <div className="relative max-w-2xl">
+        <Search className="absolute left-4 top-3.5 h-5 w-5 text-slate-400" />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Поиск по нормам и правилам..."
+          className="w-full bg-slate-900/80 border border-slate-800 rounded-2xl h-12 pl-12 pr-4 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner"
         />
-        {all.length === 0 ? (
-          <div className="neu-inset rounded-2xl p-10 text-center text-muted-foreground">
-            Ничего не найдено. Попробуйте изменить запрос или фильтр.
-          </div>
-        ) : (
-          <DocGrid docs={all} />
-        )}
-      </section>
-    </div>
-  );
-}
-
-function SectionHeader({
-  icon: Icon,
-  title,
-  subtitle,
-}: {
-  icon: LucideIcon;
-  title: string;
-  subtitle: string;
-}) {
-  return (
-    <div className="mb-4 flex items-center gap-3">
-      <div className="neu-sm flex h-10 w-10 items-center justify-center rounded-xl text-accent">
-        <Icon className="h-5 w-5" />
-      </div>
-      <div>
-        <h2 className="text-xl font-bold tracking-tight">{title}</h2>
-        <p className="text-xs text-muted-foreground">{subtitle}</p>
-      </div>
-    </div>
-  );
-}
-
-function DocGrid({ docs }: { docs: Doc[] }) {
-  return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {docs.map((d) => (
-        <DocCard key={d.id} doc={d} />
-      ))}
-    </div>
-  );
-}
-
-function DocCard({ doc }: { doc: Doc }) {
-  const Icon = doc.icon;
-  return (
-    <button
-      type="button"
-      className="group neu relative flex h-full flex-col items-start rounded-2xl p-5 text-left transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_20px_50px_-15px_var(--color-primary)]"
-    >
-      <div className="neu-sm mb-4 flex h-12 w-12 items-center justify-center rounded-xl text-primary transition-colors duration-300 group-hover:text-accent">
-        <Icon className="h-6 w-6" />
       </div>
 
-      <h3 className="text-base font-bold leading-snug">{doc.title}</h3>
-      <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">{doc.description}</p>
-
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {doc.tags.map((t) => (
-          <span
-            key={t}
-            className="rounded-full border border-border bg-muted/50 px-2 py-0.5 text-[10px] font-semibold text-muted-foreground"
+      {/* Filter Tabs */}
+      <div className="flex gap-2 overflow-x-auto pb-2">
+        {tabs.map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`whitespace-nowrap rounded-xl px-4 h-9 text-sm font-medium transition-all ${
+              activeTab === tab
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-slate-900/60 text-slate-400 hover:text-white hover:bg-slate-800/80 border border-slate-800"
+            }`}
           >
-            {t}
-          </span>
+            {tab}
+          </button>
         ))}
       </div>
 
-      <div className="mt-4 flex w-full items-center justify-between pt-3 border-t border-border/60">
-        <span className="text-sm font-semibold text-primary">Читать</span>
-        <ArrowRight className="h-4 w-4 text-primary transition-transform duration-300 group-hover:translate-x-1" />
-      </div>
-    </button>
-  );
-}
+      {/* Document Cards Grid */}
+      <div className="space-y-4">
+        <div className="flex items-baseline justify-between">
+          <h2 className="text-xl font-semibold">Документы ({filteredDocs.length})</h2>
+        </div>
 
-function pluralize(n: number, forms: [string, string, string]) {
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  if (mod10 === 1 && mod100 !== 11) return forms[0];
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return forms[1];
-  return forms[2];
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {filteredDocs.map((doc) => (
+            <div
+              key={doc.id}
+              className="group glass neu rounded-2xl p-6 flex flex-col justify-between space-y-4 border border-slate-800/80 bg-slate-900/40 hover:bg-slate-900/70 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl"
+            >
+              <div className="space-y-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 grid place-items-center">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="font-bold text-lg text-white leading-tight">{doc.title}</h3>
+                  <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">{doc.subtitle}</p>
+                </div>
+              </div>
+
+              <div className="space-y-4 pt-2">
+                <div className="flex flex-wrap gap-1.5">
+                  {doc.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center rounded-md bg-blue-500/10 px-2 py-0.5 text-[10px] font-medium text-blue-400 border border-blue-500/20"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setSelectedDoc(doc)}
+                  className="w-full flex items-center justify-between text-sm font-semibold text-blue-400 hover:text-blue-300 pt-2 border-t border-slate-800 transition-colors group-hover:translate-x-0.5"
+                >
+                  <span>Читать документ</span>
+                  <ExternalLink className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Reader Modal / Drawer */}
+      {selectedDoc && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6 md:p-8 space-y-6 text-slate-100 shadow-2xl">
+            <div className="flex items-start justify-between border-b border-slate-800 pb-4">
+              <div className="space-y-1">
+                <div className="flex gap-2">
+                  {selectedDoc.tags.map((t) => (
+                    <span key={t} className="text-xs font-semibold text-blue-400 bg-blue-500/10 px-2.5 py-0.5 rounded-full border border-blue-500/20">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+                <h2 className="text-2xl font-bold tracking-tight text-white pt-1">{selectedDoc.title}</h2>
+                <p className="text-sm text-slate-400">{selectedDoc.subtitle}</p>
+              </div>
+              <button
+                onClick={() => setSelectedDoc(null)}
+                className="w-10 h-10 rounded-full bg-slate-800 text-slate-400 hover:text-white grid place-items-center transition-colors shrink-0"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-sm text-slate-300 leading-relaxed">
+              {selectedDoc.content.map((paragraph, idx) => (
+                <p key={idx}>{paragraph}</p>
+              ))}
+            </div>
+
+            <div className="pt-4 border-t border-slate-800 flex justify-end">
+              <Button
+                onClick={() => setSelectedDoc(null)}
+                className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6"
+              >
+                Закрыть
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
