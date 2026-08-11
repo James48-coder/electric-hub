@@ -351,7 +351,7 @@ export function KnowledgePage() {
                 <div className="border border-slate-700 rounded-xl overflow-hidden mt-4 text-xs">
                   <div className="bg-slate-800 px-4 py-2 font-semibold text-slate-200 flex justify-between">
                     <span>Зона применения</span>
-                    <span>Ток утечки ($I_{\Delta n}$)</span>
+                    <span>Ток утечки</span>
                   </div>
                   <div className="divide-y divide-slate-800">
                     <div className="px-4 py-2 flex justify-between"><span>Ванная / Бассейн</span><span className="text-emerald-400">10 мА</span></div>
