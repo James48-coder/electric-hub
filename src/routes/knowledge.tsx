@@ -130,11 +130,12 @@ const KNOWLEDGE_DOCS: DocItem[] = [
     title: "УЗО и дифавтоматы",
     subtitle: "Выбор номинала, селективность, требования ПУЭ гл. 7.1 для жилых помещений.",
     category: "ПУЭ",
-    tags: ["ПУЭ", "Заземление"],
+    tags: ["ПУЭ", "Заземление", "Безопасность"],
+    hasTable: true,
     content: [
       "Устройство защитного отключения (УЗО) отключает сеть при утечке тока на землю (повреждение изоляции, прикосновение человека к фазе).",
-      "Номиналы тока утечки: 10 мА — для влажных зон (ванная), 30 мА — для обычных розеточных групп, 300 мА — противопожарное вводное.",
-      "Правило выбора по току: номинал УЗО должен быть на ступень выше номинала защитного автомата (автомат 16А — УЗО 25А)."
+      "Правило выбора по току: номинал УЗО должен быть на ступень выше номинала защитного автомата (автомат 16А — УЗО 25А).",
+      "Ниже приведена шпаргалка по выбору токов утечки для разных зон:"
     ]
   },
   {
@@ -199,9 +200,11 @@ const KNOWLEDGE_DOCS: DocItem[] = [
     subtitle: "Правила по охране труда при эксплуатации электроустановок.",
     category: "Безопасность",
     tags: ["Безопасность", "ПУЭ"],
+    hasTable: true,
     content: [
       "Обязательный нормативный документ по технике безопасности для всех специалистов, выполняющих работы в электроустановках.",
-      "Регламентирует порядок организации и безопасного выполнения работ (без снятия напряжения, со снятием напряжения, вблизи токоведущих частей), требования к оформлению нарядов-допусков, распоряжений, а также квалификационные группы по электробезопасности (от I до V)."
+      "Регламентирует порядок организации и безопасного выполнения работ, требования к оформлению нарядов-допусков, а также квалификационные группы по электробезопасности.",
+      "Ниже представлена шпаргалка по группам электробезопасности:"
     ]
   },
   {
@@ -343,7 +346,38 @@ export function KnowledgePage() {
                 <p key={idx}>{paragraph}</p>
               ))}
 
-              {/* Custom tables for Stage 1 */}
+              {/* Table: UZO / DIFF */}
+              {selectedDoc.id === 'uzo-diff' && (
+                <div className="border border-slate-700 rounded-xl overflow-hidden mt-4 text-xs">
+                  <div className="bg-slate-800 px-4 py-2 font-semibold text-slate-200 flex justify-between">
+                    <span>Зона применения</span>
+                    <span>Ток утечки ($I_{\Delta n}$)</span>
+                  </div>
+                  <div className="divide-y divide-slate-800">
+                    <div className="px-4 py-2 flex justify-between"><span>Ванная / Бассейн</span><span className="text-emerald-400">10 мА</span></div>
+                    <div className="px-4 py-2 flex justify-between"><span>Розетки / Быт</span><span className="text-amber-400">30 мА</span></div>
+                    <div className="px-4 py-2 flex justify-between"><span>Ввод (Противопожарное)</span><span className="text-red-400">100 / 300 мА</span></div>
+                  </div>
+                </div>
+              )}
+
+              {/* Table: POTEE */}
+              {selectedDoc.id === 'potee' && (
+                <div className="border border-slate-700 rounded-xl overflow-hidden mt-4 text-xs">
+                  <div className="bg-slate-800 px-4 py-2 font-semibold text-slate-200 flex justify-between">
+                    <span>Группа</span>
+                    <span>Требования</span>
+                  </div>
+                  <div className="divide-y divide-slate-800">
+                    <div className="px-4 py-2 flex justify-between"><span>I</span><span>Инструктаж, неэлектротехнический персонал</span></div>
+                    <div className="px-4 py-2 flex justify-between"><span>II</span><span>Минимальная для самостоятельной работы</span></div>
+                    <div className="px-4 py-2 flex justify-between"><span>III</span><span>Допуск до 1000В, обслуживание</span></div>
+                    <div className="px-4 py-2 flex justify-between"><span>IV / V</span><span>Высшие группы, ответственные за электрохозяйство</span></div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Tables from Stage 1 */}
               {selectedDoc.id === 'gost-50571-5-52' && (
                 <div className="border border-slate-700 rounded-xl overflow-hidden mt-4 text-xs">
                   <div className="bg-slate-800 px-4 py-2 font-semibold text-slate-200 flex justify-between">
