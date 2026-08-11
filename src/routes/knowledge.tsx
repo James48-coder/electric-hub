@@ -32,7 +32,7 @@ const KNOWLEDGE_DOCS: DocItem[] = [
     content: [
       "ПУЭ (Правила устройства электроустановок) — главный нормативный документ для каждого электромонтажника в РФ.",
       "Основные разделы: общие правила, устройство электрооборудования, заземление и защитные меры безопасности, электропроводки и кабельные линии.",
-      "Ключевые требования: обязательное применение трехпроводной системы питания (L, N, PE) в новых зданиях, запрет на скрытую прокладку алюминиевой проводки в жилых домах сечением менее 2.5 мм² (с 2001 года только медь для розеточных групп), нормативы по сечениям кабелей и защитным аппаратам."
+      "Ключевые требования: обязательное применение трехпроводной системы питания (L, N, PE) в новых зданиях, запрет на скрытую прокладку алюминиевой проводки в жилых домах сечением менее 2.5 мм2 (с 2001 года только медь для розеточных групп), нормативы по сечениям кабелей и защитным аппаратам."
     ]
   },
   {
@@ -59,7 +59,7 @@ const KNOWLEDGE_DOCS: DocItem[] = [
     content: [
       "Свод правил регламентирует расчет электрических нагрузок, проектирование групповых сетей в квартирах и домах.",
       "Основные положения: учет коэффициентов одновременности для бытовых электроприборов, требования к размещению розеток и выключателей в жилых комнатах, кухнях и санузлах.",
-      "Нормативы высоты установки: выключатели обычно на высоте 900 мм (или 300 мм по евростандарту), розеточные группы — 300 мм от пола, на кухне — на высоте 1100 мм."
+      "Нормативы высоты установки: выключатели обычно на высоте 900 мм, розеточные группы — 300 мм от пола, на кухне — на высоте 1100 мм."
     ]
   },
   {
@@ -348,7 +348,6 @@ export function KnowledgePage() {
                 <p key={idx}>{paragraph}</p>
               ))}
 
-              {/* Table: Grounding Systems */}
               {selectedDoc.id === 'grounding-systems' && (
                 <div className="border border-slate-700 rounded-xl overflow-hidden mt-4 text-xs">
                   <div className="bg-slate-800 px-4 py-2 font-semibold text-slate-200 flex justify-between">
@@ -363,7 +362,6 @@ export function KnowledgePage() {
                 </div>
               )}
 
-              {/* Table: Power Quality */}
               {selectedDoc.id === 'gost-32144' && (
                 <div className="border border-slate-700 rounded-xl overflow-hidden mt-4 text-xs">
                   <div className="bg-slate-800 px-4 py-2 font-semibold text-slate-200 flex justify-between">
@@ -371,12 +369,11 @@ export function KnowledgePage() {
                   </div>
                   <div className="divide-y divide-slate-800">
                     <div className="px-4 py-2 flex justify-between"><span>Напряжение (В)</span><span>230 В</span><span>207 - 253 В</span></div>
-                    <div className="px-4 py-2 flex justify-between"><span>Частота (Гц)</span><span>50 Гц</span><span>плюс-минус 0.4 Гц</span></div>
+                    <div className="px-4 py-2 flex justify-between"><span>Частота (Гц)</span><span>50 Гц</span><span>0.4 Гц</span></div>
                   </div>
                 </div>
               )}
               
-              {/* Table: UZO / DIFF */}
               {selectedDoc.id === 'uzo-diff' && (
                 <div className="border border-slate-700 rounded-xl overflow-hidden mt-4 text-xs">
                   <div className="bg-slate-800 px-4 py-2 font-semibold text-slate-200 flex justify-between">
@@ -390,7 +387,6 @@ export function KnowledgePage() {
                 </div>
               )}
 
-              {/* Table: POTEE */}
               {selectedDoc.id === 'potee' && (
                 <div className="border border-slate-700 rounded-xl overflow-hidden mt-4 text-xs">
                   <div className="bg-slate-800 px-4 py-2 font-semibold text-slate-200 flex justify-between">
@@ -405,7 +401,6 @@ export function KnowledgePage() {
                 </div>
               )}
 
-              {/* Table: GOST 50571.5.52 */}
               {selectedDoc.id === 'gost-50571-5-52' && (
                 <div className="border border-slate-700 rounded-xl overflow-hidden mt-4 text-xs">
                   <div className="bg-slate-800 px-4 py-2 font-semibold text-slate-200 flex justify-between">
@@ -421,7 +416,6 @@ export function KnowledgePage() {
                 </div>
               )}
 
-              {/* Table: GOST 50462 */}
               {selectedDoc.id === 'gost-50462' && (
                 <div className="border border-slate-700 rounded-xl overflow-hidden mt-4 text-xs">
                   <div className="bg-slate-800 px-4 py-2 font-semibold text-slate-200 flex justify-between">
