@@ -203,7 +203,7 @@ const KNOWLEDGE_DOCS: DocItem[] = [
     hasTable: true,
     content: [
       "Обязательный нормативный документ по технике безопасности для всех специалистов, выполняющих работы в электроустановках.",
-      "Регламентирует порядок организации и безопасного выполнения работ, требования к оформлению нарядов-допусков, а также квалификационные группы по электробезопасности.",
+      "Регламентирует порядок организации и безопасного выполнения работ, требования к оформлению нарядов-допусков, распоряжений, а также квалификационные группы по электробезопасности.",
       "Ниже представлена шпаргалка по группам электробезопасности:"
     ]
   },
@@ -403,7 +403,7 @@ export function KnowledgePage() {
                     <span>Цвет изоляции</span>
                   </div>
                   <div className="divide-y divide-slate-800">
-                    <div className="px-4 py-2 flex justify-between"><span>Фаза</span><span>L</span><span className="text-amber-400">Коричневый / Черный / Белый</span></div>
+                    <div className="px-4 py-2 flex justify-between"><span>Фаза</span><span>L</span><span className="text-amber-400">Коричневый / Черный / Серый / Белый</span></div>
                     <div className="px-4 py-2 flex justify-between"><span>Нейтраль</span><span>N</span><span className="text-blue-400">Голубой / Синий</span></div>
                     <div className="px-4 py-2 flex justify-between"><span>Заземление</span><span>PE</span><span className="text-emerald-400">Желто-зеленый</span></div>
                   </div>
