@@ -1,11 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { TanStackRouterVite } from '@tanstack/router-vite-plugin'
+import { tanStackRouterVite } from '@tanstack/router-plugin/vite'
 
 export default defineConfig({
-  base: './', // Делает пути к стилям относительными для корректной работы на воркерах
+  base: '/',
   plugins: [
-    TanStackRouterVite(),
+    tanStackRouterVite(),
     react(),
   ],
 })
