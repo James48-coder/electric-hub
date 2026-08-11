@@ -68,6 +68,7 @@ const KNOWLEDGE_DOCS: DocItem[] = [
     subtitle: "Системы TN-C, TN-S, TN-C-S, TT, IT. Сопротивление контура и проверка.",
     category: "Заземление",
     tags: ["ПУЭ", "Заземление"],
+    hasTable: true,
     content: [
       "Системы заземления электроустановок зданий по классификации ГОСТ Р 50571.1:",
       "• TN-C — совмещенный нулевой защитный и рабочий проводник (PEN) на всем протяжении. Устаревшая система.",
@@ -189,6 +190,7 @@ const KNOWLEDGE_DOCS: DocItem[] = [
     subtitle: "Электрическая энергия. Нормы качества в системах электроснабжения общего назначения.",
     category: "ГОСТ",
     tags: ["ГОСТ"],
+    hasTable: true,
     content: [
       "Определяет показатели и установленные нормы качества электроэнергии в сетях переменного тока частотой 50 Гц.",
       "Регламентирует допустимые отклонения напряжения: в нормальном режиме работы отклонение напряжения в точке присоединения потребителя не должно превышать ±10% от номинального значения."
@@ -346,12 +348,39 @@ export function KnowledgePage() {
                 <p key={idx}>{paragraph}</p>
               ))}
 
-              {/* Table: UZO / DIFF */}
+              {/* Table: Grounding Systems */}
+              {selectedDoc.id === 'grounding-systems' && (
+                <div className="border border-slate-700 rounded-xl overflow-hidden mt-4 text-xs">
+                  <div className="bg-slate-800 px-4 py-2 font-semibold text-slate-200 flex justify-between">
+                    <span>Система</span><span>Описание</span><span>Безопасность</span>
+                  </div>
+                  <div className="divide-y divide-slate-800">
+                    <div className="px-4 py-2 flex justify-between"><span>TN-C</span><span>PEN-проводник</span><span>Низкая</span></div>
+                    <div className="px-4 py-2 flex justify-between"><span>TN-S</span><span>PE+N отдельно</span><span>Высокая</span></div>
+                    <div className="px-4 py-2 flex justify-between"><span>TN-C-S</span><span>Разделение на вводе</span><span>Высокая</span></div>
+                    <div className="px-4 py-2 flex justify-between"><span>TT</span><span>Локальный контур</span><span>Зависит от УЗО</span></div>
+                  </div>
+                </div>
+              )}
+
+              {/* Table: Power Quality */}
+              {selectedDoc.id === 'gost-32144' && (
+                <div className="border border-slate-700 rounded-xl overflow-hidden mt-4 text-xs">
+                  <div className="bg-slate-800 px-4 py-2 font-semibold text-slate-200 flex justify-between">
+                    <span>Параметр</span><span>Номинал</span><span>Допуск (±10%)</span>
+                  </div>
+                  <div className="divide-y divide-slate-800">
+                    <div className="px-4 py-2 flex justify-between"><span>Напряжение (В)</span><span>230 В</span><span>207 - 253 В</span></div>
+                    <div className="px-4 py-2 flex justify-between"><span>Частота (Гц)</span><span>50 Гц</span><span>± 0.2 - 0.4 Гц</span></div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Tables from previous stages remain available */}
               {selectedDoc.id === 'uzo-diff' && (
                 <div className="border border-slate-700 rounded-xl overflow-hidden mt-4 text-xs">
                   <div className="bg-slate-800 px-4 py-2 font-semibold text-slate-200 flex justify-between">
-                    <span>Зона применения</span>
-                    <span>Ток утечки</span>
+                    <span>Зона применения</span><span>Ток утечки ($I_{\Delta n}$)</span>
                   </div>
                   <div className="divide-y divide-slate-800">
                     <div className="px-4 py-2 flex justify-between"><span>Ванная / Бассейн</span><span className="text-emerald-400">10 мА</span></div>
@@ -361,12 +390,10 @@ export function KnowledgePage() {
                 </div>
               )}
 
-              {/* Table: POTEE */}
               {selectedDoc.id === 'potee' && (
                 <div className="border border-slate-700 rounded-xl overflow-hidden mt-4 text-xs">
                   <div className="bg-slate-800 px-4 py-2 font-semibold text-slate-200 flex justify-between">
-                    <span>Группа</span>
-                    <span>Требования</span>
+                    <span>Группа</span><span>Требования</span>
                   </div>
                   <div className="divide-y divide-slate-800">
                     <div className="px-4 py-2 flex justify-between"><span>I</span><span>Инструктаж, неэлектротехнический персонал</span></div>
@@ -376,14 +403,11 @@ export function KnowledgePage() {
                   </div>
                 </div>
               )}
-              
-              {/* Tables from Stage 1 */}
+
               {selectedDoc.id === 'gost-50571-5-52' && (
                 <div className="border border-slate-700 rounded-xl overflow-hidden mt-4 text-xs">
                   <div className="bg-slate-800 px-4 py-2 font-semibold text-slate-200 flex justify-between">
-                    <span>Сечение (мм²)</span>
-                    <span>Открыто (А)</span>
-                    <span>В трубе (А)</span>
+                    <span>Сечение (мм²)</span><span>Открыто (А)</span><span>В трубе (А)</span>
                   </div>
                   <div className="divide-y divide-slate-800">
                     <div className="px-4 py-2 flex justify-between"><span>1.5</span><span>19 А</span><span>15 А</span></div>
@@ -398,9 +422,7 @@ export function KnowledgePage() {
               {selectedDoc.id === 'gost-50462' && (
                 <div className="border border-slate-700 rounded-xl overflow-hidden mt-4 text-xs">
                   <div className="bg-slate-800 px-4 py-2 font-semibold text-slate-200 flex justify-between">
-                    <span>Назначение жилы</span>
-                    <span>Буквенный код</span>
-                    <span>Цвет изоляции</span>
+                    <span>Назначение жилы</span><span>Буквенный код</span><span>Цвет изоляции</span>
                   </div>
                   <div className="divide-y divide-slate-800">
                     <div className="px-4 py-2 flex justify-between"><span>Фаза</span><span>L</span><span className="text-amber-400">Коричневый / Черный / Серый / Белый</span></div>
