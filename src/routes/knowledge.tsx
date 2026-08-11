@@ -1,13 +1,9 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
-  BookOpen,
   Search,
   X,
   FileText,
-  Shield,
-  Zap,
-  CheckCircle2,
   ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,6 +19,7 @@ type DocItem = {
   category: string;
   tags: string[];
   content: string[];
+  hasTable?: boolean;
 };
 
 const KNOWLEDGE_DOCS: DocItem[] = [
@@ -120,8 +117,9 @@ const KNOWLEDGE_DOCS: DocItem[] = [
     subtitle: "Идентификация проводников по цветам и буквенно-цифровым обозначениям.",
     category: "ГОСТ",
     tags: ["ГОСТ", "Кабельные линии"],
+    hasTable: true,
     content: [
-      "Цветовая гамма проводов и кабелей в электроустановках переменного тока:",
+      "Цветовая гамма проводов и кабелей в электроустановках переменного тока согласно стандарту:",
       "• Фазные проводники (L): коричневый, черный, серый.",
       "• Нейтральный рабочий проводник (N): голубой / синий.",
       "• Защитный проводник (PE / заземление): желто-зеленый."
@@ -178,9 +176,10 @@ const KNOWLEDGE_DOCS: DocItem[] = [
     subtitle: "Электроустановки низковольтные. Выбор и монтаж электропроводок.",
     category: "ГОСТ",
     tags: ["ГОСТ", "Кабельные линии"],
+    hasTable: true,
     content: [
       "Устанавливает детальные требования к выбору и монтажу электропроводок в зависимости от внешних воздействий и условий окружающей среды.",
-      "Содержит базовые таблицы допустимых длительных токов для проводов и кабелей с медными и алюминиевыми жилами в различных режимах прокладки (в трубах, коробах, в земле, открыто), а также поправочные коэффициенты при групповой прокладке."
+      "Ниже приведена таблица допустимых длительных токов для медных кабелей (например, ВВГнг-LS) в зависимости от сечения и способа прокладки:"
     ]
   },
   {
@@ -343,6 +342,39 @@ export function KnowledgePage() {
               {selectedDoc.content.map((paragraph, idx) => (
                 <p key={idx}>{paragraph}</p>
               ))}
+
+              {/* Custom tables for Stage 1 */}
+              {selectedDoc.id === 'gost-50571-5-52' && (
+                <div className="border border-slate-700 rounded-xl overflow-hidden mt-4 text-xs">
+                  <div className="bg-slate-800 px-4 py-2 font-semibold text-slate-200 flex justify-between">
+                    <span>Сечение (мм²)</span>
+                    <span>Открыто (А)</span>
+                    <span>В трубе (А)</span>
+                  </div>
+                  <div className="divide-y divide-slate-800">
+                    <div className="px-4 py-2 flex justify-between"><span>1.5</span><span>19 А</span><span>15 А</span></div>
+                    <div className="px-4 py-2 flex justify-between"><span>2.5</span><span>27 А</span><span>21 А</span></div>
+                    <div className="px-4 py-2 flex justify-between"><span>4.0</span><span>38 А</span><span>28 А</span></div>
+                    <div className="px-4 py-2 flex justify-between"><span>6.0</span><span>46 А</span><span>36 А</span></div>
+                    <div className="px-4 py-2 flex justify-between"><span>10.0</span><span>70 А</span><span>50 А</span></div>
+                  </div>
+                </div>
+              )}
+
+              {selectedDoc.id === 'gost-50462' && (
+                <div className="border border-slate-700 rounded-xl overflow-hidden mt-4 text-xs">
+                  <div className="bg-slate-800 px-4 py-2 font-semibold text-slate-200 flex justify-between">
+                    <span>Назначение жилы</span>
+                    <span>Буквенный код</span>
+                    <span>Цвет изоляции</span>
+                  </div>
+                  <div className="divide-y divide-slate-800">
+                    <div className="px-4 py-2 flex justify-between"><span>Фаза</span><span>L</span><span className="text-amber-400">Коричневый / Черный</span></div>
+                    <div className="px-4 py-2 flex justify-between"><span>Нейтраль</span><span>N</span><span className="text-blue-400">Голубой / Синий</span></div>
+                    <div className="px-4 py-2 flex justify-between"><span>Заземление</span><span>PE</span><span className="text-emerald-400">Желто-зеленый</span></div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="pt-4 border-t border-slate-800 flex justify-end">
