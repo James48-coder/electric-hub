@@ -88,7 +88,7 @@ export function RootLayout() {
                   <div
                     key={idx}
                     onClick={() => {
-                      navigate({ to: item.path });
+                      navigate({ to: item.path as any });
                       setIsSearchOpen(false);
                       setSearchQuery("");
                     }}
