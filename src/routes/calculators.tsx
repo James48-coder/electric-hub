@@ -16,6 +16,7 @@ import {
   BookOpen,
   Lightbulb,
   ShieldAlert,
+  Calculator,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,7 +37,8 @@ type ToolId =
   | "three-way"
   | "color-codes"
   | "lighting-calc"
-  | "uzo-calc";
+  | "uzo-calc"
+  | "load-calc";
 
 type Tool = {
   id: ToolId;
@@ -118,6 +120,13 @@ const CATEGORIES: Category[] = [
         title: "Подбор УЗО / Диф. автомата",
         description: "Выбор тока утечки и номинала по правилам ПУЭ гл. 7.1.",
         icon: ShieldAlert,
+        ready: true,
+      },
+      {
+        id: "load-calc",
+        title: "Расчёт суммарной нагрузки",
+        description: "Суммарная мощность и ток с коэффициентом одновременности по СП 256.",
+        icon: Calculator,
         ready: true,
       },
     ],
@@ -820,10 +829,10 @@ function LightingCalculatorEmbedded() {
   );
 }
 
-// --- ПУНКТ 2 (ИЗ НОВОГО СПИСКА): ВЫБОР НОМИНАЛА И ТИПА УЗО / ДИФ. АВТОМАТА (ПО ПУЭ ГЛ. 7.1) ---
+// --- ВЫБОР НОМИНАЛА И ТИПА УЗО / ДИФ. АВТОМАТА (ПО ПУЭ ГЛ. 7.1) ---
 function UzoCalculatorEmbedded() {
-  const [zoneType, setZoneType] = useState('sockets'); // bathroom=10mA, sockets=30mA, fire=300mA
-  const [breakerRating, setBreakerRating] = useState('16'); // номинал защитного автомата
+  const [zoneType, setZoneType] = useState('sockets');
+  const [breakerRating, setBreakerRating] = useState('16');
   const [resultData, setResultData] = useState<{ leakage: number; recommendedUzo: number; typeUzo: string; message: string } | null>(null);
 
   const handleCalculate = () => {
@@ -839,7 +848,6 @@ function UzoCalculatorEmbedded() {
       zoneDesc = "Противопожарное вводное УЗО";
     }
 
-    // Правило ПУЭ: номинал УЗО по току должен быть не менее номинала защитного автомата (на ступень выше)
     const standardUzoRatings = [16, 25, 40, 63, 80];
     let recommendedUzo = 25;
     for (const r of standardUzoRatings) {
@@ -848,7 +856,6 @@ function UzoCalculatorEmbedded() {
         break;
       }
     }
-    // Если автомат равен номиналу УЗО, по правилам безопасности лучше взять на ступень выше
     if (recommendedUzo === bAmps) {
       const idx = standardUzoRatings.indexOf(bAmps);
       if (idx !== -1 && idx < standardUzoRatings.length - 1) {
@@ -907,6 +914,143 @@ function UzoCalculatorEmbedded() {
           className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors mt-2 flex items-center justify-center gap-2"
         >
           <Zap className="w-4 h-4" /> Рассчитать УЗО по ПУЭ
+        </button>
+
+        {resultData && (
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3 text-sm text-blue-900 font-medium">
+            <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+            <span>{resultData.message}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// --- ПУНКТ 3 (ИЗ НОВОГО СПИСКА): РАСЧЁТ СУММАРНОЙ НАГРУЗКИ С КОЭФФИЦИЕНТОМ ОДНОВРЕМЕННОСТИ (СП 256) ---
+function LoadCalculatorEmbedded() {
+  const [voltage, setVoltage] = useState('220');
+  const [lighting, setLighting] = useState('');
+  const [sockets, setSockets] = useState('');
+  const [kitchen, setKitchen] = useState('');
+  const [climate, setClimate] = useState('');
+  const [resultData, setResultData] = useState<{ pInst: number; pCalc: number; current: number; breaker: number; message: string } | null>(null);
+
+  const handleCalculate = () => {
+    const l = Number(lighting) || 0;
+    const sock = Number(sockets) || 0;
+    const kit = Number(kitchen) || 0;
+    const clim = Number(climate) || 0;
+    const U = Number(voltage) || 220;
+
+    const pInst = l + sock + kit + clim;
+    if (pInst <= 0) {
+      alert("Введите мощность хотя бы для одной группы потребителей");
+      return;
+    }
+
+    // Расчет по СП 256.1325800 с коэффициентами одновременности:
+    // Освещение: 0.8, Розетки: 0.3, Кухня/плита: 0.7, Климат/бойлер: 0.8
+    const pCalc = (l * 0.8) + (sock * 0.3) + (kit * 0.7) + (clim * 0.8);
+
+    let current = 0;
+    if (U === 380) {
+      current = (pCalc * 1000) / (1.732 * 380 * 0.9);
+    } else {
+      current = (pCalc * 1000) / (220 * 0.9);
+    }
+
+    const breakers = [16, 25, 32, 40, 50, 63, 80, 100];
+    let selectedBreaker = breakers[0];
+    for (const b of breakers) {
+      if (b >= current) {
+        selectedBreaker = b;
+        break;
+      }
+    }
+    if (current > selectedBreaker) selectedBreaker = 100;
+
+    setResultData({
+      pInst: Number(pInst.toFixed(2)),
+      pCalc: Number(pCalc.toFixed(2)),
+      current: Number(current.toFixed(1)),
+      breaker: selectedBreaker,
+      message: `Установленная мощность: ${pInst.toFixed(1)} кВт. С учётом коэффициентов одновременности по СП 256.1325800 расчетная нагрузка составляет ~${pCalc.toFixed(1)} кВт. Расчетный ток: ~${current.toFixed(1)} А. Рекомендуемый вводной автомат: ${selectedBreaker} А.`
+    });
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-xl mx-auto text-slate-900 space-y-6">
+      <h2 className="text-xl font-bold flex items-center gap-2">
+        <Calculator className="w-6 h-6 text-blue-600" />
+        Расчёт суммарной нагрузки (СП 256)
+      </h2>
+
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Label>Напряжение сети (В)</Label>
+          <Select value={voltage} onValueChange={setVoltage}>
+            <SelectTrigger className="w-full bg-slate-50">
+              <SelectValue placeholder="220 В" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="220">220 В (Однофазная)</SelectItem>
+              <SelectItem value="380">380 В (Трехфазная)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Освещение (кВт)</Label>
+            <input 
+              type="number" 
+              value={lighting}
+              onChange={(e) => setLighting(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-md h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+              placeholder="1.0" 
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Розетки / бытовые (кВт)</Label>
+            <input 
+              type="number" 
+              value={sockets}
+              onChange={(e) => setSockets(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-md h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+              placeholder="5.0" 
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Электроплита / кухня (кВт)</Label>
+            <input 
+              type="number" 
+              value={kitchen}
+              onChange={(e) => setKitchen(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-md h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+              placeholder="7.0" 
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Бойлер / климат (кВт)</Label>
+            <input 
+              type="number" 
+              value={climate}
+              onChange={(e) => setClimate(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-md h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+              placeholder="3.0" 
+            />
+          </div>
+        </div>
+
+        <button 
+          onClick={handleCalculate}
+          className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors mt-2 flex items-center justify-center gap-2"
+        >
+          <Zap className="w-4 h-4" /> Рассчитать нагрузку по СП 256
         </button>
 
         {resultData && (
@@ -1243,6 +1387,21 @@ function Page() {
           <p className="text-muted-foreground text-sm">Выбор тока утечки и номинала по правилам ПУЭ гл. 7.1.</p>
         </header>
         <UzoCalculatorEmbedded />
+      </div>
+    );
+  }
+
+  if (openTool === "load-calc") {
+    return (
+      <div className="mx-auto w-full max-w-6xl py-6 space-y-6">
+        <Button variant="ghost" size="sm" onClick={() => setOpenTool(null)} className="gap-2">
+          <ArrowLeft className="h-4 w-4" /> К списку калькуляторов
+        </Button>
+        <header className="space-y-1">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Расчёт суммарной нагрузки</h1>
+          <p className="text-muted-foreground text-sm">Расчет мощности и вводного автомата с коэффициентами одновременности по СП 256.</p>
+        </header>
+        <LoadCalculatorEmbedded />
       </div>
     );
   }
