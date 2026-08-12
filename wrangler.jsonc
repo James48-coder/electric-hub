@@ -1,10 +1,7 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "electric-hub",
-  "compatibility_date": "2025-09-24",
-  "compatibility_flags": ["nodejs_compat"],
-  "main": "dist/server/server.js",
+  "compatibility_date": "2024-04-05",
   "assets": {
-    "directory": "./dist/client"
+    "directory": "./dist"
   }
 }
