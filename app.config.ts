@@ -1,19 +1,19 @@
-import { defineConfig } from 'vinxi'
-import tsConfigPaths from 'vite-tsconfig-paths'
-import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
+import { createApp } from "vinxi"
+import tsConfigPaths from "vite-tsconfig-paths"
+import { TanStackRouterVite } from "@tanstack/router-plugin/vite"
 
-export default defineConfig({
+export default createApp({
   routers: [
     {
-      name: 'public',
-      type: 'static',
-      dir: './public',
+      name: "public",
+      type: "static",
+      dir: "./public",
     },
     {
-      name: 'ssr',
-      type: 'http',
-      handler: './app/ssr.tsx',
-      target: 'server',
+      name: "ssr",
+      type: "http",
+      handler: "./app/ssr.tsx",
+      target: "server",
       plugins: () => [TanStackRouterVite(), tsConfigPaths()],
     },
   ],
