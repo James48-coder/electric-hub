@@ -1,8 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider } from '@tanstack/react-router'
-import router from './router'
+import { getRouter } from './router'
 import './styles.css'
+
+// Создаем экземпляр роутера, вызывая функцию из твоего файла
+const router = getRouter()
 
 const rootElement = document.getElementById('root')!
 if (!rootElement.innerHTML) {
