@@ -1,7 +1,7 @@
 import { createRootRoute, Outlet, ScrollRestoration } from "@tanstack/react-router";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/header";
-import { Sidebar } from "@/components/sidebar"; // Убедись, что регистр совпадает с твоим файлом
+import { AppSidebar } from "@/components/app-sidebar"; 
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -12,8 +12,8 @@ function RootComponent() {
     <ThemeProvider defaultTheme="dark">
       <div className="flex min-h-screen w-full bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
         
-        {/* Левое боковое меню */}
-        <Sidebar />
+        {/* Левое боковое меню (восстановлено) */}
+        <AppSidebar />
         
         {/* Правая часть: Шапка + Основной контент */}
         <div className="flex flex-1 flex-col overflow-hidden">
