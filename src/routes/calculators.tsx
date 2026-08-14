@@ -1,149 +1,178 @@
-@import "tailwindcss" source(none);
-@import "tw-animate-css";
-@source "../src";
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { 
+  Cable, 
+  TrendingDown, 
+  CircleDashed, 
+  Sigma, 
+  Lightbulb, 
+  Cpu, 
+  ShieldAlert, 
+  Calculator 
+} from 'lucide-react'
 
-@custom-variant dark (&:is(.dark *));
+export const Route = createFileRoute('/calculators')({
+  component: CalculatorsPage,
+})
 
-@theme {
-  --font-sans: 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
-}
+function CalculatorsPage() {
+  return (
+    <div className="container mx-auto p-6 max-w-6xl animate-in fade-in duration-500">
+      <div className="mb-8">
+        <p className="text-muted-foreground text-sm uppercase tracking-wider mb-2 font-mono">
+          Полный инженерный набор: расчёты, проектирование трасс, подбор оборудования и распиновки.
+        </p>
+      </div>
 
-/* --- БАЗОВЫЕ ТЕМЫ --- */
-:root, .light {
-  --background: #ffffff;
-  --foreground: #09090b;
-  --card: #ffffff;
-  --card-foreground: #09090b;
-  --popover: #ffffff;
-  --popover-foreground: #09090b;
-  --primary: #2563eb;
-  --primary-foreground: #ffffff;
-  --accent: #f1f5f9;
-  --destructive: #ef4444;
-  --border: #e2e8f0;
-  --radius: 0.5rem;
-}
+      {/* Навигация по разделам (вкладки) */}
+      <div className="flex items-center gap-6 border-b border-border pb-4 mb-8 text-sm font-medium text-muted-foreground overflow-x-auto">
+        <span className="text-foreground border-b-2 border-primary pb-4 -mb-[17px] cursor-pointer">Базовые</span>
+        <span className="hover:text-foreground cursor-pointer transition-colors">Проектирование</span>
+        <span className="hover:text-foreground cursor-pointer transition-colors">Оборудование</span>
+        <span className="hover:text-foreground cursor-pointer transition-colors">Схемы и распиновка</span>
+      </div>
 
-.dark {
-  --background: #09090b;
-  --foreground: #fafafa;
-  --card: #18181b;
-  --card-foreground: #fafafa;
-  --popover: #18181b;
-  --popover-foreground: #fafafa;
-  --primary: #3b82f6;
-  --primary-foreground: #ffffff;
-  --accent: #27272a;
-  --destructive: #991b1b;
-  --border: #27272a;
-  --radius: 0.5rem;
-}
+      <div className="space-y-12">
+        {/* Секция: Базовые */}
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">Базовые</h2>
+            <span className="text-xs text-muted-foreground font-mono">2 инстр.</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Карточка 1 */}
+            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary/50 transition-all">
+              <div>
+                <div className="mb-4 inline-flex items-center justify-center rounded-lg p-2 bg-primary/10 text-primary">
+                  <Cable className="h-6 w-6" />
+                </div>
+                <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Сечение кабеля по мощности</h3>
+                <p className="text-sm text-muted-foreground mb-6">Подбор сечения и автомата по нагрузке (Cu/Al, 220/380 В).</p>
+              </div>
+              <Link to="/" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+                Открыть
+              </Link>
+            </div>
 
-.contrast {
-  --background: #000000;
-  --foreground: #ffffff;
-  --card: #000000;
-  --card-foreground: #ffffff;
-  --popover: #000000;
-  --popover-foreground: #ffffff;
-  --primary: #fbbf24;
-  --primary-foreground: #000000;
-  --accent: #333333;
-  --destructive: #ff0000;
-  --border: #fbbf24;
-  --radius: 0;
-}
+            {/* Карточка 2 */}
+            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary/50 transition-all">
+              <div>
+                <div className="mb-4 inline-flex items-center justify-center rounded-lg p-2 bg-yellow-500/10 text-yellow-500">
+                  <TrendingDown className="h-6 w-6" />
+                </div>
+                <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors flex items-center gap-2">
+                  Падение напряжения
+                </h3>
+                <p className="text-sm text-muted-foreground mb-6">Проверка ΔU на линии с учётом длины и тока.</p>
+              </div>
+              <Link to="/" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+                Открыть
+              </Link>
+            </div>
+          </div>
+        </section>
 
-/* --- ПРЕМИУМ-ТЕМЫ --- */
-.theme-oled {
-  --background: #000000;
-  --foreground: #f4f4f5;
-  --card: #0a0a0a;
-  --card-foreground: #f4f4f5;
-  --popover: #0a0a0a;
-  --popover-foreground: #f4f4f5;
-  --primary: #ccff00;
-  --primary-foreground: #000000;
-  --accent: #171717;
-  --destructive: #ef4444;
-  --border: #1a1a1a;
-  --radius: 0.75rem;
-}
+        {/* Секция: Проектирование */}
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">Проектирование</h2>
+            <span className="text-xs text-muted-foreground font-mono">3 инстр.</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Карточка 3 */}
+            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary/50 transition-all">
+              <div>
+                <div className="mb-4 inline-flex items-center justify-center rounded-lg p-2 bg-primary/10 text-primary">
+                  <CircleDashed className="h-6 w-6" />
+                </div>
+                <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Заполняемость гофры/трубы</h3>
+                <p className="text-sm text-muted-foreground mb-6">Допустимое количество кабелей в трассе по нормам.</p>
+              </div>
+              <Link to="/" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+                Открыть
+              </Link>
+            </div>
 
-.theme-scandi {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --card-foreground: #0f172a;
-  --popover: #ffffff;
-  --popover-foreground: #0f172a;
-  --primary: #0f172a;
-  --primary-foreground: #ffffff;
-  --accent: #f1f5f9;
-  --destructive: #dc2626;
-  --border: #000000;
-  --radius: 0px; 
-}
+            {/* Карточка 4 */}
+            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary/50 transition-all">
+              <div>
+                <div className="mb-4 inline-flex items-center justify-center rounded-lg p-2 bg-primary/10 text-primary">
+                  <Sigma className="h-6 w-6" />
+                </div>
+                <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Расчёт контура заземления</h3>
+                <p className="text-sm text-muted-foreground mb-6">Сопротивление растеканию по типу грунта и электродов.</p>
+              </div>
+              <Link to="/" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+                Открыть
+              </Link>
+            </div>
 
-.theme-terminal {
-  --background: #18181b;
-  --foreground: #a1a1aa;
-  --card: #27272a;
-  --card-foreground: #e4e4e7;
-  --popover: #27272a;
-  --popover-foreground: #e4e4e7;
-  --primary: #10b981;
-  --primary-foreground: #000000;
-  --accent: #3f3f46;
-  --destructive: #ef4444;
-  --border: #3f3f46;
-  --radius: 0.25rem;
-  font-family: var(--font-mono); 
-}
+            {/* Карточка 5 */}
+            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary/50 transition-all">
+              <div>
+                <div className="mb-4 inline-flex items-center justify-center rounded-lg p-2 bg-primary/10 text-primary">
+                  <Lightbulb className="h-6 w-6" />
+                </div>
+                <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Расчёт освещенности</h3>
+                <p className="text-sm text-muted-foreground mb-6">Определение светового потока и числа светильников по СП 52.13330.</p>
+              </div>
+              <Link to="/" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+                Открыть
+              </Link>
+            </div>
+          </div>
+        </section>
 
-.theme-ocean {
-  --background: #082f49;
-  --foreground: #f0f9ff;
-  --card: #0c4a6e;
-  --card-foreground: #f0f9ff;
-  --popover: #0c4a6e;
-  --popover-foreground: #f0f9ff;
-  --primary: #06b6d4;
-  --primary-foreground: #ffffff;
-  --accent: #facc15;
-  --destructive: #ef4444;
-  --border: #0369a1;
-  --radius: 0.75rem;
-}
+        {/* Секция: Оборудование */}
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">Оборудование</h2>
+            <span className="text-xs text-muted-foreground font-mono">4 инстр.</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Карточка 6 */}
+            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary/50 transition-all">
+              <div>
+                <div className="mb-4 inline-flex items-center justify-center rounded-lg p-2 bg-primary/10 text-primary">
+                  <Cpu className="h-6 w-6" />
+                </div>
+                <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Подбор конденсаторов для двигателя</h3>
+                <p className="text-sm text-muted-foreground mb-6">Ёмкость пускового и рабочего конденсатора 1Ф/3Ф.</p>
+              </div>
+              <Link to="/" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+                Открыть
+              </Link>
+            </div>
 
-.theme-teal {
-  --background: #042f2e;
-  --foreground: #ccfbf1;
-  --card: #134e4a;
-  --card-foreground: #ccfbf1;
-  --popover: #134e4a;
-  --popover-foreground: #ccfbf1;
-  --primary: #2dd4bf;
-  --primary-foreground: #042f2e;
-  --accent: #0f766e;
-  --destructive: #f87171;
-  --border: #115e59;
-  --radius: 0.5rem;
-}
+            {/* Карточка 7 */}
+            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary/50 transition-all">
+              <div>
+                <div className="mb-4 inline-flex items-center justify-center rounded-lg p-2 bg-primary/10 text-primary">
+                  <ShieldAlert className="h-6 w-6" />
+                </div>
+                <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Подбор УЗО / Диф. автомата</h3>
+                <p className="text-sm text-muted-foreground mb-6">Выбор тока утечки и номинала по правилам ПУЭ гл. 7.1.</p>
+              </div>
+              <Link to="/" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+                Открыть
+              </Link>
+            </div>
 
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-}
-
-.bg-card {
-  background-color: var(--card) !important;
-  color: var(--card-foreground) !important;
-}
-
-/* Принудительная заливка всплывающих окон и селектов */
-.bg-popover, select {
-  background-color: var(--popover) !important;
-  color: var(--popover-foreground) !important;
+            {/* Карточка 8 */}
+            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary/50 transition-all">
+              <div>
+                <div className="mb-4 inline-flex items-center justify-center rounded-lg p-2 bg-primary/10 text-primary">
+                  <Calculator className="h-6 w-6" />
+                </div>
+                <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Расчёт суммарной нагрузки</h3>
+                <p className="text-sm text-muted-foreground mb-6">Суммарная мощность и ток с коэффициентом одновременности по СП 256.</p>
+              </div>
+              <Link to="/" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+                Открыть
+              </Link>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  )
 }
