@@ -7,6 +7,8 @@ export const THEMES = [
   { id: "theme-oled", label: "OLED Pro", icon: "Monitor", swatch: "#000000" },
   { id: "theme-scandi", label: "Сканди Тех", icon: "Square", swatch: "#f8fafc" },
   { id: "theme-terminal", label: "Терминал", icon: "Terminal", swatch: "#10b981" },
+  { id: "theme-ocean", label: "Неоновый Океан", icon: "Waves", swatch: "#06b6d4" },
+  { id: "theme-teal", label: "Тёмная Бирюза", icon: "Hexagon", swatch: "#2dd4bf" },
 ];
 
 type Theme = string;
