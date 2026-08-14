@@ -15,6 +15,8 @@
   --foreground: #09090b;
   --card: #ffffff;
   --card-foreground: #09090b;
+  --popover: #ffffff;
+  --popover-foreground: #09090b;
   --primary: #2563eb;
   --primary-foreground: #ffffff;
   --accent: #f1f5f9;
@@ -28,6 +30,8 @@
   --foreground: #fafafa;
   --card: #18181b;
   --card-foreground: #fafafa;
+  --popover: #18181b;
+  --popover-foreground: #fafafa;
   --primary: #3b82f6;
   --primary-foreground: #ffffff;
   --accent: #27272a;
@@ -41,6 +45,8 @@
   --foreground: #ffffff;
   --card: #000000;
   --card-foreground: #ffffff;
+  --popover: #000000;
+  --popover-foreground: #ffffff;
   --primary: #fbbf24;
   --primary-foreground: #000000;
   --accent: #333333;
@@ -55,6 +61,8 @@
   --foreground: #f4f4f5;
   --card: #0a0a0a;
   --card-foreground: #f4f4f5;
+  --popover: #0a0a0a;
+  --popover-foreground: #f4f4f5;
   --primary: #ccff00;
   --primary-foreground: #000000;
   --accent: #171717;
@@ -68,6 +76,8 @@
   --foreground: #0f172a;
   --card: #ffffff;
   --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
   --primary: #0f172a;
   --primary-foreground: #ffffff;
   --accent: #f1f5f9;
@@ -81,6 +91,8 @@
   --foreground: #a1a1aa;
   --card: #27272a;
   --card-foreground: #e4e4e7;
+  --popover: #27272a;
+  --popover-foreground: #e4e4e7;
   --primary: #10b981;
   --primary-foreground: #000000;
   --accent: #3f3f46;
@@ -95,6 +107,8 @@
   --foreground: #f0f9ff;
   --card: #0c4a6e;
   --card-foreground: #f0f9ff;
+  --popover: #0c4a6e;
+  --popover-foreground: #f0f9ff;
   --primary: #06b6d4;
   --primary-foreground: #ffffff;
   --accent: #facc15;
@@ -108,6 +122,8 @@
   --foreground: #ccfbf1;
   --card: #134e4a;
   --card-foreground: #ccfbf1;
+  --popover: #134e4a;
+  --popover-foreground: #ccfbf1;
   --primary: #2dd4bf;
   --primary-foreground: #042f2e;
   --accent: #0f766e;
@@ -121,14 +137,13 @@ body {
   color: var(--foreground);
 }
 
-/* Жестко фиксируем непрозрачность карточек и элементов, чтобы текст не накладывался */
 .bg-card {
   background-color: var(--card) !important;
   color: var(--card-foreground) !important;
 }
 
-/* Исправление для выпадающих списков (селектов), чтобы они не накладывали текст друг на друга */
-select, option {
-  background-color: var(--card);
-  color: var(--foreground);
+/* Принудительная заливка всплывающих окон и селектов */
+.bg-popover, select {
+  background-color: var(--popover) !important;
+  color: var(--popover-foreground) !important;
 }
