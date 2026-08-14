@@ -1,44 +1,75 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
-export type Theme = "light" | "dark" | "hc" | "electric" | "industrial" | "eco" | "emerald";
-
-export const THEMES: { id: Theme; label: string; swatch: string }[] = [
-  { id: "light", label: "Светлая", swatch: "linear-gradient(135deg,#f4f6fb,#e6ecf6)" },
-  { id: "dark", label: "Тёмная", swatch: "linear-gradient(135deg,#1f2540,#0f1325)" },
-  { id: "hc", label: "Контраст", swatch: "linear-gradient(135deg,#ffffff 50%,#000 50%)" },
-  { id: "electric", label: "Electric Blue", swatch: "linear-gradient(135deg,#1b3bff,#22d3ee)" },
-  { id: "industrial", label: "Industrial", swatch: "linear-gradient(135deg,#3a2c1c,#d18a3a)" },
-  { id: "eco", label: "Eco Power", swatch: "linear-gradient(135deg,#0f7a3d,#5fd38a)" },
-  { id: "emerald", label: "Solid Emerald", swatch: "linear-gradient(135deg,#064e3b,#10b981)" },
+export const THEMES = [
+  { id: "light", label: "Светлая", swatch: "#ffffff" },
+  { id: "dark", label: "Тёмная", swatch: "#09090b" },
+  { id: "contrast", label: "Контрастная (на солнце)", swatch: "#fbbf24" }
 ];
 
-type Ctx = { theme: Theme; setTheme: (t: Theme) => void };
-const ThemeCtx = createContext<Ctx | null>(null);
+type Theme = string;
 
-const ALL = ["light", "dark", "hc", "electric", "industrial", "eco", "emerald"] as const;
+type ThemeProviderProps = {
+  children: React.ReactNode;
+  defaultTheme?: Theme;
+  storageKey?: string;
+};
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("light");
+type ThemeProviderState = {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+};
+
+const initialState: ThemeProviderState = {
+  theme: "light",
+  setTheme: () => null,
+};
+
+const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
+
+export function ThemeProvider({
+  children,
+  defaultTheme = "light",
+  storageKey = "voltpro-ui-theme",
+  ...props
+}: ThemeProviderProps) {
+  const [theme, setTheme] = useState<Theme>(
+    () => (typeof window !== "undefined" ? (localStorage.getItem(storageKey) as Theme) : null) || defaultTheme
+  );
 
   useEffect(() => {
-    const saved = (typeof window !== "undefined" && localStorage.getItem("theme")) as Theme | null;
-    if (saved && ALL.includes(saved)) setThemeState(saved);
-  }, []);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    ALL.forEach((t) => root.classList.remove(t));
-    if (theme !== "light") root.classList.add(theme);
-    localStorage.setItem("theme", theme);
+    const root = window.document.documentElement;
+    
+    // Удаляем старые классы тем
+    root.classList.remove("light", "dark", "contrast");
+    
+    // Добавляем текущую
+    if (theme === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      root.classList.add(systemTheme);
+      return;
+    }
+    
+    root.classList.add(theme);
   }, [theme]);
 
+  const value = {
+    theme,
+    setTheme: (theme: Theme) => {
+      localStorage.setItem(storageKey, theme);
+      setTheme(theme);
+    },
+  };
+
   return (
-    <ThemeCtx.Provider value={{ theme, setTheme: setThemeState }}>{children}</ThemeCtx.Provider>
+    <ThemeProviderContext.Provider {...props} value={value}>
+      {children}
+    </ThemeProviderContext.Provider>
   );
 }
 
-export function useTheme() {
-  const ctx = useContext(ThemeCtx);
-  if (!ctx) throw new Error("useTheme must be used within ThemeProvider");
-  return ctx;
-}
+export const useTheme = () => {
+  const context = useContext(ThemeProviderContext);
+  if (context === undefined)
+    throw new Error("useTheme must be used within a ThemeProvider");
+  return context;
+};
