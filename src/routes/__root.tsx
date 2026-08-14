@@ -1,6 +1,6 @@
 import { createRootRoute, Outlet, ScrollRestoration } from "@tanstack/react-router";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Header } from "@/components/Header"; 
+import { Header } from "@/components/header"; 
 
 export const Route = createRootRoute({
   component: RootComponent,
