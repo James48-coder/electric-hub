@@ -54,14 +54,14 @@ export function AppSidebar() {
   return (
     <aside className="hidden w-64 flex-col border-r border-border bg-card/30 lg:flex">
       
-      {/* Логотип с улучшенным выделением и неоном */}
+      {/* Логотип: Исправленный, 100% видимый текст */}
       <div className="flex h-16 items-center px-6 mb-4 mt-2">
         <Link to="/" className="flex items-center gap-3 outline-none group w-full">
           <div className="relative grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary transition-all duration-500 group-hover:bg-primary/20 group-hover:shadow-[0_0_20px_color-mix(in_srgb,var(--primary)_50%,transparent)]">
             <Zap className="h-5 w-5 drop-shadow-[0_0_8px_var(--primary)]" />
           </div>
           <div>
-            <div className="bg-gradient-to-r from-primary to-accent bg-clip-text text-xl font-black tracking-tight text-transparent transition-all duration-300 drop-shadow-sm group-hover:drop-shadow-[0_0_8px_color-mix(in_srgb,var(--primary)_40%,transparent)]">
+            <div className="text-xl font-black tracking-tight text-foreground transition-all duration-300 drop-shadow-sm group-hover:text-primary group-hover:drop-shadow-[0_0_8px_color-mix(in_srgb,var(--primary)_40%,transparent)]">
               ВольтПро
             </div>
             <div className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase opacity-80">
