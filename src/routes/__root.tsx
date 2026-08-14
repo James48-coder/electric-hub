@@ -1,6 +1,7 @@
 import { createRootRoute, Outlet, ScrollRestoration } from "@tanstack/react-router";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Header } from "@/components/header"; 
+import { Header } from "@/components/header";
+import { Sidebar } from "@/components/sidebar"; // Убедись, что регистр совпадает с твоим файлом
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -9,16 +10,18 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <ThemeProvider defaultTheme="dark">
-      {/* Главная обертка приложения */}
-      <div className="relative flex min-h-screen flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
+      <div className="flex min-h-screen w-full bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
         
-        {/* Шапка сайта */}
-        <Header />
+        {/* Левое боковое меню */}
+        <Sidebar />
         
-        {/* Контент текущей страницы (Калькуляторы, Схемы и т.д.) */}
-        <main className="flex-1">
-          <Outlet />
-        </main>
+        {/* Правая часть: Шапка + Основной контент */}
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <Header />
+          <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+            <Outlet />
+          </main>
+        </div>
         
       </div>
       <ScrollRestoration />
