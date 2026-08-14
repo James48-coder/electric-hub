@@ -46,7 +46,7 @@ function CalculatorsPage() {
                 <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Сечение кабеля по мощности</h3>
                 <p className="text-sm text-muted-foreground mb-6">Подбор сечения и автомата по нагрузке (Cu/Al, 220/380 В).</p>
               </div>
-              <Link to="/calculators" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+              <Link to="/calculators/cable" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
                 Открыть
               </Link>
             </div>
@@ -61,7 +61,7 @@ function CalculatorsPage() {
                 </h3>
                 <p className="text-sm text-muted-foreground mb-6">Проверка ΔU на линии с учётом длины и тока.</p>
               </div>
-              <Link to="/calculators" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+              <Link to="/calculators/voltage" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
                 Открыть
               </Link>
             </div>
@@ -83,7 +83,7 @@ function CalculatorsPage() {
                 <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Заполняемость гофры/трубы</h3>
                 <p className="text-sm text-muted-foreground mb-6">Допустимое количество кабелей в трассе по нормам.</p>
               </div>
-              <Link to="/calculators" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+              <Link to="/calculators/gofra" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
                 Открыть
               </Link>
             </div>
@@ -96,7 +96,7 @@ function CalculatorsPage() {
                 <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Расчёт контура заземления</h3>
                 <p className="text-sm text-muted-foreground mb-6">Сопротивление растеканию по типу грунта и электродов.</p>
               </div>
-              <Link to="/calculators" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+              <Link to="/calculators/grounding" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
                 Открыть
               </Link>
             </div>
@@ -109,7 +109,7 @@ function CalculatorsPage() {
                 <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Расчёт освещенности</h3>
                 <p className="text-sm text-muted-foreground mb-6">Определение светового потока и числа светильников по СП 52.13330.</p>
               </div>
-              <Link to="/calculators" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+              <Link to="/calculators/light" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
                 Открыть
               </Link>
             </div>
@@ -131,7 +131,7 @@ function CalculatorsPage() {
                 <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Подбор конденсаторов для двигателя</h3>
                 <p className="text-sm text-muted-foreground mb-6">Ёмкость пускового и рабочего конденсатора 1Ф/3Ф.</p>
               </div>
-              <Link to="/calculators" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+              <Link to="/calculators/capacitor" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
                 Открыть
               </Link>
             </div>
@@ -144,7 +144,7 @@ function CalculatorsPage() {
                 <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Подбор УЗО / Диф. автомата</h3>
                 <p className="text-sm text-muted-foreground mb-6">Выбор тока утечки и номинала по правилам ПУЭ гл. 7.1.</p>
               </div>
-              <Link to="/calculators" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+              <Link to="/calculators/rcd" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
                 Открыть
               </Link>
             </div>
@@ -157,7 +157,7 @@ function CalculatorsPage() {
                 <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Расчёт суммарной нагрузки</h3>
                 <p className="text-sm text-muted-foreground mb-6">Суммарная мощность и ток с коэффициентом одновременности по СП 256.</p>
               </div>
-              <Link to="/calculators" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+              <Link to="/calculators/load" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
                 Открыть
               </Link>
             </div>
