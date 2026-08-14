@@ -9,7 +9,8 @@ import {
   ShieldAlert, 
   Calculator,
   Network,
-  Palette
+  Palette,
+  Plug
 } from 'lucide-react'
 
 export const Route = createFileRoute('/calculators')({
@@ -25,7 +26,7 @@ function CalculatorsPage() {
         </p>
       </div>
 
-      {/* Навигация (теперь кликабельная) */}
+      {/* Навигация */}
       <div className="flex items-center gap-6 border-b border-border pb-4 mb-8 text-sm font-medium text-muted-foreground overflow-x-auto">
         <a href="#basic" className="hover:text-foreground cursor-pointer transition-colors">Базовые</a>
         <a href="#design" className="hover:text-foreground cursor-pointer transition-colors">Проектирование</a>
@@ -123,7 +124,7 @@ function CalculatorsPage() {
         <section id="equipment">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-foreground">Оборудование</h2>
-            <span className="text-xs text-muted-foreground font-mono">4 инстр.</span>
+            <span className="text-xs text-muted-foreground font-mono">5 инстр.</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary hover:shadow-md hover:shadow-primary/20 transition-all duration-300">
@@ -164,10 +165,24 @@ function CalculatorsPage() {
                 Открыть
               </Link>
             </div>
+
+            {/* НОВАЯ КАРТОЧКА: МУФТЫ */}
+            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary hover:shadow-md hover:shadow-primary/20 transition-all duration-300">
+              <div>
+                <div className="mb-4 inline-flex items-center justify-center rounded-lg p-2 bg-primary/10 text-primary">
+                  <Plug className="h-6 w-6" />
+                </div>
+                <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors text-foreground">Подбор кабельных муфт</h3>
+                <p className="text-sm text-muted-foreground mb-6">Выбор концевых и соединительных муфт (термоусадка, заливные) по сечению.</p>
+              </div>
+              <Link to="/calculators/joints" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+                Открыть
+              </Link>
+            </div>
           </div>
         </section>
 
-        {/* Секция: Схемы и распиновка (НОВАЯ) */}
+        {/* Секция: Схемы и распиновка */}
         <section id="schemes">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-foreground">Схемы и распиновка</h2>
