@@ -23,7 +23,6 @@ function CalculatorsPage() {
         </p>
       </div>
 
-      {/* Навигация по разделам (вкладки) */}
       <div className="flex items-center gap-6 border-b border-border pb-4 mb-8 text-sm font-medium text-muted-foreground overflow-x-auto">
         <span className="text-foreground border-b-2 border-primary pb-4 -mb-[17px] cursor-pointer">Базовые</span>
         <span className="hover:text-foreground cursor-pointer transition-colors">Проектирование</span>
@@ -39,8 +38,7 @@ function CalculatorsPage() {
             <span className="text-xs text-muted-foreground font-mono">2 инстр.</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* Карточка 1 */}
-            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary/50 transition-all">
+            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary hover:shadow-md hover:shadow-primary/20 transition-all duration-300">
               <div>
                 <div className="mb-4 inline-flex items-center justify-center rounded-lg p-2 bg-primary/10 text-primary">
                   <Cable className="h-6 w-6" />
@@ -48,13 +46,12 @@ function CalculatorsPage() {
                 <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Сечение кабеля по мощности</h3>
                 <p className="text-sm text-muted-foreground mb-6">Подбор сечения и автомата по нагрузке (Cu/Al, 220/380 В).</p>
               </div>
-              <Link to="/" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+              <Link to="/calculators" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
                 Открыть
               </Link>
             </div>
 
-            {/* Карточка 2 */}
-            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary/50 transition-all">
+            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary hover:shadow-md hover:shadow-primary/20 transition-all duration-300">
               <div>
                 <div className="mb-4 inline-flex items-center justify-center rounded-lg p-2 bg-yellow-500/10 text-yellow-500">
                   <TrendingDown className="h-6 w-6" />
@@ -64,7 +61,7 @@ function CalculatorsPage() {
                 </h3>
                 <p className="text-sm text-muted-foreground mb-6">Проверка ΔU на линии с учётом длины и тока.</p>
               </div>
-              <Link to="/" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+              <Link to="/calculators" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
                 Открыть
               </Link>
             </div>
@@ -78,8 +75,7 @@ function CalculatorsPage() {
             <span className="text-xs text-muted-foreground font-mono">3 инстр.</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* Карточка 3 */}
-            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary/50 transition-all">
+            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary hover:shadow-md hover:shadow-primary/20 transition-all duration-300">
               <div>
                 <div className="mb-4 inline-flex items-center justify-center rounded-lg p-2 bg-primary/10 text-primary">
                   <CircleDashed className="h-6 w-6" />
@@ -87,13 +83,12 @@ function CalculatorsPage() {
                 <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Заполняемость гофры/трубы</h3>
                 <p className="text-sm text-muted-foreground mb-6">Допустимое количество кабелей в трассе по нормам.</p>
               </div>
-              <Link to="/" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+              <Link to="/calculators" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
                 Открыть
               </Link>
             </div>
 
-            {/* Карточка 4 */}
-            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary/50 transition-all">
+            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary hover:shadow-md hover:shadow-primary/20 transition-all duration-300">
               <div>
                 <div className="mb-4 inline-flex items-center justify-center rounded-lg p-2 bg-primary/10 text-primary">
                   <Sigma className="h-6 w-6" />
@@ -101,13 +96,12 @@ function CalculatorsPage() {
                 <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Расчёт контура заземления</h3>
                 <p className="text-sm text-muted-foreground mb-6">Сопротивление растеканию по типу грунта и электродов.</p>
               </div>
-              <Link to="/" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+              <Link to="/calculators" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
                 Открыть
               </Link>
             </div>
 
-            {/* Карточка 5 */}
-            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary/50 transition-all">
+            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary hover:shadow-md hover:shadow-primary/20 transition-all duration-300">
               <div>
                 <div className="mb-4 inline-flex items-center justify-center rounded-lg p-2 bg-primary/10 text-primary">
                   <Lightbulb className="h-6 w-6" />
@@ -115,7 +109,7 @@ function CalculatorsPage() {
                 <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Расчёт освещенности</h3>
                 <p className="text-sm text-muted-foreground mb-6">Определение светового потока и числа светильников по СП 52.13330.</p>
               </div>
-              <Link to="/" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+              <Link to="/calculators" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
                 Открыть
               </Link>
             </div>
@@ -129,8 +123,7 @@ function CalculatorsPage() {
             <span className="text-xs text-muted-foreground font-mono">4 инстр.</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* Карточка 6 */}
-            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary/50 transition-all">
+            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary hover:shadow-md hover:shadow-primary/20 transition-all duration-300">
               <div>
                 <div className="mb-4 inline-flex items-center justify-center rounded-lg p-2 bg-primary/10 text-primary">
                   <Cpu className="h-6 w-6" />
@@ -138,13 +131,12 @@ function CalculatorsPage() {
                 <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Подбор конденсаторов для двигателя</h3>
                 <p className="text-sm text-muted-foreground mb-6">Ёмкость пускового и рабочего конденсатора 1Ф/3Ф.</p>
               </div>
-              <Link to="/" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+              <Link to="/calculators" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
                 Открыть
               </Link>
             </div>
 
-            {/* Карточка 7 */}
-            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary/50 transition-all">
+            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary hover:shadow-md hover:shadow-primary/20 transition-all duration-300">
               <div>
                 <div className="mb-4 inline-flex items-center justify-center rounded-lg p-2 bg-primary/10 text-primary">
                   <ShieldAlert className="h-6 w-6" />
@@ -152,13 +144,12 @@ function CalculatorsPage() {
                 <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Подбор УЗО / Диф. автомата</h3>
                 <p className="text-sm text-muted-foreground mb-6">Выбор тока утечки и номинала по правилам ПУЭ гл. 7.1.</p>
               </div>
-              <Link to="/" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+              <Link to="/calculators" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
                 Открыть
               </Link>
             </div>
 
-            {/* Карточка 8 */}
-            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary/50 transition-all">
+            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary hover:shadow-md hover:shadow-primary/20 transition-all duration-300">
               <div>
                 <div className="mb-4 inline-flex items-center justify-center rounded-lg p-2 bg-primary/10 text-primary">
                   <Calculator className="h-6 w-6" />
@@ -166,7 +157,7 @@ function CalculatorsPage() {
                 <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors">Расчёт суммарной нагрузки</h3>
                 <p className="text-sm text-muted-foreground mb-6">Суммарная мощность и ток с коэффициентом одновременности по СП 256.</p>
               </div>
-              <Link to="/" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+              <Link to="/calculators" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
                 Открыть
               </Link>
             </div>
