@@ -1,15 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 export const THEMES = [
-  { id: "light", label: "Светлая", icon: "Sun", swatch: "#ffffff" },
-  { id: "dark", label: "Тёмная", icon: "Moon", swatch: "#09090b" },
-  { id: "contrast", label: "Контрастная", icon: "SunDim", swatch: "#fbbf24" },
-  { id: "theme-industrial", label: "Электрощитовая", icon: "Zap", swatch: "#b87333" },
-  { id: "theme-blueprint", label: "Схемотехника", icon: "PenTool", swatch: "#1976d2" },
-  { id: "theme-safety", label: "Безопасность", icon: "ShieldCheck", swatch: "#2e7d32" },
-  { id: "theme-diy", label: "Мастерская", icon: "Wrench", swatch: "#cd7f32" },
-  { id: "theme-flow", label: "Энергия", icon: "Activity", swatch: "#ff6a00" },
-  { id: "theme-minimal", label: "Минимализм", icon: "Box", swatch: "#0066ff" },
+  { id: "light", label: "Светлая", swatch: "#ffffff" },
+  { id: "dark", label: "Тёмная", swatch: "#09090b" },
+  { id: "contrast", label: "Контрастная (на солнце)", swatch: "#fbbf24" }
 ];
 
 type Theme = string;
@@ -26,7 +20,7 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-  theme: "light",
+  theme: "dark",
   setTheme: () => null,
 };
 
@@ -34,7 +28,7 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
-  defaultTheme = "light",
+  defaultTheme = "dark",
   storageKey = "voltpro-ui-theme",
   ...props
 }: ThemeProviderProps) {
@@ -46,12 +40,9 @@ export function ThemeProvider({
     const root = window.document.documentElement;
     const body = window.document.body;
     
-    // Удаляем все возможные классы тем перед установкой новой
-    const allThemes = THEMES.map(t => t.id);
-    root.classList.remove(...allThemes, "system");
-    body.classList.remove(...allThemes, "system");
+    root.classList.remove("light", "dark", "contrast", "system");
+    body.classList.remove("light", "dark", "contrast", "system");
     
-    // Применяем тему к html и body для надежности
     root.classList.add(theme);
     body.classList.add(theme);
   }, [theme]);
