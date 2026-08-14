@@ -120,3 +120,17 @@ body {
   background-color: var(--background);
   color: var(--foreground);
 }
+
+/* --- ZEN MODE (РЕЖИМ КОНЦЕНТРАЦИИ) --- */
+/* Плавно затемняем и размываем сайдбар и шапку, если пользователь вводит данные в калькуляторе */
+body:has(main input:focus) aside,
+body:has(main input:focus) header {
+  opacity: 0.3;
+  filter: grayscale(30%) blur(3px);
+  pointer-events: none;
+}
+
+/* Обеспечиваем плавный переход туда и обратно */
+aside, header {
+  transition: opacity 0.5s ease, filter 0.5s ease;
+}
