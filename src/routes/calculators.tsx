@@ -10,7 +10,8 @@ import {
   Calculator,
   Network,
   Palette,
-  Plug
+  Plug,
+  ShieldPlus
 } from 'lucide-react'
 
 export const Route = createFileRoute('/calculators')({
@@ -76,7 +77,7 @@ function CalculatorsPage() {
         <section id="design">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-foreground">Проектирование</h2>
-            <span className="text-xs text-muted-foreground font-mono">3 инстр.</span>
+            <span className="text-xs text-muted-foreground font-mono">4 инстр.</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary hover:shadow-md hover:shadow-primary/20 transition-all duration-300">
@@ -117,6 +118,20 @@ function CalculatorsPage() {
                 Открыть
               </Link>
             </div>
+
+            {/* НОВАЯ КАРТОЧКА: ДСУП */}
+            <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary hover:shadow-md hover:shadow-primary/20 transition-all duration-300">
+              <div>
+                <div className="mb-4 inline-flex items-center justify-center rounded-lg p-2 bg-primary/10 text-primary">
+                  <ShieldPlus className="h-6 w-6" />
+                </div>
+                <h3 className="text-base font-bold mb-2 group-hover:text-primary transition-colors text-foreground">Проектирование ДСУП</h3>
+                <p className="text-sm text-muted-foreground mb-6">Доп. электробезопасность во влажных зонах. Выбор КУП и сечения проводников по ПУЭ гл. 1.7.</p>
+              </div>
+              <Link to="/calculators/dsup" className="text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+                Открыть
+              </Link>
+            </div>
           </div>
         </section>
 
@@ -124,7 +139,7 @@ function CalculatorsPage() {
         <section id="equipment">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-foreground">Оборудование</h2>
-            <span className="text-xs text-muted-foreground font-mono">5 инстр.</span>
+            <span className="text-xs text-muted-foreground font-mono">4 инстр.</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary hover:shadow-md hover:shadow-primary/20 transition-all duration-300">
@@ -166,7 +181,7 @@ function CalculatorsPage() {
               </Link>
             </div>
 
-            {/* НОВАЯ КАРТОЧКА: МУФТЫ */}
+            {/* КАРТОЧКА: МУФТЫ */}
             <div className="group relative flex flex-col justify-between p-6 bg-card rounded-[var(--radius)] border border-border shadow-sm hover:border-primary hover:shadow-md hover:shadow-primary/20 transition-all duration-300">
               <div>
                 <div className="mb-4 inline-flex items-center justify-center rounded-lg p-2 bg-primary/10 text-primary">
