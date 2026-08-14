@@ -1,27 +1,122 @@
-/* 4. Неоновый Океан (Голубой фон, бирюза и желтый) */
+@import "tailwindcss" source(none);
+@import "tw-animate-css";
+@source "../src";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+}
+
+/* --- БАЗОВЫЕ ТЕМЫ --- */
+:root, .light {
+  --background: #ffffff;
+  --foreground: #09090b;
+  --card: #ffffff;
+  --card-foreground: #09090b;
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --accent: #f1f5f9;
+  --destructive: #ef4444;
+  --border: #e2e8f0;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-foreground: #fafafa;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --accent: #27272a;
+  --destructive: #991b1b;
+  --border: #27272a;
+  --radius: 0.5rem;
+}
+
+.contrast {
+  --background: #000000;
+  --foreground: #ffffff;
+  --card: #000000;
+  --card-foreground: #ffffff;
+  --primary: #fbbf24;
+  --primary-foreground: #000000;
+  --accent: #333333;
+  --destructive: #ff0000;
+  --border: #fbbf24;
+  --radius: 0;
+}
+
+/* --- НОВЫЕ ПРЕМИУМ-ТЕМЫ --- */
+.theme-oled {
+  --background: #000000;
+  --foreground: #f4f4f5;
+  --card: #0a0a0a;
+  --card-foreground: #f4f4f5;
+  --primary: #ccff00;
+  --primary-foreground: #000000;
+  --accent: #171717;
+  --destructive: #ef4444;
+  --border: #1a1a1a;
+  --radius: 0.75rem;
+}
+
+.theme-scandi {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --primary: #0f172a;
+  --primary-foreground: #ffffff;
+  --accent: #f1f5f9;
+  --destructive: #dc2626;
+  --border: #000000;
+  --radius: 0px; 
+}
+
+.theme-terminal {
+  --background: #18181b;
+  --foreground: #a1a1aa;
+  --card: #27272a;
+  --card-foreground: #e4e4e7;
+  --primary: #10b981;
+  --primary-foreground: #000000;
+  --accent: #3f3f46;
+  --destructive: #ef4444;
+  --border: #3f3f46;
+  --radius: 0.25rem;
+  font-family: var(--font-mono); 
+}
+
 .theme-ocean {
-  --background: #082f49; /* Тёмно-синий океан */
+  --background: #082f49;
   --foreground: #f0f9ff;
   --card: #0c4a6e;
   --card-foreground: #f0f9ff;
-  --primary: #06b6d4; /* Бирюзовый акцент */
+  --primary: #06b6d4;
   --primary-foreground: #ffffff;
-  --accent: #facc15; /* Желтый акцент */
+  --accent: #facc15;
   --destructive: #ef4444;
   --border: #0369a1;
   --radius: 0.75rem;
 }
 
-/* 5. Тёмная Бирюза */
 .theme-teal {
-  --background: #042f2e; /* Самая тёмная бирюза */
+  --background: #042f2e;
   --foreground: #ccfbf1;
   --card: #134e4a;
   --card-foreground: #ccfbf1;
-  --primary: #2dd4bf; /* Яркий бирюзовый неон */
+  --primary: #2dd4bf;
   --primary-foreground: #042f2e;
   --accent: #0f766e;
   --destructive: #f87171;
   --border: #115e59;
   --radius: 0.5rem;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
 }
