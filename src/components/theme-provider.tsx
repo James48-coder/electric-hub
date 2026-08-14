@@ -1,9 +1,12 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 export const THEMES = [
-  { id: "light", label: "Светлая", swatch: "#ffffff" },
-  { id: "dark", label: "Тёмная", swatch: "#09090b" },
-  { id: "contrast", label: "Контрастная (на солнце)", swatch: "#fbbf24" }
+  { id: "light", label: "Светлая", icon: "Sun", swatch: "#ffffff" },
+  { id: "dark", label: "Тёмная", icon: "Moon", swatch: "#09090b" },
+  { id: "contrast", label: "Контрастная", icon: "SunDim", swatch: "#fbbf24" },
+  { id: "theme-oled", label: "OLED Pro", icon: "Monitor", swatch: "#000000" },
+  { id: "theme-scandi", label: "Сканди Тех", icon: "Square", swatch: "#f8fafc" },
+  { id: "theme-terminal", label: "Терминал", icon: "Terminal", swatch: "#10b981" },
 ];
 
 type Theme = string;
@@ -40,8 +43,10 @@ export function ThemeProvider({
     const root = window.document.documentElement;
     const body = window.document.body;
     
-    root.classList.remove("light", "dark", "contrast", "system");
-    body.classList.remove("light", "dark", "contrast", "system");
+    // Сбрасываем все классы перед применением нового
+    const allThemes = THEMES.map(t => t.id);
+    root.classList.remove(...allThemes, "system");
+    body.classList.remove(...allThemes, "system");
     
     root.classList.add(theme);
     body.classList.add(theme);
