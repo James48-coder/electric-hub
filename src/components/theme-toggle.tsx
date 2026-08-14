@@ -1,6 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { Palette, Check } from "lucide-react";
+import { Palette, Check, Sun, Moon, SunDim, Monitor, Square, Terminal } from "lucide-react";
 import { THEMES, useTheme } from "./theme-provider";
+
+// Маппинг иконок
+const iconMap: Record<string, React.ElementType> = {
+  Sun, Moon, SunDim, Monitor, Square, Terminal
+};
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -28,30 +33,41 @@ export function ThemeToggle() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-12 z-50 min-w-56 rounded-[var(--radius)] border border-border bg-card p-1 shadow-xl">
+        <div className="absolute right-0 top-12 z-50 w-56 rounded-[var(--radius)] border border-border bg-card p-2 shadow-xl">
           <div className="px-2 py-1.5 text-sm font-semibold text-foreground">
-            Тема оформления
+            Оформление платформы
           </div>
           <div className="my-1 h-px bg-border" />
           
-          <div className="flex flex-col gap-1">
-            {THEMES.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => {
-                  setTheme(t.id);
-                  setIsOpen(false);
-                }}
-                className="flex w-full cursor-pointer items-center gap-3 rounded-md p-2 text-left transition-colors hover:bg-accent hover:text-foreground"
-              >
-                <span
-                  className="h-4 w-4 shrink-0 rounded-full border border-border"
-                  style={{ background: t.swatch }}
-                />
-                <span className="flex-1 text-sm">{t.label}</span>
-                {theme === t.id && <Check className="h-4 w-4 text-primary" />}
-              </button>
-            ))}
+          <div className="flex flex-col gap-1 pt-1">
+            {THEMES.map((t) => {
+              const Icon = iconMap[t.icon];
+              const isActive = theme === t.id;
+
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => {
+                    setTheme(t.id);
+                    setIsOpen(false);
+                  }}
+                  className={`flex w-full cursor-pointer items-center gap-3 rounded-md p-2 text-left transition-colors ${
+                    isActive
+                      ? "bg-primary/10 font-medium text-primary"
+                      : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                  }`}
+                >
+                  <div
+                    className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border border-border/50 shadow-sm"
+                    style={{ backgroundColor: t.swatch }}
+                  >
+                    {isActive && <Check className="h-3 w-3 mix-blend-difference text-white" />}
+                  </div>
+                  <Icon className="h-4 w-4 opacity-70" />
+                  <span className="flex-1 text-sm">{t.label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
