@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Zap, Shield, Clock, Calculator, Network, MessageSquare, ArrowRight } from "lucide-react";
+import { SpotlightCard } from "@/components/spotlight-card";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -7,113 +8,121 @@ export const Route = createFileRoute("/")({
 
 export function HomePage() {
   return (
-    <div className="mx-auto w-full max-w-6xl py-6 space-y-8 text-slate-100">
-      {/* Верхний блок статистики со скриншота */}
+    <div className="mx-auto w-full max-w-6xl py-6 space-y-8 text-foreground">
+      
+      {/* Верхний блок статистики (Обернут в Spotlight) */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="glass neu rounded-2xl p-6 border border-slate-800/80 bg-slate-900/40">
+        <SpotlightCard className="p-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 grid place-items-center">
-              <Zap className="w-5 h-5" />
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+              <Zap className="h-5 w-5" />
             </div>
             <div>
               <div className="text-2xl font-bold">1240+</div>
-              <div className="text-xs text-slate-400">расчётов в день</div>
+              <div className="text-xs text-muted-foreground">расчётов в день</div>
             </div>
           </div>
-        </div>
+        </SpotlightCard>
 
-        <div className="glass neu rounded-2xl p-6 border border-slate-800/80 bg-slate-900/40">
+        <SpotlightCard className="p-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 grid place-items-center">
-              <Shield className="w-5 h-5" />
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+              <Shield className="h-5 w-5" />
             </div>
             <div>
               <div className="text-2xl font-bold">100%</div>
-              <div className="text-xs text-slate-400">соответствие ПУЭ</div>
+              <div className="text-xs text-muted-foreground">соответствие ПУЭ</div>
             </div>
           </div>
-        </div>
+        </SpotlightCard>
 
-        <div className="glass neu rounded-2xl p-6 border border-slate-800/80 bg-slate-900/40">
+        <SpotlightCard className="p-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 grid place-items-center">
-              <Clock className="w-5 h-5" />
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+              <Clock className="h-5 w-5" />
             </div>
             <div>
               <div className="text-2xl font-bold">&lt; 8 сек</div>
-              <div className="text-xs text-slate-400">среднее время</div>
+              <div className="text-xs text-muted-foreground">среднее время</div>
             </div>
           </div>
-        </div>
+        </SpotlightCard>
       </div>
 
       <header className="space-y-1">
         <h2 className="text-2xl font-bold tracking-tight">Быстрые инструменты</h2>
-        <p className="text-xs text-slate-400">Открывайте нужное в один клик.</p>
+        <p className="text-xs text-muted-foreground">Открывайте нужное в один клик.</p>
       </header>
 
-      {/* Карточки быстрых инструментов */}
+      {/* Карточки быстрых инструментов (Обернуты в Spotlight) */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Link
-          to="/calculators"
-          className="group glass neu rounded-2xl p-6 text-left border border-slate-800/80 bg-slate-900/40 hover:bg-slate-900/70 transition-all hover:-translate-y-0.5 hover:shadow-xl flex flex-col justify-between"
-        >
-          <div className="space-y-4">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 grid place-items-center">
-              <Calculator className="w-5 h-5" />
+        
+        <SpotlightCard>
+          <Link
+            to="/calculators"
+            className="group flex h-full flex-col justify-between p-6 outline-none"
+          >
+            <div className="space-y-4">
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
+                <Calculator className="h-5 w-5" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-lg font-bold">Калькуляторы</h3>
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  Сечение кабеля, падение напряжения, защита, заземление.
+                </p>
+              </div>
             </div>
-            <div className="space-y-1">
-              <h3 className="font-bold text-lg">Калькуляторы</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Сечение кабеля, падение напряжения, защита, заземление.
-              </p>
+            <div className="mt-4 flex items-center border-t border-border pt-4 text-sm font-semibold text-primary transition-transform group-hover:translate-x-1">
+              Открыть <ArrowRight className="ml-1 h-4 w-4" />
             </div>
-          </div>
-          <div className="flex items-center text-sm font-semibold text-blue-400 group-hover:translate-x-1 transition-transform pt-4 mt-4 border-t border-slate-800/80">
-            Открыть <ArrowRight className="w-4 h-4 ml-1" />
-          </div>
-        </Link>
+          </Link>
+        </SpotlightCard>
 
-        {/* Обновленная карточка схем */}
-        <Link
-          to="/schemes"
-          className="group glass neu rounded-2xl p-6 text-left border border-slate-800/80 bg-slate-900/40 hover:bg-slate-900/70 transition-all hover:-translate-y-0.5 hover:shadow-xl flex flex-col justify-between"
-        >
-          <div className="space-y-4">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 grid place-items-center">
-              <Network className="w-5 h-5" />
+        <SpotlightCard>
+          <Link
+            to="/schemes"
+            className="group flex h-full flex-col justify-between p-6 outline-none"
+          >
+            <div className="space-y-4">
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
+                <Network className="h-5 w-5" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-lg font-bold">Описание схем</h3>
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  Практические руководства и правила электромонтажа
+                </p>
+              </div>
             </div>
-            <div className="space-y-1">
-              <h3 className="font-bold text-lg">Описание схем</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Практические руководства и правила электромонтажа
-              </p>
+            <div className="mt-4 flex items-center border-t border-border pt-4 text-sm font-semibold text-primary transition-transform group-hover:translate-x-1">
+              Открыть <ArrowRight className="ml-1 h-4 w-4" />
             </div>
-          </div>
-          <div className="flex items-center text-sm font-semibold text-blue-400 group-hover:translate-x-1 transition-transform pt-4 mt-4 border-t border-slate-800/80">
-            Открыть <ArrowRight className="w-4 h-4 ml-1" />
-          </div>
-        </Link>
+          </Link>
+        </SpotlightCard>
 
-        <Link
-          to="/chat"
-          className="group glass neu rounded-2xl p-6 text-left border border-slate-800/80 bg-slate-900/40 hover:bg-slate-900/70 transition-all hover:-translate-y-0.5 hover:shadow-xl flex flex-col justify-between"
-        >
-          <div className="space-y-4">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 grid place-items-center">
-              <MessageSquare className="w-5 h-5" />
+        <SpotlightCard>
+          <Link
+            to="/chat"
+            className="group flex h-full flex-col justify-between p-6 outline-none"
+          >
+            <div className="space-y-4">
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
+                <MessageSquare className="h-5 w-5" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-lg font-bold">Чат с ИИ</h3>
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  Подскажет по ПУЭ, ГОСТ и поможет с расчётом на объекте.
+                </p>
+              </div>
             </div>
-            <div className="space-y-1">
-              <h3 className="font-bold text-lg">Чат с ИИ</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Подскажет по ПУЭ, ГОСТ и поможет с расчётом на объекте.
-              </p>
+            <div className="mt-4 flex items-center border-t border-border pt-4 text-sm font-semibold text-primary transition-transform group-hover:translate-x-1">
+              Открыть <ArrowRight className="ml-1 h-4 w-4" />
             </div>
-          </div>
-          <div className="flex items-center text-sm font-semibold text-blue-400 group-hover:translate-x-1 transition-transform pt-4 mt-4 border-t border-slate-800/80">
-            Открыть <ArrowRight className="w-4 h-4 ml-1" />
-          </div>
-        </Link>
+          </Link>
+        </SpotlightCard>
+
       </div>
     </div>
   );
