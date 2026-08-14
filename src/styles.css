@@ -6,8 +6,10 @@
 
 @theme {
   --font-sans: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
 }
 
+/* --- БАЗОВЫЕ ТЕМЫ (Оставляем как надежный фундамент) --- */
 :root, .light {
   --background: #ffffff;
   --foreground: #09090b;
@@ -19,7 +21,6 @@
   --destructive: #ef4444;
   --border: #e2e8f0;
   --radius: 0.5rem;
-  background-image: none;
 }
 
 .dark {
@@ -33,7 +34,6 @@
   --destructive: #991b1b;
   --border: #27272a;
   --radius: 0.5rem;
-  background-image: none;
 }
 
 .contrast {
@@ -47,7 +47,51 @@
   --destructive: #ff0000;
   --border: #fbbf24;
   --radius: 0;
-  background-image: none;
+}
+
+/* --- НОВЫЕ ПРЕМИУМ-ТЕМЫ (Минимализм 2026 года) --- */
+
+/* 1. OLED Pro (Абсолютный черный + неоновый желтый акцент) */
+.theme-oled {
+  --background: #000000;
+  --foreground: #f4f4f5;
+  --card: #0a0a0a;
+  --card-foreground: #f4f4f5;
+  --primary: #ccff00;
+  --primary-foreground: #000000;
+  --accent: #171717;
+  --destructive: #ef4444;
+  --border: #1a1a1a;
+  --radius: 0.75rem;
+}
+
+/* 2. Скандинавский Тех (Белоснежный с жесткими границами) */
+.theme-scandi {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --primary: #0f172a;
+  --primary-foreground: #ffffff;
+  --accent: #f1f5f9;
+  --destructive: #dc2626;
+  --border: #000000;
+  --radius: 0px; 
+}
+
+/* 3. Индустриальный Терминал (Строгий матовый серый) */
+.theme-terminal {
+  --background: #18181b;
+  --foreground: #a1a1aa;
+  --card: #27272a;
+  --card-foreground: #e4e4e7;
+  --primary: #10b981;
+  --primary-foreground: #000000;
+  --accent: #3f3f46;
+  --destructive: #ef4444;
+  --border: #3f3f46;
+  --radius: 0.25rem;
+  font-family: var(--font-mono); 
 }
 
 body {
