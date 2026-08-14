@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from "react";
-import { Palette, Check, Sun, Moon, SunDim, Monitor, Square, Terminal } from "lucide-react";
+import { Palette, Check, Sun, Moon, SunDim, Monitor, Square, Terminal, Waves, Hexagon } from "lucide-react";
 import { THEMES, useTheme } from "./theme-provider";
 
-// Маппинг иконок
+// Обновленный маппинг всех иконок, включая новые темы
 const iconMap: Record<string, React.ElementType> = {
-  Sun, Moon, SunDim, Monitor, Square, Terminal
+  Sun, Moon, SunDim, Monitor, Square, Terminal, Waves, Hexagon
 };
 
 export function ThemeToggle() {
@@ -12,6 +12,7 @@ export function ThemeToggle() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Закрытие меню при клике мимо
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
