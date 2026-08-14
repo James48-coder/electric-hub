@@ -8,7 +8,6 @@
   --font-sans: 'Inter', sans-serif;
 }
 
-/* БАЗОВЫЕ ТЕМЫ */
 :root, .light {
   --background: #ffffff;
   --foreground: #09090b;
@@ -21,7 +20,6 @@
   --border: #e2e8f0;
   --radius: 0.5rem;
   background-image: none;
-  font-family: 'Inter', sans-serif;
 }
 
 .dark {
@@ -36,7 +34,6 @@
   --border: #27272a;
   --radius: 0.5rem;
   background-image: none;
-  font-family: 'Inter', sans-serif;
 }
 
 .contrast {
@@ -51,111 +48,8 @@
   --border: #fbbf24;
   --radius: 0;
   background-image: none;
-  font-family: 'Inter', sans-serif;
 }
 
-/* 1. ЭЛЕКТРОЩИТОВАЯ (Dark Industrial) */
-.theme-industrial {
-  --background: #121316;
-  --foreground: #e0e0e0;
-  --card: #2a2d31;
-  --card-foreground: #ffffff;
-  --primary: #b87333; /* Медь */
-  --primary-foreground: #ffffff;
-  --accent: #4dff4d; /* Неон */
-  --destructive: #ff3333;
-  --border: #404040;
-  --radius: 0px;
-  background-image: none;
-  font-family: 'JetBrains Mono', monospace;
-}
-.theme-industrial h1, .theme-industrial h2, .theme-industrial h3 { font-family: 'Russo One', sans-serif; }
-
-/* 2. СХЕМОТЕХНИКА (Clean Blueprint) */
-.theme-blueprint {
-  --background: #f5f2e8;
-  --foreground: #1c2833;
-  --card: #ffffff;
-  --card-foreground: #1c2833;
-  --primary: #1976d2;
-  --primary-foreground: #ffffff;
-  --accent: #e3f2fd;
-  --destructive: #d32f2f;
-  --border: #1976d2;
-  --radius: 0px;
-  /* Миллиметровая сетка */
-  background-image: linear-gradient(#c0d0e0 1px, transparent 1px), linear-gradient(90deg, #c0d0e0 1px, transparent 1px);
-  background-size: 20px 20px;
-  font-family: 'IBM Plex Mono', monospace;
-}
-
-/* 3. БЕЗОПАСНОСТЬ (Trust & Safety) */
-.theme-safety {
-  --background: #fcfcf9;
-  --foreground: #333333;
-  --card: #ffffff;
-  --card-foreground: #333333;
-  --primary: #2e7d32;
-  --primary-foreground: #ffffff;
-  --accent: #e8f5e9;
-  --destructive: #d32f2f;
-  --border: #e0e0e0;
-  --radius: 16px;
-  background-image: none;
-  font-family: 'Nunito', sans-serif;
-}
-
-/* 4. МАСТЕРСКАЯ (Warm DIY) */
-.theme-diy {
-  --background: #f5f0e6;
-  --foreground: #3e2723;
-  --card: #fffdf9;
-  --card-foreground: #3e2723;
-  --primary: #cd7f32;
-  --primary-foreground: #ffffff;
-  --accent: #efebe1;
-  --destructive: #c62828;
-  --border: #d7ccc8;
-  --radius: 8px;
-  background-image: none;
-  font-family: 'PT Sans', sans-serif;
-}
-.theme-diy h1, .theme-diy h2 { font-family: 'Lora', serif; }
-
-/* 5. ЭНЕРГИЯ (Light & Flow) */
-.theme-flow {
-  --background: #1a0530;
-  --foreground: #ffffff;
-  --card: #2d134d;
-  --card-foreground: #ffffff;
-  --primary: #ff6a00;
-  --primary-foreground: #ffffff;
-  --accent: #ffd200;
-  --destructive: #ff3366;
-  --border: #441d70;
-  --radius: 24px;
-  background-image: radial-gradient(circle at 50% 0%, #3e186b 0%, transparent 50%);
-  font-family: 'Poppins', sans-serif;
-}
-.theme-flow h1, .theme-flow h2 { font-family: 'Montserrat', sans-serif; }
-
-/* 6. СОВРЕМЕННЫЙ ЭЛЕКТРИК (Ultra-Minimal) */
-.theme-minimal {
-  --background: #ffffff;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --card-foreground: #0f172a;
-  --primary: #0066ff;
-  --primary-foreground: #ffffff;
-  --accent: #f8fafc;
-  --destructive: #ef4444;
-  --border: #f1f5f9;
-  --radius: 2px;
-  background-image: none;
-  font-family: 'Inter', sans-serif;
-}
-
-/* Глобальное применение цвета к фону (так как Tailwind bg-background работает через эти переменные) */
 body {
   background-color: var(--background);
   color: var(--foreground);
