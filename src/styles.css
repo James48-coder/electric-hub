@@ -49,7 +49,7 @@
   --radius: 0;
 }
 
-/* --- НОВЫЕ ПРЕМИУМ-ТЕМЫ --- */
+/* --- ПРЕМИУМ-ТЕМЫ --- */
 .theme-oled {
   --background: #000000;
   --foreground: #f4f4f5;
@@ -121,16 +121,14 @@ body {
   color: var(--foreground);
 }
 
-/* --- ZEN MODE (РЕЖИМ КОНЦЕНТРАЦИИ) --- */
-/* Плавно затемняем и размываем сайдбар и шапку, если пользователь вводит данные в калькуляторе */
-body:has(main input:focus) aside,
-body:has(main input:focus) header {
-  opacity: 0.3;
-  filter: grayscale(30%) blur(3px);
-  pointer-events: none;
+/* Жестко фиксируем непрозрачность карточек и элементов, чтобы текст не накладывался */
+.bg-card {
+  background-color: var(--card) !important;
+  color: var(--card-foreground) !important;
 }
 
-/* Обеспечиваем плавный переход туда и обратно */
-aside, header {
-  transition: opacity 0.5s ease, filter 0.5s ease;
+/* Исправление для выпадающих списков (селектов), чтобы они не накладывали текст друг на друга */
+select, option {
+  background-color: var(--card);
+  color: var(--foreground);
 }
