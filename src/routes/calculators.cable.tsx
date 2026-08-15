@@ -11,19 +11,16 @@ function CableCalculatorPage() {
   const [voltage, setVoltage] = useState('220')
   const [material, setMaterial] = useState('copper')
 
-  // Упрощенная логика расчета сечения кабеля (для MVP)
   const calculate = () => {
     if (!power) return null
     const p = parseFloat(power.replace(',', '.'))
     if (isNaN(p)) return null
 
-    // Ток = Мощность(Вт) / Напряжение
     const current = voltage === '220' ? (p * 1000) / 220 : (p * 1000) / (380 * 1.73)
     
     let section = '1.5'
     let breaker = 10
 
-    // Простейшая таблица подбора ПУЭ (открытая проводка, приближенно)
     if (material === 'copper') {
       if (current > 40) { section = '10.0'; breaker = 50 }
       else if (current > 32) { section = '6.0'; breaker = 40 }
@@ -31,7 +28,6 @@ function CableCalculatorPage() {
       else if (current > 16) { section = '2.5'; breaker = 20 }
       else { section = '1.5'; breaker = 16 }
     } else {
-      // Алюминий
       if (current > 32) { section = '10.0'; breaker = 40 }
       else if (current > 25) { section = '6.0'; breaker = 32 }
       else if (current > 16) { section = '4.0'; breaker = 20 }
@@ -48,9 +44,12 @@ function CableCalculatorPage() {
 
   const result = calculate()
 
+  // Единый стиль для всех активных и неактивных кнопок-переключателей
+  const activeClass = "bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-400 shadow-sm"
+  const inactiveClass = "bg-background border-border text-muted-foreground hover:border-amber-500/50 hover:text-foreground"
+
   return (
     <div className="container mx-auto p-6 max-w-4xl animate-in fade-in duration-500 text-foreground pb-24">
-      {/* Кнопка возврата */}
       <Link to="/calculators" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-6 group">
         <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> 
         Назад к инженерному набору
@@ -69,7 +68,6 @@ function CableCalculatorPage() {
 
         <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
           
-          {/* Левая колонка: Ввод данных */}
           <div className="space-y-6">
             <div className="space-y-3">
               <label className="text-sm font-bold text-foreground flex items-center gap-2">
@@ -94,21 +92,13 @@ function CableCalculatorPage() {
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => setVoltage('220')}
-                  className={`h-12 rounded-lg border text-sm font-bold transition-all ${
-                    voltage === '220' 
-                    ? 'bg-primary/10 border-primary text-primary' 
-                    : 'bg-background border-border text-muted-foreground hover:border-primary/50'
-                  }`}
+                  className={`h-12 rounded-lg border text-sm font-bold transition-all duration-300 ${voltage === '220' ? activeClass : inactiveClass}`}
                 >
                   220 В (1 фаза)
                 </button>
                 <button
                   onClick={() => setVoltage('380')}
-                  className={`h-12 rounded-lg border text-sm font-bold transition-all ${
-                    voltage === '380' 
-                    ? 'bg-primary/10 border-primary text-primary' 
-                    : 'bg-background border-border text-muted-foreground hover:border-primary/50'
-                  }`}
+                  className={`h-12 rounded-lg border text-sm font-bold transition-all duration-300 ${voltage === '380' ? activeClass : inactiveClass}`}
                 >
                   380 В (3 фазы)
                 </button>
@@ -120,21 +110,13 @@ function CableCalculatorPage() {
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => setMaterial('copper')}
-                  className={`h-12 rounded-lg border text-sm font-bold transition-all ${
-                    material === 'copper' 
-                    ? 'bg-amber-500/10 border-amber-500 text-amber-600 dark:text-amber-500' 
-                    : 'bg-background border-border text-muted-foreground hover:border-amber-500/50'
-                  }`}
+                  className={`h-12 rounded-lg border text-sm font-bold transition-all duration-300 ${material === 'copper' ? activeClass : inactiveClass}`}
                 >
                   Медь (Cu)
                 </button>
                 <button
                   onClick={() => setMaterial('aluminum')}
-                  className={`h-12 rounded-lg border text-sm font-bold transition-all ${
-                    material === 'aluminum' 
-                    ? 'bg-slate-500/10 border-slate-500 text-slate-700 dark:text-slate-300' 
-                    : 'bg-background border-border text-muted-foreground hover:border-slate-500/50'
-                  }`}
+                  className={`h-12 rounded-lg border text-sm font-bold transition-all duration-300 ${material === 'aluminum' ? activeClass : inactiveClass}`}
                 >
                   Алюминий (Al)
                 </button>
@@ -142,7 +124,6 @@ function CableCalculatorPage() {
             </div>
           </div>
 
-          {/* Правая колонка: Результат */}
           <div className="bg-muted/30 rounded-2xl p-6 border border-border flex flex-col justify-center">
             {!result ? (
               <div className="text-center text-muted-foreground space-y-3">
@@ -176,14 +157,13 @@ function CableCalculatorPage() {
                 <div className="bg-background rounded-xl p-4 border border-border shadow-sm flex items-center justify-between">
                   <div>
                     <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mb-1">Автоматический выключатель</p>
-                    <p className="text-xl font-black text-foreground">{result.breaker} <span className="text-base text-muted-foreground">А (характеристика C)</span></p>
+                    <p className="text-xl font-black text-foreground">{result.breaker} <span className="text-base text-muted-foreground">А (хар-ка C)</span></p>
                   </div>
                   <ShieldCheck className="h-8 w-8 text-green-500 opacity-20" />
                 </div>
               </div>
             )}
           </div>
-
         </div>
       </div>
     </div>
