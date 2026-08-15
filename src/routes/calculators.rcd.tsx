@@ -176,11 +176,11 @@ function RcdCalculatorPage() {
                   </div>
                 </div>
 
-                {/* Блок предупреждения, если ток слишком велик для 10мА */}
+                {/* Исправленный блок предупреждения с жестко заданным красным цветом */}
                 {result.notice && (
-                  <div className="bg-destructive/10 rounded-xl p-4 border border-destructive/20 shadow-sm flex items-start gap-3">
-                    <AlertTriangle className="h-5 w-5 text-destructive shrink-0" />
-                    <p className="text-xs text-destructive font-medium leading-relaxed">
+                  <div className="bg-red-500/10 rounded-xl p-4 border border-red-500/20 shadow-sm flex items-start gap-3">
+                    <AlertTriangle className="h-5 w-5 text-red-500 dark:text-red-400 shrink-0" />
+                    <p className="text-xs text-red-600 dark:text-red-400 font-medium leading-relaxed">
                       {result.notice}
                     </p>
                   </div>
