@@ -14,7 +14,7 @@ import {
   ShieldPlus
 } from 'lucide-react'
 
-export const Route = createFileRoute('/calculators')({
+export const Route = createFileRoute('/calculators/')({
   component: CalculatorsPage,
 })
 
