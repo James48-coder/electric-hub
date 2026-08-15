@@ -306,7 +306,7 @@ function CrossSchemeDetail({ onBack }: { onBack: () => void }) {
   )
 }
 
-// 5. ГРУППА РОЗЕТОК (НОВАЯ)
+// 5. ГРУППА РОЗЕТОК (НОВАЯ - УЛУЧШЕННЫЙ ДИЗАЙН WAGO)
 function SocketsSchemeDetail({ onBack }: { onBack: () => void }) {
   const [powerOn, setPowerOn] = useState(false)
 
@@ -332,83 +332,114 @@ function SocketsSchemeDetail({ onBack }: { onBack: () => void }) {
             <BookOpen className="h-5 w-5" /> Важное правило ПУЭ 1.7.144
           </h3>
           <p className="text-sm text-destructive font-medium leading-relaxed">
-            Подключение защитного проводника (PE) шлейфом строго запрещено! Каждая розетка должна подключаться к заземлению отдельным ответвлением (через WAGO, опрессовку или пайку в глубоком подрозетнике).
+            Подключение защитного проводника (PE) шлейфом строго запрещено! Каждая розетка должна подключаться к заземлению отдельным ответвлением (через WAGO, опрессовку или пайку).
           </p>
         </div>
       </div>
 
       <div className="bg-card border border-border rounded-2xl p-6 md:p-8">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
           <h3 className="font-bold text-foreground">Правильное подключение</h3>
           <button 
             onClick={() => setPowerOn(!powerOn)} 
-            className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${powerOn ? 'bg-amber-500 text-neutral-900' : 'bg-neutral-800 text-white hover:bg-neutral-700'}`}
+            className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${powerOn ? 'bg-amber-500 text-neutral-900 shadow-[0_0_15px_rgba(245,158,11,0.5)]' : 'bg-neutral-800 text-white hover:bg-neutral-700'}`}
           >
             {powerOn ? 'Отключить питание' : 'Подать питание'}
           </button>
         </div>
 
-        <div className="relative bg-black/20 rounded-2xl p-8 border border-border/50 flex flex-col items-center min-h-[400px]">
+        <div className="relative bg-neutral-950/50 rounded-2xl p-4 sm:p-8 pt-12 border border-border/50 flex flex-col items-center min-h-[420px] overflow-hidden">
           
-          {/* Магистральные провода сверху */}
-          <div className="w-full max-w-md space-y-4 mb-16 relative">
+          {/* Контейнер для точного позиционирования проводов и розеток */}
+          <div className="relative w-full max-w-md h-72">
             
-            {/* L (Фаза) - Идет шлейфом */}
-            <div className="relative h-2">
-              <div className="absolute font-bold text-amber-500 -left-6 -top-2">L</div>
-              <div className={`h-full w-full rounded-full transition-colors duration-500 ${powerOn ? 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]' : 'bg-amber-900/50'}`}></div>
-              {/* Отводы фазы */}
-              <div className={`absolute left-[15%] top-2 w-1 h-12 transition-colors duration-500 ${powerOn ? 'bg-amber-500' : 'bg-amber-900/50'}`}></div>
-              <div className={`absolute left-[50%] top-2 w-1 h-12 transition-colors duration-500 ${powerOn ? 'bg-amber-500' : 'bg-amber-900/50'}`}></div>
-              <div className={`absolute left-[85%] top-2 w-1 h-12 transition-colors duration-500 ${powerOn ? 'bg-amber-500' : 'bg-amber-900/50'}`}></div>
+            {/* ====== ФАЗА (L) - Шлейф ====== */}
+            <div className="absolute font-black text-amber-500 -left-6 sm:-left-8 top-1">L</div>
+            <div className={`absolute left-0 right-[20%] top-2 h-2 rounded-full transition-colors duration-500 ${powerOn ? 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]' : 'bg-amber-900/50'}`}></div>
+            {/* Отводы (Левая, Центр, Правая) */}
+            <div className={`absolute left-[10%] top-2 w-1.5 h-40 transition-colors duration-500 ${powerOn ? 'bg-amber-500' : 'bg-amber-900/50'}`}></div>
+            <div className={`absolute left-[45%] top-2 w-1.5 h-40 transition-colors duration-500 ${powerOn ? 'bg-amber-500' : 'bg-amber-900/50'}`}></div>
+            <div className={`absolute left-[80%] top-2 w-1.5 h-40 transition-colors duration-500 ${powerOn ? 'bg-amber-500' : 'bg-amber-900/50'}`}></div>
+
+            {/* ====== НОЛЬ (N) - Шлейф ====== */}
+            <div className="absolute font-black text-blue-500 -left-6 sm:-left-8 top-7">N</div>
+            <div className="absolute left-0 right-[10%] top-8 h-2 bg-blue-600 rounded-full"></div>
+            <div className="absolute left-[20%] top-8 w-1.5 h-34 bg-blue-600"></div>
+            <div className="absolute left-[55%] top-8 w-1.5 h-34 bg-blue-600"></div>
+            <div className="absolute left-[90%] top-8 w-1.5 h-34 bg-blue-600"></div>
+
+            {/* ====== ЗАЗЕМЛЕНИЕ (PE) - Звезда ====== */}
+            <div className="absolute font-black text-green-500 -left-8 sm:-left-10 top-13">PE</div>
+            <div className="absolute left-0 w-[50%] top-14 h-2 bg-green-500 rounded-l-full"></div>
+            
+            {/* Красивая клемма WAGO */}
+            <div className="absolute left-[50%] -translate-x-1/2 top-10 w-14 h-9 bg-neutral-200/90 border border-neutral-400 rounded-lg shadow-lg flex flex-col justify-between p-1 z-20 backdrop-blur-sm">
+              <div className="flex justify-evenly w-full mt-0.5">
+                <div className="w-1.5 h-3.5 bg-orange-500 rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.3)]"></div>
+                <div className="w-1.5 h-3.5 bg-orange-500 rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.3)]"></div>
+                <div className="w-1.5 h-3.5 bg-orange-500 rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.3)]"></div>
+                <div className="w-1.5 h-3.5 bg-orange-500 rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.3)]"></div>
+              </div>
+              <span className="text-[9px] font-black text-neutral-600 text-center tracking-widest leading-none mb-0.5">WAGO</span>
             </div>
 
-            {/* N (Ноль) - Идет шлейфом */}
-            <div className="relative h-2">
-              <div className="absolute font-bold text-blue-500 -left-6 -top-2">N</div>
-              <div className="h-full w-full bg-blue-600 rounded-full"></div>
-              {/* Отводы нуля */}
-              <div className="absolute left-[20%] top-2 w-1 h-12 bg-blue-600"></div>
-              <div className="absolute left-[55%] top-2 w-1 h-12 bg-blue-600"></div>
-              <div className="absolute left-[90%] top-2 w-1 h-12 bg-blue-600"></div>
-            </div>
+            {/* Ортогональная разводка PE "Звездой" */}
+            {/* Центр */}
+            <div className="absolute left-[50%] -translate-x-1/2 top-18 w-1.5 h-24 bg-green-500 z-10"></div>
+            
+            {/* Левый отвод */}
+            <div className="absolute left-[47%] top-18 w-1.5 h-4 bg-green-500 z-10"></div>
+            <div className="absolute left-[15%] right-[53%] top-22 h-1.5 bg-green-500 rounded-l z-10"></div>
+            <div className="absolute left-[15%] -translate-x-1/2 top-22 w-1.5 h-20 bg-green-500 z-10"></div>
 
-            {/* PE (Земля) - Разветвитель (Клемма WAGO) */}
-            <div className="relative h-2">
-              <div className="absolute font-bold text-green-500 -left-8 -top-2">PE</div>
-              <div className="h-full w-[40%] bg-green-500 rounded-full"></div>
+            {/* Правый отвод */}
+            <div className="absolute left-[53%] top-18 w-1.5 h-6 bg-green-500 z-10"></div>
+            <div className="absolute left-[53%] right-[15%] top-24 h-1.5 bg-green-500 rounded-r z-10"></div>
+            <div className="absolute left-[85%] -translate-x-1/2 top-24 w-1.5 h-18 bg-green-500 z-10"></div>
+
+
+            {/* ====== БЛОК РОЗЕТОК ====== */}
+            <div className="absolute bottom-0 left-0 w-full h-24">
               
-              {/* Клемма WAGO/Опрессовка */}
-              <div className="absolute left-[40%] -top-3 w-8 h-8 bg-neutral-300 border-2 border-neutral-400 rounded-md flex items-center justify-center z-10">
-                <span className="text-[8px] font-black text-black">WAGO</span>
+              {/* Розетка 1 (Центр: 15%) */}
+              <div className="absolute bottom-0 left-[15%] -translate-x-1/2 w-16 h-16 sm:w-20 sm:h-20 bg-neutral-100 rounded-xl border-2 border-neutral-300 flex items-center justify-center shadow-xl z-20">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-neutral-200 rounded-full border border-neutral-300 flex flex-col items-center justify-center relative">
+                  <div className="absolute top-0 w-2 h-2 bg-neutral-400 rounded-b"></div>
+                  <div className="flex gap-3 sm:gap-4">
+                    <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-colors duration-500 ${powerOn ? 'bg-amber-500 shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]' : 'bg-neutral-800'}`}></div>
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-neutral-800 rounded-full shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]"></div>
+                  </div>
+                  <div className="absolute bottom-0 w-2 h-2 bg-neutral-400 rounded-t"></div>
+                </div>
               </div>
 
-              {/* Три отдельных отвода PE ИЗ ОДНОЙ ТОЧКИ */}
-              <div className="absolute left-[42%] top-2 w-1 h-12 bg-green-500 origin-top -rotate-[25deg]"></div>
-              <div className="absolute left-[44%] top-5 w-1 h-9 bg-green-500"></div>
-              <div className="absolute left-[46%] top-2 w-1 h-16 bg-green-500 origin-top rotate-[45deg]"></div>
+              {/* Розетка 2 (Центр: 50%) */}
+              <div className="absolute bottom-0 left-[50%] -translate-x-1/2 w-16 h-16 sm:w-20 sm:h-20 bg-neutral-100 rounded-xl border-2 border-neutral-300 flex items-center justify-center shadow-xl z-20">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-neutral-200 rounded-full border border-neutral-300 flex flex-col items-center justify-center relative">
+                  <div className="absolute top-0 w-2 h-2 bg-neutral-400 rounded-b"></div>
+                  <div className="flex gap-3 sm:gap-4">
+                    <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-colors duration-500 ${powerOn ? 'bg-amber-500 shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]' : 'bg-neutral-800'}`}></div>
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-neutral-800 rounded-full shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]"></div>
+                  </div>
+                  <div className="absolute bottom-0 w-2 h-2 bg-neutral-400 rounded-t"></div>
+                </div>
+              </div>
+
+              {/* Розетка 3 (Центр: 85%) */}
+              <div className="absolute bottom-0 left-[85%] -translate-x-1/2 w-16 h-16 sm:w-20 sm:h-20 bg-neutral-100 rounded-xl border-2 border-neutral-300 flex items-center justify-center shadow-xl z-20">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-neutral-200 rounded-full border border-neutral-300 flex flex-col items-center justify-center relative">
+                  <div className="absolute top-0 w-2 h-2 bg-neutral-400 rounded-b"></div>
+                  <div className="flex gap-3 sm:gap-4">
+                    <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-colors duration-500 ${powerOn ? 'bg-amber-500 shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]' : 'bg-neutral-800'}`}></div>
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-neutral-800 rounded-full shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]"></div>
+                  </div>
+                  <div className="absolute bottom-0 w-2 h-2 bg-neutral-400 rounded-t"></div>
+                </div>
+              </div>
+
             </div>
-
           </div>
 
-          {/* Розетки */}
-          <div className="flex gap-4 sm:gap-12 relative z-20 mt-4">
-            {[1, 2, 3].map((item) => (
-              <div key={item} className="w-16 h-16 sm:w-20 sm:h-20 bg-neutral-100 rounded-xl border-2 border-neutral-300 flex items-center justify-center relative shadow-xl">
-                 <div className="w-12 h-12 sm:w-14 sm:h-14 bg-neutral-200 rounded-full border border-neutral-300 flex items-center justify-center relative">
-                   {/* Отверстия */}
-                   <div className="flex gap-3">
-                     <div className={`w-3 h-3 rounded-full transition-colors duration-500 ${powerOn ? 'bg-amber-500/80 shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]' : 'bg-black'}`}></div>
-                     <div className="w-3 h-3 bg-black rounded-full shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]"></div>
-                   </div>
-                   {/* Усики заземления */}
-                   <div className="absolute top-0 w-2 h-2 bg-neutral-400 rounded-b"></div>
-                   <div className="absolute bottom-0 w-2 h-2 bg-neutral-400 rounded-t"></div>
-                 </div>
-              </div>
-            ))}
-          </div>
-          
         </div>
       </div>
     </div>
