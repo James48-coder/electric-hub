@@ -420,8 +420,77 @@ function Motor2SchemeDetail({ onBack }: { onBack: () => void }) {
 }
 
 // ----------------------------------------------------------------------------
-// 9. НОВАЯ СХЕМА: СБОРКА ЩИТА (DIN-РЕЙКИ)
+// 9. НОВАЯ СХЕМА: СБОРКА ЩИТА (DIN-РЕЙКИ) - УЛУЧШЕННЫЙ ДИЗАЙН
 // ----------------------------------------------------------------------------
+
+// Вспомогательные компоненты для реалистичной отрисовки модулей
+const PanelModule2P = ({ left, top, label, title, isOn, isRelay }: any) => (
+  <div className="absolute bg-gradient-to-b from-neutral-100 to-neutral-300 border-2 border-neutral-400 rounded shadow-xl flex flex-col items-center justify-between py-1 z-20" style={{ left, top, width: 60, height: 80 }}>
+    {/* Верхние клеммы */}
+    <div className="flex justify-between w-full px-2">
+      <div className="w-3 h-2 bg-neutral-500 rounded-sm shadow-inner border-b border-neutral-600"></div>
+      <div className="w-3 h-2 bg-neutral-500 rounded-sm shadow-inner border-b border-neutral-600"></div>
+    </div>
+    
+    {isRelay ? (
+       <div className={`w-12 h-7 bg-black rounded flex items-center justify-center border-2 border-neutral-600 ${isOn ? 'text-red-500 shadow-[inset_0_0_8px_rgba(239,68,6,0.8)]' : 'text-neutral-700'}`}>
+          <span className="font-mono font-bold text-[11px] tracking-wider">{isOn ? '232' : '000'}</span>
+       </div>
+    ) : (
+       <div className="flex flex-col items-center mt-1">
+         <div className={`w-4 h-1.5 rounded-sm mb-1 ${isOn ? 'bg-red-500 shadow-[0_0_5px_rgba(239,68,6,0.8)]' : 'bg-green-500'}`}></div>
+         <div className="bg-neutral-400 w-8 h-6 rounded flex justify-center items-center shadow-inner border border-neutral-500">
+           <div className={`w-6 h-4 bg-white rounded-sm border-b-4 border-neutral-300 shadow transition-transform ${isOn ? '-translate-y-1' : 'translate-y-1'}`}></div>
+         </div>
+       </div>
+    )}
+    
+    <div className="flex flex-col items-center">
+      <span className="text-[10px] font-black text-neutral-800 leading-none">{label}</span>
+      <span className="text-[7px] font-bold text-neutral-600 leading-none mt-0.5">{title}</span>
+    </div>
+    
+    {/* Нижние клеммы */}
+    <div className="flex justify-between w-full px-2">
+      <div className="w-3 h-2 bg-neutral-500 rounded-sm shadow-inner border-t border-neutral-600"></div>
+      <div className="w-3 h-2 bg-neutral-500 rounded-sm shadow-inner border-t border-neutral-600"></div>
+    </div>
+  </div>
+)
+
+const PanelModule1P = ({ left, top, label, isOn }: any) => (
+  <div className="absolute bg-gradient-to-b from-neutral-100 to-neutral-300 border-2 border-neutral-400 rounded shadow-xl flex flex-col items-center justify-between py-1 z-20" style={{ left, top, width: 30, height: 80 }}>
+    <div className="w-3 h-2 bg-neutral-500 rounded-sm shadow-inner border-b border-neutral-600"></div>
+    <div className="flex flex-col items-center mt-1">
+       <div className={`w-3 h-1.5 rounded-sm mb-1 ${isOn ? 'bg-red-500 shadow-[0_0_5px_rgba(239,68,6,0.8)]' : 'bg-green-500'}`}></div>
+       <div className="bg-neutral-400 w-5 h-6 rounded flex justify-center items-center shadow-inner border border-neutral-500">
+         <div className={`w-3 h-4 bg-white rounded-sm border-b-4 border-neutral-300 shadow transition-transform ${isOn ? '-translate-y-1' : 'translate-y-1'}`}></div>
+       </div>
+    </div>
+    <span className="text-[9px] font-black text-neutral-800 my-auto">{label}</span>
+    <div className="w-3 h-2 bg-neutral-500 rounded-sm shadow-inner border-t border-neutral-600"></div>
+  </div>
+)
+
+const PanelCrossModule = ({ left, top, isOn }: any) => (
+  <div className="absolute bg-gradient-to-b from-neutral-100 to-neutral-300 border-2 border-neutral-400 rounded shadow-xl flex flex-col items-center justify-between py-1 z-20" style={{ left, top, width: 60, height: 80 }}>
+    <div className="flex justify-between w-full px-2">
+      <div className="w-3 h-2 bg-neutral-500 rounded-sm shadow-inner border-b border-neutral-600"></div>
+      <div className="w-3 h-2 bg-neutral-500 rounded-sm shadow-inner border-b border-neutral-600"></div>
+    </div>
+    <div className="flex flex-col gap-2 my-auto w-full px-2">
+       <div className={`h-1.5 w-full rounded-sm ${isOn ? 'bg-amber-500 shadow-[0_0_5px_rgba(245,158,11,0.8)]' : 'bg-neutral-400'}`}></div>
+       <div className={`h-1.5 w-full rounded-sm ${isOn ? 'bg-blue-500 shadow-[0_0_5px_rgba(59,130,246,0.8)]' : 'bg-neutral-400'}`}></div>
+    </div>
+    <span className="text-[8px] font-black text-neutral-600">КРОСС</span>
+    <div className="flex justify-between w-full px-2">
+      <div className="w-3 h-2 bg-neutral-500 rounded-sm shadow-inner border-t border-neutral-600"></div>
+      <div className="w-3 h-2 bg-neutral-500 rounded-sm shadow-inner border-t border-neutral-600"></div>
+    </div>
+  </div>
+)
+
+// Основной экран щита
 function PanelSchemeDetail({ onBack }: { onBack: () => void }) {
   const [mainPower, setMainPower] = useState(false)
 
@@ -439,22 +508,8 @@ function PanelSchemeDetail({ onBack }: { onBack: () => void }) {
         <p className="text-muted-foreground text-lg">Базовая компоновка оборудования на DIN-рейке.</p>
       </div>
 
-      <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden mb-8 p-6 md:p-8 space-y-6">
-        <p className="text-foreground leading-relaxed">
-          Современный электрощит собирается по каскадной схеме: Вводной автомат → Реле напряжения → Групповые УЗО (дифзащита) → Линейные автоматы.
-        </p>
-        <div className="bg-muted/30 border border-border rounded-xl p-6">
-          <h3 className="flex items-center gap-2 font-bold text-foreground mb-2">
-            <BookOpen className="h-5 w-5 text-primary" /> Правила хорошего тона
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            Реле напряжения (УЗМ/РН) защищает технику от отгорания нуля и скачков напряжения. Разделение на несколько УЗО (например, на свет и розетки отдельно) позволяет не обесточивать всю квартиру при утечке на одной линии.
-          </p>
-        </div>
-      </div>
-
       <div className="bg-card border border-border rounded-2xl p-6 md:p-8">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <h3 className="font-bold text-foreground">Интерактивный электрощит</h3>
           <button 
             onClick={() => setMainPower(!mainPower)} 
@@ -464,95 +519,65 @@ function PanelSchemeDetail({ onBack }: { onBack: () => void }) {
           </button>
         </div>
 
-        <div className="relative bg-neutral-200/5 dark:bg-neutral-900 rounded-2xl p-8 border border-border/50 flex flex-col gap-16 min-h-[400px]">
-           
-           {/* ВХОДЯЩАЯ ФАЗА */}
-           <div className={`absolute top-0 left-[88px] w-1.5 h-8 transition-colors duration-500 ${mainPower ? 'bg-amber-500' : 'bg-neutral-800'}`}></div>
+        {/* Контейнер щитка (скроллится на телефонах, чтобы не ломать пропорции) */}
+        <div className="w-full overflow-x-auto pb-4">
+          <div className="relative w-[800px] h-[480px] bg-neutral-900 border-2 border-neutral-800 rounded-xl shadow-2xl mx-auto flex-shrink-0 overflow-hidden">
+            
+            {/* Металлические DIN-рейки */}
+            <div className="absolute top-[130px] w-full h-[40px] bg-gradient-to-b from-neutral-500 via-neutral-300 to-neutral-500 border-y border-neutral-400 shadow-md"></div>
+            <div className="absolute top-[330px] w-full h-[40px] bg-gradient-to-b from-neutral-500 via-neutral-300 to-neutral-500 border-y border-neutral-400 shadow-md"></div>
 
-           {/* ВЕРХНЯЯ DIN-РЕЙКА */}
-           <div className="relative w-full h-24 bg-neutral-300 dark:bg-neutral-800 border-y-2 border-neutral-400 dark:border-neutral-600 flex items-center px-4 gap-1 shadow-inner">
-              
-              {/* Вводной автомат 2P */}
-              <div className="w-16 h-20 bg-neutral-100 dark:bg-neutral-200 rounded border-2 border-neutral-400 shadow-md flex flex-col items-center p-1 relative z-10">
-                 <div className={`w-8 h-4 rounded-t mb-2 transition-colors ${mainPower ? 'bg-red-500' : 'bg-green-500'}`}></div>
-                 <span className="text-[10px] font-black text-black">C40</span>
-                 <span className="text-[8px] text-black">ВВОД</span>
-              </div>
+            {/* Вся проводка и шины-гребенки (Строгая SVG-графика под 90 градусов) */}
+            <svg viewBox="0 0 800 480" className="absolute inset-0 w-full h-full z-10 pointer-events-none">
+               
+               {/* Фаза (L) */}
+               <g className={`transition-all duration-500 ${mainPower ? 'stroke-amber-500 drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]' : 'stroke-neutral-700'}`} strokeWidth="4" fill="none">
+                 <path d="M 85 0 L 85 110" />
+                 <path d="M 85 190 L 85 215 L 205 215 L 205 190" />
+                 <path d="M 205 110 L 205 75 L 585 75 L 585 110" />
+                 <path d="M 585 190 L 585 265 L 135 265 L 135 310" />
+                 <path d="M 435 265 L 435 310" />
+                 
+                 {/* Шина-гребенка (Свет) */}
+                 <line x1="125" y1="396" x2="300" y2="396" strokeWidth="8" />
+                 {/* Зубья гребенки (Свет) */}
+                 <path d="M 135 396 L 135 390 M 210 396 L 210 390 M 250 396 L 250 390 M 290 396 L 290 390" />
+                 
+                 {/* Шина-гребенка (Розетки) */}
+                 <line x1="425" y1="396" x2="560" y2="396" strokeWidth="8" />
+                 {/* Зубья гребенки (Розетки) */}
+                 <path d="M 435 396 L 435 390 M 510 396 L 510 390 M 550 396 L 550 390" />
+               </g>
 
-              {/* Реле напряжения */}
-              <div className="w-16 h-20 bg-neutral-100 dark:bg-neutral-200 rounded border-2 border-neutral-400 shadow-md flex flex-col items-center p-1 relative z-10 ml-2">
-                 <div className={`w-12 h-6 bg-black rounded flex items-center justify-center mb-1 transition-all ${mainPower ? 'text-red-500 shadow-[inset_0_0_5px_rgba(239,68,6,0.8)]' : 'text-neutral-700'}`}>
-                    <span className="font-mono font-bold text-xs">{mainPower ? '232' : '000'}</span>
-                 </div>
-                 <span className="text-[8px] font-black text-black mt-1">РЕЛЕ НАПР.</span>
-              </div>
+               {/* Ноль (N) */}
+               <g className={`transition-all duration-500 ${mainPower ? 'stroke-blue-500 drop-shadow-[0_0_6px_rgba(59,130,246,0.8)]' : 'stroke-neutral-800'}`} strokeWidth="4" fill="none">
+                 <path d="M 115 0 L 115 110" />
+                 <path d="M 115 190 L 115 225 L 235 225 L 235 190" />
+                 <path d="M 235 110 L 235 65 L 615 65 L 615 110" />
+                 <path d="M 615 190 L 615 275 L 165 275 L 165 310" />
+                 <path d="M 465 275 L 465 310" />
+               </g>
+            </svg>
 
-              {/* Кросс-модуль / Шина */}
-              <div className="w-12 h-20 bg-neutral-100 dark:bg-neutral-200 rounded border-2 border-neutral-400 shadow-md flex flex-col items-center p-1 relative z-10 ml-auto">
-                 <div className="flex justify-between w-full mt-1 px-1">
-                    <div className={`w-2 h-2 rounded-full ${mainPower ? 'bg-amber-500' : 'bg-neutral-400'}`}></div>
-                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                 </div>
-                 <span className="text-[8px] font-black text-black mt-auto">КРОСС</span>
-              </div>
+            {/* Модульное оборудование (Реалистичное позиционирование) */}
+            
+            {/* Верхняя рейка */}
+            <PanelModule2P left={70} top={110} label="C40" title="ВВОД" isOn={mainPower} />
+            <PanelModule2P left={190} top={110} label="232" title="РЕЛЕ НАПР." isOn={mainPower} isRelay={true} />
+            <PanelCrossModule left={570} top={110} isOn={mainPower} />
 
-              {/* Разводка на первой рейке */}
-              {/* Ввод -> Реле */}
-              <div className={`absolute top-0 left-[110px] w-6 h-1.5 transition-colors duration-500 z-0 ${mainPower ? 'bg-amber-500' : 'bg-neutral-500'}`}></div>
-              {/* Реле -> Кросс */}
-              <div className={`absolute top-0 left-[180px] right-[70px] h-1.5 transition-colors duration-500 z-0 ${mainPower ? 'bg-amber-500' : 'bg-neutral-500'}`}></div>
-           </div>
+            {/* Нижняя рейка (Группа 1 - Свет) */}
+            <PanelModule2P left={120} top={310} label="40A 30mA" title="УЗО СВЕТ" isOn={mainPower} />
+            <PanelModule1P left={195} top={310} label="C10" isOn={mainPower} />
+            <PanelModule1P left={235} top={310} label="C10" isOn={mainPower} />
+            <PanelModule1P left={275} top={310} label="C10" isOn={mainPower} />
 
-           {/* ПРОВОД НА НИЖНЮЮ РЕЙКУ */}
-           <div className={`absolute top-[120px] right-[70px] w-1.5 h-[80px] transition-colors duration-500 ${mainPower ? 'bg-amber-500' : 'bg-neutral-500'}`}></div>
+            {/* Нижняя рейка (Группа 2 - Розетки) */}
+            <PanelModule2P left={420} top={310} label="40A 30mA" title="УЗО РОЗ." isOn={mainPower} />
+            <PanelModule1P left={495} top={310} label="C16" isOn={mainPower} />
+            <PanelModule1P left={535} top={310} label="C16" isOn={mainPower} />
 
-           {/* НИЖНЯЯ DIN-РЕЙКА (ГРУППОВАЯ) */}
-           <div className="relative w-full h-24 bg-neutral-300 dark:bg-neutral-800 border-y-2 border-neutral-400 dark:border-neutral-600 flex items-center px-4 gap-1 shadow-inner">
-              
-              {/* УЗО 1 */}
-              <div className="w-16 h-20 bg-neutral-100 dark:bg-neutral-200 rounded border-2 border-neutral-400 shadow-md flex flex-col items-center p-1 relative z-10">
-                 <div className="w-4 h-3 rounded-full bg-neutral-300 border border-neutral-400 mb-1"></div>
-                 <div className={`w-8 h-4 rounded-t mb-1 transition-colors ${mainPower ? 'bg-red-500' : 'bg-green-500'}`}></div>
-                 <span className="text-[10px] font-black text-black">УЗО</span>
-              </div>
-
-              {/* Гребенка (Шина) */}
-              <div className={`absolute top-[-8px] left-[105px] w-[110px] h-2 rounded transition-colors duration-500 z-20 ${mainPower ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)]' : 'bg-neutral-400'}`}></div>
-
-              {/* Автоматы группы 1 */}
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="w-8 h-20 bg-neutral-100 dark:bg-neutral-200 rounded border-2 border-neutral-400 shadow-md flex flex-col items-center p-1 relative z-10">
-                   <div className={`w-4 h-3 rounded-t mb-2 transition-colors ${mainPower ? 'bg-red-500' : 'bg-green-500'}`}></div>
-                   <span className="text-[8px] font-black text-black">C16</span>
-                </div>
-              ))}
-
-              <div className="w-4"></div> {/* Отступ */}
-
-              {/* УЗО 2 */}
-              <div className="w-16 h-20 bg-neutral-100 dark:bg-neutral-200 rounded border-2 border-neutral-400 shadow-md flex flex-col items-center p-1 relative z-10">
-                 <div className="w-4 h-3 rounded-full bg-neutral-300 border border-neutral-400 mb-1"></div>
-                 <div className={`w-8 h-4 rounded-t mb-1 transition-colors ${mainPower ? 'bg-red-500' : 'bg-green-500'}`}></div>
-                 <span className="text-[10px] font-black text-black">УЗО</span>
-              </div>
-
-              {/* Гребенка (Шина) 2 */}
-              <div className={`absolute top-[-8px] left-[260px] w-[75px] h-2 rounded transition-colors duration-500 z-20 ${mainPower ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)]' : 'bg-neutral-400'}`}></div>
-
-              {/* Автоматы группы 2 */}
-              {[1, 2].map((i) => (
-                <div key={i} className="w-8 h-20 bg-neutral-100 dark:bg-neutral-200 rounded border-2 border-neutral-400 shadow-md flex flex-col items-center p-1 relative z-10">
-                   <div className={`w-4 h-3 rounded-t mb-2 transition-colors ${mainPower ? 'bg-red-500' : 'bg-green-500'}`}></div>
-                   <span className="text-[8px] font-black text-black">C10</span>
-                </div>
-              ))}
-
-              {/* Разводка на нижнюю рейку от Кросс-модуля */}
-              <div className={`absolute top-[-25px] right-[70px] left-[50px] h-1.5 transition-colors duration-500 z-0 ${mainPower ? 'bg-amber-500' : 'bg-neutral-500'}`}></div>
-              <div className={`absolute top-[-25px] left-[50px] w-1.5 h-[25px] transition-colors duration-500 z-0 ${mainPower ? 'bg-amber-500' : 'bg-neutral-500'}`}></div>
-              <div className={`absolute top-[-25px] left-[230px] w-1.5 h-[25px] transition-colors duration-500 z-0 ${mainPower ? 'bg-amber-500' : 'bg-neutral-500'}`}></div>
-           </div>
-
+          </div>
         </div>
       </div>
     </div>
