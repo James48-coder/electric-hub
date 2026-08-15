@@ -14,10 +14,9 @@ function GroundingCalculatorPage() {
 
   const calculate = () => {
     const L = parseFloat(length)
-    const d = parseFloat(diameter) / 1000 // перевод мм в метры
+    const d = parseFloat(diameter) / 1000 
     const n = parseInt(count)
 
-    // Удельное сопротивление грунта (Ом*м)
     const soilResistivity: Record<string, number> = {
       clay: 40,
       loam: 100,
@@ -25,20 +24,15 @@ function GroundingCalculatorPage() {
     }
     const rho = soilResistivity[soil]
 
-    // Сопротивление одного одиночного стержня
-    // Формула: R1 = rho / (2 * PI * L) * ln(2L / d)
     const R1 = (rho / (2 * Math.PI * L)) * Math.log((2 * L) / d)
 
-    // Коэффициент использования (примерный для контура в ряд/треугольник)
     let eta = 1
     if (n === 2) eta = 0.85
     if (n >= 3 && n <= 5) eta = 0.7
     if (n > 5) eta = 0.6
 
-    // Общее сопротивление контура
     const R_total = R1 / (n * eta)
 
-    // Норма по ПУЭ (до 4 Ом для 380/220В, до 30 Ом для повторного заземления)
     const isExcellent = R_total <= 4
     const isAcceptable = R_total > 4 && R_total <= 30
 
@@ -52,7 +46,6 @@ function GroundingCalculatorPage() {
 
   const result = calculate()
 
-  // Наш фирменный стиль кнопок
   const activeClass = "bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-400 shadow-sm"
   const inactiveClass = "bg-background border-border text-muted-foreground hover:border-amber-500/50 hover:text-foreground"
 
@@ -76,7 +69,6 @@ function GroundingCalculatorPage() {
 
         <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
           
-          {/* Левая колонка: Ввод данных */}
           <div className="space-y-6">
             <div className="space-y-3">
               <label className="text-sm font-bold text-foreground">Тип грунта</label>
@@ -140,24 +132,26 @@ function GroundingCalculatorPage() {
               </div>
             </div>
 
+            {/* Исправленный блок ползунка */}
             <div className="space-y-3">
-              <label className="text-sm font-bold text-foreground flex justify-between">
-                <span>Количество электродов (шт)</span>
-                <span className="text-primary">{count}</span>
-              </label>
-              <input
-                type="range"
-                min="1"
-                max="15"
-                step="1"
-                value={count}
-                onChange={(e) => setCount(e.target.value)}
-                className="w-full accent-primary h-2 bg-muted rounded-lg appearance-none cursor-pointer"
-              />
+              <label className="text-sm font-bold text-foreground">Количество электродов (шт)</label>
+              <div className="flex items-center gap-4">
+                <input
+                  type="range"
+                  min="1"
+                  max="15"
+                  step="1"
+                  value={count}
+                  onChange={(e) => setCount(e.target.value)}
+                  className="flex-1 accent-amber-500"
+                />
+                <div className="w-16 h-12 bg-background border border-border rounded-lg flex items-center justify-center font-bold text-foreground shadow-sm">
+                  {count}
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Правая колонка: Результат */}
           <div className="bg-muted/30 rounded-2xl p-6 border border-border flex flex-col justify-center">
             <div className="space-y-6 animate-in zoom-in-95 duration-300">
               <div className={`rounded-xl p-5 border shadow-sm relative overflow-hidden ${
