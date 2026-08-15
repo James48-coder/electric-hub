@@ -16,7 +16,6 @@ function ColorsCalculatorPage() {
     const N = { name: 'Нейтраль (N)', desc: 'Рабочий ноль', color: 'bg-blue-500', label: 'N' }
 
     if (standard === 'cable') {
-      // Кабели по ГОСТ 31946-2012
       if (voltage === '220') {
         return [
           { name: 'Фаза (L)', desc: 'Фазный проводник', color: 'bg-amber-800', label: 'L' },
@@ -33,7 +32,6 @@ function ColorsCalculatorPage() {
         ]
       }
     } else {
-      // Жесткие шины по ПУЭ гл. 1.1.29
       if (voltage === '220') {
         return [
           { name: 'Фаза (L)', desc: 'Примыкающая к шине', color: 'bg-red-500', label: 'L' },
@@ -48,6 +46,23 @@ function ColorsCalculatorPage() {
           N,
           PE
         ]
+      }
+    }
+  }
+
+  // Динамический текст подсказки в зависимости от обоих параметров
+  const getInfoText = () => {
+    if (standard === 'cable') {
+      if (voltage === '220') {
+        return 'В однофазной сети (220В) фазный провод чаще всего бывает коричневым, белым или черным. Желто-зеленый (PE) и синий (N) цвета использовать для фазы строго запрещено!'
+      } else {
+        return 'В трехфазном кабеле (380В) по ГОСТ 31946-2012 фазные жилы маркируются коричневым (L1), черным (L2) и серым (L3) цветами. Эта маркировка помогает не перепутать чередование фаз.'
+      }
+    } else {
+      if (voltage === '220') {
+        return 'По ПУЭ (гл. 1.1.30) в однофазных щитах при использовании жесткой ошиновки фазная шина (примыкающая) окрашивается в красный цвет.'
+      } else {
+        return 'Цветовая маркировка «ЖЗК» (Желтый, Зеленый, Красный) применяется на жестких шинах в ВРУ, ГРЩ и подстанциях для визуального контроля порядка чередования фаз А, В, С.'
       }
     }
   }
@@ -78,7 +93,6 @@ function ColorsCalculatorPage() {
 
         <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
           
-          {/* Левая колонка: Управление */}
           <div className="space-y-6">
             
             <div className="space-y-3">
@@ -122,14 +136,11 @@ function ColorsCalculatorPage() {
             <div className="bg-muted/50 p-4 rounded-xl border border-border flex items-start gap-3 mt-4">
               <Info className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
               <p className="text-xs text-muted-foreground leading-relaxed">
-                {standard === 'cable' 
-                  ? 'В однофазной сети (220В) фазный провод чаще всего бывает коричневым, белым или черным. Желто-зеленый (PE) и синий (N) цвета использовать для фазы строго запрещено!' 
-                  : 'Окраска шин применяется в ВРУ, ГРЩ и подстанциях для визуального контроля порядка чередования фаз.'}
+                {getInfoText()}
               </p>
             </div>
           </div>
 
-          {/* Правая колонка: Визуализация */}
           <div className="bg-muted/30 rounded-2xl p-6 border border-border flex flex-col justify-center">
             <div className="space-y-4 animate-in zoom-in-95 duration-300">
               
@@ -144,9 +155,7 @@ function ColorsCalculatorPage() {
                 {wires.map((wire, idx) => (
                   <div key={idx} className="flex items-center gap-4 p-2 hover:bg-muted/50 rounded-lg transition-colors">
                     
-                    {/* Визуализация сечения провода */}
                     {wire.color === 'pe' ? (
-                      // Спец-отрисовка для Желто-зеленого провода
                       <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden flex flex-col border border-border/20 shadow-inner shrink-0 relative">
                         <div className="w-full h-1/2 bg-yellow-400"></div>
                         <div className="w-full h-1/2 bg-green-500"></div>
@@ -155,15 +164,15 @@ function ColorsCalculatorPage() {
                         </div>
                       </div>
                     ) : (
-                      // Обычный сплошной цвет
                       <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-border/20 shadow-inner shrink-0 flex items-center justify-center font-black text-xs sm:text-sm ${
-                        wire.color.includes('text-neutral') ? wire.color : `${wire.color} text-white/90`
+                        wire.color.includes('text-neutral') || wire.color.includes('text-black') 
+                          ? wire.color 
+                          : `${wire.color} text-white/90`
                       }`}>
                         {wire.label}
                       </div>
                     )}
 
-                    {/* Описание */}
                     <div className="flex-1">
                       <p className="text-sm sm:text-base font-bold text-foreground">{wire.name}</p>
                       <p className="text-xs text-muted-foreground">{wire.desc}</p>
