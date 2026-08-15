@@ -176,11 +176,11 @@ function RcdCalculatorPage() {
                   </div>
                 </div>
 
-                {/* Исправленный блок предупреждения с жестко заданным красным цветом */}
+                {/* Исправленный блок: красный фон и обводка, светлый читаемый текст */}
                 {result.notice && (
-                  <div className="bg-red-500/10 rounded-xl p-4 border border-red-500/20 shadow-sm flex items-start gap-3">
-                    <AlertTriangle className="h-5 w-5 text-red-500 dark:text-red-400 shrink-0" />
-                    <p className="text-xs text-red-600 dark:text-red-400 font-medium leading-relaxed">
+                  <div className="bg-red-500/10 rounded-xl p-4 border border-red-500/30 shadow-sm flex items-start gap-3">
+                    <AlertTriangle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+                    <p className="text-sm text-foreground font-medium leading-relaxed">
                       {result.notice}
                     </p>
                   </div>
