@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { ArrowLeft, TrendingDown, Info, AlertTriangle, CheckCircle2, Zap } from 'lucide-react'
+import { ArrowLeft, TrendingDown, Info, AlertTriangle, CheckCircle2 } from 'lucide-react'
 import React, { useState } from 'react'
 
 export const Route = createFileRoute('/calculators/voltage')({
@@ -21,7 +21,6 @@ function VoltageDropPage() {
     
     if (isNaN(p) || isNaN(l) || isNaN(s) || s === 0) return null
 
-    // Удельное сопротивление (Ом·мм²/м)
     const rho = material === 'copper' ? 0.0175 : 0.028
 
     let current = 0
@@ -30,12 +29,10 @@ function VoltageDropPage() {
 
     if (voltage === '220') {
       current = (p * 1000) / 220
-      // Формула для 1 фазы: 2 * L * I * rho / S
       voltageDrop = (2 * l * current * rho) / s
       voltageDropPercent = (voltageDrop / 220) * 100
     } else {
       current = (p * 1000) / (380 * 1.732)
-      // Формула для 3 фаз: sqrt(3) * L * I * rho / S
       voltageDrop = (1.732 * l * current * rho) / s
       voltageDropPercent = (voltageDrop / 380) * 100
     }
@@ -50,6 +47,10 @@ function VoltageDropPage() {
   }
 
   const result = calculate()
+
+  // Тот же единый стиль кнопок
+  const activeClass = "bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-400 shadow-sm"
+  const inactiveClass = "bg-background border-border text-muted-foreground hover:border-amber-500/50 hover:text-foreground"
 
   return (
     <div className="container mx-auto p-6 max-w-4xl animate-in fade-in duration-500 text-foreground pb-24">
@@ -71,7 +72,6 @@ function VoltageDropPage() {
 
         <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
           
-          {/* Левая колонка: Ввод данных */}
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-3">
@@ -118,6 +118,8 @@ function VoltageDropPage() {
                 <option value="10">10.0 мм²</option>
                 <option value="16">16.0 мм²</option>
                 <option value="25">25.0 мм²</option>
+                <option value="35">35.0 мм²</option>
+                <option value="50">50.0 мм²</option>
               </select>
             </div>
 
@@ -126,17 +128,13 @@ function VoltageDropPage() {
               <div className="grid grid-cols-2 gap-3 mb-3">
                 <button
                   onClick={() => setVoltage('220')}
-                  className={`h-10 rounded-lg border text-sm font-bold transition-all ${
-                    voltage === '220' ? 'bg-primary/10 border-primary text-primary' : 'bg-background border-border text-muted-foreground'
-                  }`}
+                  className={`h-12 rounded-lg border text-sm font-bold transition-all duration-300 ${voltage === '220' ? activeClass : inactiveClass}`}
                 >
                   220 В
                 </button>
                 <button
                   onClick={() => setVoltage('380')}
-                  className={`h-10 rounded-lg border text-sm font-bold transition-all ${
-                    voltage === '380' ? 'bg-primary/10 border-primary text-primary' : 'bg-background border-border text-muted-foreground'
-                  }`}
+                  className={`h-12 rounded-lg border text-sm font-bold transition-all duration-300 ${voltage === '380' ? activeClass : inactiveClass}`}
                 >
                   380 В
                 </button>
@@ -144,17 +142,13 @@ function VoltageDropPage() {
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => setMaterial('copper')}
-                  className={`h-10 rounded-lg border text-sm font-bold transition-all ${
-                    material === 'copper' ? 'bg-amber-500/10 border-amber-500 text-amber-600 dark:text-amber-500' : 'bg-background border-border text-muted-foreground'
-                  }`}
+                  className={`h-12 rounded-lg border text-sm font-bold transition-all duration-300 ${material === 'copper' ? activeClass : inactiveClass}`}
                 >
                   Медь (Cu)
                 </button>
                 <button
                   onClick={() => setMaterial('aluminum')}
-                  className={`h-10 rounded-lg border text-sm font-bold transition-all ${
-                    material === 'aluminum' ? 'bg-slate-500/10 border-slate-500 text-slate-700 dark:text-slate-300' : 'bg-background border-border text-muted-foreground'
-                  }`}
+                  className={`h-12 rounded-lg border text-sm font-bold transition-all duration-300 ${material === 'aluminum' ? activeClass : inactiveClass}`}
                 >
                   Алюминий (Al)
                 </button>
@@ -162,7 +156,6 @@ function VoltageDropPage() {
             </div>
           </div>
 
-          {/* Правая колонка: Результат */}
           <div className="bg-muted/30 rounded-2xl p-6 border border-border flex flex-col justify-center">
             {!result ? (
               <div className="text-center text-muted-foreground space-y-3">
@@ -216,7 +209,6 @@ function VoltageDropPage() {
               </div>
             )}
           </div>
-
         </div>
       </div>
     </div>
