@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { ArrowLeft, ShieldAlert, Info, Zap, Shield, Activity } from 'lucide-react'
+import { ArrowLeft, ShieldAlert, Info, Zap, Shield, Activity, AlertTriangle } from 'lucide-react'
 import React, { useState } from 'react'
 
 export const Route = createFileRoute('/calculators/rcd')({
@@ -27,16 +27,22 @@ function RcdCalculatorPage() {
     const rcdRatings = [16, 25, 32, 40, 50, 63, 80, 100, 125]
     const rcdNominal = rcdRatings.find(r => r > breaker) || 125
 
-    // Ток утечки в зависимости от линии
+    // Ток утечки и логика предупреждений
     let leakage = 30
     let rcdType = 'Тип A (реагирует на переменный и пульсирующий ток)'
+    let notice = null
 
     if (lineType === 'wet') {
-      leakage = current <= 16 ? 10 : 30 // Для влажных помещений (стиралка, бойлер)
+      if (current <= 16) {
+        leakage = 10
+      } else {
+        leakage = 30
+        notice = 'Мощность превышает 3.5 кВт. УЗО на 10 мА для таких токов найти сложно (выпускаются до 16 А). Выбран стандарт 30 мА. Рекомендуется разделить приборы на две отдельные линии.'
+      }
     } else if (lineType === 'general') {
       leakage = 30
     } else if (lineType === 'fire') {
-      leakage = 300 // Противопожарное УЗО на вводе
+      leakage = 300
       rcdType = 'Тип S (Селективное, с задержкой срабатывания)'
     }
 
@@ -45,7 +51,8 @@ function RcdCalculatorPage() {
       breaker,
       rcdNominal,
       leakage,
-      rcdType
+      rcdType,
+      notice
     }
   }
 
@@ -75,7 +82,6 @@ function RcdCalculatorPage() {
 
         <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
           
-          {/* Левая колонка: Ввод данных */}
           <div className="space-y-6">
             <div className="space-y-3">
               <label className="text-sm font-bold text-foreground flex items-center gap-2">
@@ -138,7 +144,6 @@ function RcdCalculatorPage() {
             </div>
           </div>
 
-          {/* Правая колонка: Результат */}
           <div className="bg-muted/30 rounded-2xl p-6 border border-border flex flex-col justify-center">
             {!result ? (
               <div className="text-center text-muted-foreground space-y-3">
@@ -146,7 +151,7 @@ function RcdCalculatorPage() {
                 <p className="text-sm">Введите мощность линии для подбора аппарата защиты.</p>
               </div>
             ) : (
-              <div className="space-y-6 animate-in zoom-in-95 duration-300">
+              <div className="space-y-4 animate-in zoom-in-95 duration-300">
                 
                 <div className="bg-primary/10 rounded-xl p-5 border border-primary/20 shadow-sm relative overflow-hidden">
                   <div className="absolute -right-4 -bottom-4 opacity-10">
@@ -171,12 +176,22 @@ function RcdCalculatorPage() {
                   </div>
                 </div>
 
+                {/* Блок предупреждения, если ток слишком велик для 10мА */}
+                {result.notice && (
+                  <div className="bg-destructive/10 rounded-xl p-4 border border-destructive/20 shadow-sm flex items-start gap-3">
+                    <AlertTriangle className="h-5 w-5 text-destructive shrink-0" />
+                    <p className="text-xs text-destructive font-medium leading-relaxed">
+                      {result.notice}
+                    </p>
+                  </div>
+                )}
+
                 <div className="bg-background rounded-xl p-5 border border-border shadow-sm flex items-center justify-between">
                   <div>
                     <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mb-1">Защитный автомат</p>
                     <div className="flex items-baseline gap-2">
                       <span className="text-xl font-black text-foreground">{result.breaker} А</span>
-                      <span className="text-sm text-muted-foreground">(расчетный ток: {result.current} А)</span>
+                      <span className="text-sm text-muted-foreground">(ток: {result.current} А)</span>
                     </div>
                   </div>
                   <Zap className="h-8 w-8 text-yellow-500 opacity-20" />
@@ -187,7 +202,7 @@ function RcdCalculatorPage() {
                     <Activity className="h-5 w-5" />
                   </div>
                   <p className="text-xs text-foreground font-medium leading-relaxed">
-                    Если используется Диф. автомат (RCBO), его номинал должен быть равен <strong className="text-foreground">{result.breaker} А</strong> (он совмещает в себе и УЗО, и обычный автомат).
+                    При установке Диф. автомата (RCBO), его номинал должен быть равен <strong className="text-foreground">{result.breaker} А</strong>.
                   </p>
                 </div>
 
