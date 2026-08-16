@@ -49,27 +49,28 @@ function CableCalculatorPage() {
   const inactiveClass = "bg-background border-border text-muted-foreground hover:border-amber-500/50 hover:text-foreground"
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl animate-in fade-in duration-500 text-foreground pb-24">
-      <Link to="/calculators" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-6 group">
+    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in fade-in duration-500 text-foreground pb-24">
+      <Link to="/calculators" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-4 sm:mb-6 group">
         <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> 
         Назад к инженерному набору
       </Link>
 
       <div className="bg-card border border-border rounded-[var(--radius)] shadow-sm overflow-hidden">
-        <div className="border-b border-border p-6 bg-primary/5 flex items-center gap-4">
-          <div className="p-3 bg-primary/10 rounded-xl text-primary shrink-0">
-            <Cable className="h-6 w-6" />
+        {/* Адаптивная шапка карточки */}
+        <div className="border-b border-border p-4 sm:p-6 bg-primary/5 flex items-start sm:items-center gap-3 sm:gap-4">
+          <div className="p-2 sm:p-3 bg-primary/10 rounded-xl text-primary shrink-0 mt-1 sm:mt-0">
+            <Cable className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Сечение кабеля по мощности</h1>
-            <p className="text-sm text-muted-foreground mt-1">Подбор площади сечения жилы и номинала автоматического выключателя</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground leading-tight">Сечение кабеля по мощности</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">Подбор площади сечения жилы и номинала автоматического выключателя</p>
           </div>
         </div>
 
-        <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="p-4 sm:p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           
-          <div className="space-y-6">
-            <div className="space-y-3">
+          <div className="space-y-5 sm:space-y-6">
+            <div className="space-y-2 sm:space-y-3">
               <label className="text-sm font-bold text-foreground flex items-center gap-2">
                 Суммарная мощность нагрузки (кВт)
               </label>
@@ -81,42 +82,42 @@ function CableCalculatorPage() {
                   value={power}
                   onChange={(e) => setPower(e.target.value)}
                   placeholder="Например: 5.5"
-                  className="w-full bg-background border border-border rounded-lg h-12 px-4 focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium text-lg transition-all"
+                  className="w-full bg-background border border-border rounded-lg h-10 sm:h-12 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium text-base sm:text-lg transition-all"
                 />
-                <span className="absolute right-4 top-3 text-muted-foreground font-medium">кВт</span>
+                <span className="absolute right-3 sm:right-4 top-2.5 sm:top-3 text-muted-foreground font-medium text-sm sm:text-base">кВт</span>
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               <label className="text-sm font-bold text-foreground">Напряжение сети</label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 <button
                   onClick={() => setVoltage('220')}
-                  className={`h-12 rounded-lg border text-sm font-bold transition-all duration-300 ${voltage === '220' ? activeClass : inactiveClass}`}
+                  className={`h-10 sm:h-12 rounded-lg border text-xs sm:text-sm font-bold transition-all duration-300 ${voltage === '220' ? activeClass : inactiveClass}`}
                 >
                   220 В (1 фаза)
                 </button>
                 <button
                   onClick={() => setVoltage('380')}
-                  className={`h-12 rounded-lg border text-sm font-bold transition-all duration-300 ${voltage === '380' ? activeClass : inactiveClass}`}
+                  className={`h-10 sm:h-12 rounded-lg border text-xs sm:text-sm font-bold transition-all duration-300 ${voltage === '380' ? activeClass : inactiveClass}`}
                 >
                   380 В (3 фазы)
                 </button>
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               <label className="text-sm font-bold text-foreground">Материал жил</label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 <button
                   onClick={() => setMaterial('copper')}
-                  className={`h-12 rounded-lg border text-sm font-bold transition-all duration-300 ${material === 'copper' ? activeClass : inactiveClass}`}
+                  className={`h-10 sm:h-12 rounded-lg border text-xs sm:text-sm font-bold transition-all duration-300 ${material === 'copper' ? activeClass : inactiveClass}`}
                 >
                   Медь (Cu)
                 </button>
                 <button
                   onClick={() => setMaterial('aluminum')}
-                  className={`h-12 rounded-lg border text-sm font-bold transition-all duration-300 ${material === 'aluminum' ? activeClass : inactiveClass}`}
+                  className={`h-10 sm:h-12 rounded-lg border text-xs sm:text-sm font-bold transition-all duration-300 ${material === 'aluminum' ? activeClass : inactiveClass}`}
                 >
                   Алюминий (Al)
                 </button>
@@ -124,43 +125,45 @@ function CableCalculatorPage() {
             </div>
           </div>
 
-          <div className="bg-muted/30 rounded-2xl p-6 border border-border flex flex-col justify-center">
+          <div className="bg-muted/30 rounded-2xl p-4 sm:p-6 border border-border flex flex-col justify-center">
             {!result ? (
-              <div className="text-center text-muted-foreground space-y-3">
-                <Info className="h-10 w-10 mx-auto opacity-20" />
-                <p className="text-sm">Введите мощность нагрузки, чтобы увидеть результаты расчета.</p>
+              <div className="text-center text-muted-foreground space-y-3 py-6 sm:py-0">
+                <Info className="h-8 w-8 sm:h-10 sm:w-10 mx-auto opacity-20" />
+                <p className="text-xs sm:text-sm px-4">Введите мощность нагрузки, чтобы увидеть результаты расчета.</p>
               </div>
             ) : (
-              <div className="space-y-6 animate-in zoom-in-95 duration-300">
-                <div className="bg-background rounded-xl p-4 border border-border shadow-sm flex items-center justify-between">
+              <div className="space-y-4 sm:space-y-6 animate-in zoom-in-95 duration-300">
+                
+                <div className="bg-background rounded-xl p-3 sm:p-4 border border-border shadow-sm flex items-center justify-between gap-2">
                   <div>
-                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mb-1">Расчетный ток</p>
-                    <p className="text-2xl font-black text-foreground">{result.current} <span className="text-lg text-muted-foreground">А</span></p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground font-bold uppercase tracking-wider mb-1">Расчетный ток</p>
+                    <p className="text-xl sm:text-2xl font-black text-foreground">{result.current} <span className="text-sm sm:text-lg text-muted-foreground">А</span></p>
                   </div>
-                  <Zap className="h-8 w-8 text-yellow-500 opacity-20" />
+                  <Zap className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-500 opacity-20 shrink-0" />
                 </div>
 
-                <div className="bg-primary/10 rounded-xl p-5 border border-primary/20 shadow-sm relative overflow-hidden">
+                <div className="bg-primary/10 rounded-xl p-4 sm:p-5 border border-primary/20 shadow-sm relative overflow-hidden">
                   <div className="absolute -right-4 -bottom-4 opacity-10">
-                    <Cable className="h-32 w-32 text-primary" />
+                    <Cable className="h-24 w-24 sm:h-32 sm:w-32 text-primary" />
                   </div>
-                  <p className="text-xs text-primary font-bold uppercase tracking-wider mb-2 relative z-10">Рекомендуемое сечение</p>
-                  <div className="flex items-baseline gap-2 relative z-10">
-                    <span className="text-5xl font-black text-primary">{result.section}</span>
-                    <span className="text-xl font-bold text-primary/70">мм²</span>
+                  <p className="text-[10px] sm:text-xs text-primary font-bold uppercase tracking-wider mb-1 sm:mb-2 relative z-10">Рекомендуемое сечение</p>
+                  <div className="flex items-baseline gap-1 sm:gap-2 relative z-10">
+                    <span className="text-4xl sm:text-5xl font-black text-primary">{result.section}</span>
+                    <span className="text-lg sm:text-xl font-bold text-primary/70">мм²</span>
                   </div>
-                  <p className="text-sm text-primary/80 mt-3 relative z-10 font-medium">
+                  <p className="text-xs sm:text-sm text-primary/80 mt-2 sm:mt-3 relative z-10 font-medium">
                     Кабель: ВВГнг(А)-LS {voltage === '220' ? '3' : '5'}x{result.section}
                   </p>
                 </div>
 
-                <div className="bg-background rounded-xl p-4 border border-border shadow-sm flex items-center justify-between">
+                <div className="bg-background rounded-xl p-3 sm:p-4 border border-border shadow-sm flex items-center justify-between gap-2">
                   <div>
-                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mb-1">Автоматический выключатель</p>
-                    <p className="text-xl font-black text-foreground">{result.breaker} <span className="text-base text-muted-foreground">А (хар-ка C)</span></p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground font-bold uppercase tracking-wider mb-1">Автоматический выключатель</p>
+                    <p className="text-lg sm:text-xl font-black text-foreground">{result.breaker} <span className="text-xs sm:text-base text-muted-foreground">А (хар-ка C)</span></p>
                   </div>
-                  <ShieldCheck className="h-8 w-8 text-green-500 opacity-20" />
+                  <ShieldCheck className="h-6 w-6 sm:h-8 sm:w-8 text-green-500 opacity-20 shrink-0" />
                 </div>
+                
               </div>
             )}
           </div>
