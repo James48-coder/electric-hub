@@ -66,7 +66,6 @@ function Estimator() {
       }
 
       // --- ПАРСЕР РОЗЕТОК ---
-      // Ищет слово "розет" и вытаскивает цифру перед ним.
       if (text.includes('розет')) {
         const match = text.match(/(\d+)\s*розет/);
         const qty = match ? parseInt(match[1]) : 1;
@@ -128,7 +127,7 @@ function Estimator() {
           <select 
             value={tariff} 
             onChange={(e) => setTariff(e.target.value as TariffLevel)}
-            className="bg-card border border-primary/30 text-foreground rounded-md py-1.5 px-3 focus:outline-none font-semibold"
+            className="bg-card border border-primary/30 text-foreground rounded-md py-1.5 px-3 focus:outline-none font-semibold cursor-pointer"
           >
             <option value="GUEST">Уровень 0: Гость</option>
             <option value="MASTER">Уровень 1: Мастер</option>
@@ -214,7 +213,7 @@ function Estimator() {
                 />
                 <button
                   onClick={handleGenerate}
-                  disabled={isLoading}
+                  disabled={isLoading || !prompt.trim()}
                   className="shrink-0 p-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-colors disabled:opacity-50 h-[44px] w-[44px] flex items-center justify-center mb-1 mr-1"
                 >
                   {isLoading ? <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" /> : <Send className="w-5 h-5" />}
@@ -243,16 +242,16 @@ function Estimator() {
               </div>
             </div>
 
-            <div className="bg-card p-6 md:p-8 rounded-b-[var(--radius)] shadow-sm border border-border min-h-[600px] print:shadow-none print:border-none print:p-0 overflow-hidden">
-              <div className="border-b border-border pb-6 mb-6 flex justify-between items-start">
+            <div className="bg-card p-4 sm:p-6 md:p-8 rounded-b-[var(--radius)] shadow-sm border border-border min-h-[600px] print:shadow-none print:border-none print:p-0">
+              <div className="border-b border-border pb-6 mb-6 flex flex-col sm:flex-row justify-between items-start gap-4">
                 <div>
                   <h1 className="text-2xl font-black text-foreground mb-1">СМЕТА № {new Date().getTime().toString().slice(-6)}</h1>
                   <p className="text-sm text-muted-foreground">От {new Date().toLocaleDateString('ru-RU')} {region && `| ${region}`}</p>
                 </div>
                 
-                <div className="text-right">
+                <div className="text-left sm:text-right w-full sm:w-auto">
                   {tariff === 'PRO' || tariff === 'TEAM' ? (
-                    <div className="flex flex-col items-end gap-1">
+                    <div className="flex flex-col items-start sm:items-end gap-1">
                       <div className="flex items-center gap-1 text-foreground font-bold">
                         <Building2 className="w-4 h-4 text-primary" />
                         <span contentEditable className="outline-none border-b border-transparent focus:border-primary/50">ООО "Ваша Компания"</span>
@@ -260,7 +259,7 @@ function Estimator() {
                       <span contentEditable className="text-sm text-muted-foreground outline-none border-b border-transparent focus:border-primary/50">+7 (999) 000-00-00</span>
                     </div>
                   ) : (
-                    <div className="flex flex-col items-end gap-1">
+                    <div className="flex flex-col items-start sm:items-end gap-1">
                       <div className="flex items-center gap-2 text-foreground font-black">
                         <Zap className="w-5 h-5 text-primary" /> ВольтПро
                       </div>
@@ -272,68 +271,71 @@ function Estimator() {
               {!estimateData ? (
                 <div className="flex flex-col items-center justify-center h-64 text-muted-foreground/50">
                   <FileText className="w-12 h-12 mb-3 opacity-20" />
-                  <p>Здесь появится расчет после запроса к ИИ</p>
+                  <p className="text-center max-w-sm">Здесь появится расчет после запроса к ИИ</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto pb-4">
-                  <table className="w-full min-w-[750px] text-sm text-left">
-                    <thead className="bg-muted/30 text-muted-foreground text-xs uppercase font-semibold border-y border-border">
-                      <tr>
-                        <th className="px-4 py-4 whitespace-nowrap">Наименование работ</th>
-                        <th className="px-4 py-4 w-20 text-center whitespace-nowrap">Ед.изм</th>
-                        <th className="px-4 py-4 w-24 text-center whitespace-nowrap">Кол-во</th>
-                        <th className="px-4 py-4 w-32 text-right whitespace-nowrap">Цена за ед.</th>
-                        <th className="px-4 py-4 w-36 text-right whitespace-nowrap">Сумма (₽)</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      {estimateData.map((item) => (
-                        <tr key={item.id} className="hover:bg-muted/20 transition-colors">
-                          <td className="px-4 py-4 font-medium text-foreground">{item.name}</td>
-                          <td className="px-4 py-4 text-center text-muted-foreground">{item.unit}</td>
-                          <td className="px-4 py-4 text-center text-foreground font-semibold">{item.quantity}</td>
-                          
-                          <td className="px-4 py-4 text-right">
-                            {tariff === 'GUEST' ? (
-                              <span className="inline-flex items-center gap-1 text-muted-foreground bg-muted px-2 py-1 rounded text-xs whitespace-nowrap">
-                                <Lock className="w-3 h-3" /> Скрыто
-                              </span>
-                            ) : useMyPrices ? (
-                              <div className="flex items-center justify-end gap-1">
-                                <input
-                                  type="number"
-                                  min="0"
-                                  value={item.pricePerUnit || ''}
-                                  onChange={(e) => handlePriceChange(item.id, e.target.value)}
-                                  className="w-20 text-right bg-background border border-primary/50 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all font-medium text-foreground"
-                                />
-                              </div>
-                            ) : (
-                              <span className="text-muted-foreground whitespace-nowrap">{item.pricePerUnit.toLocaleString('ru-RU')} ₽</span>
-                            )}
-                          </td>
-                          
-                          <td className="px-4 py-4 text-right">
-                            {tariff === 'GUEST' ? (
-                              <span className="inline-flex items-center gap-1 text-muted-foreground bg-muted px-2 py-1 rounded text-xs whitespace-nowrap">
-                                <Lock className="w-3 h-3" /> Скрыто
-                              </span>
-                            ) : (
-                              <span className="font-bold text-foreground whitespace-nowrap">{item.total.toLocaleString('ru-RU')} ₽</span>
-                            )}
+                <div className="w-full">
+                  {/* ИСПРАВЛЕНИЕ: Обертка для мобильного скролла таблицы */}
+                  <div className="w-full overflow-x-auto rounded-xl border border-border">
+                    <table className="w-full min-w-[700px] text-sm text-left">
+                      <thead className="bg-muted/50 text-muted-foreground text-xs uppercase font-semibold border-b border-border">
+                        <tr>
+                          <th className="px-4 py-4 whitespace-nowrap">Наименование работ</th>
+                          <th className="px-4 py-4 w-20 text-center whitespace-nowrap">Ед.изм</th>
+                          <th className="px-4 py-4 w-24 text-center whitespace-nowrap">Кол-во</th>
+                          <th className="px-4 py-4 w-32 text-right whitespace-nowrap">Цена за ед.</th>
+                          <th className="px-4 py-4 w-36 text-right whitespace-nowrap">Сумма (₽)</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border bg-card">
+                        {estimateData.map((item) => (
+                          <tr key={item.id} className="hover:bg-muted/20 transition-colors">
+                            <td className="px-4 py-4 font-medium text-foreground">{item.name}</td>
+                            <td className="px-4 py-4 text-center text-muted-foreground">{item.unit}</td>
+                            <td className="px-4 py-4 text-center text-foreground font-semibold">{item.quantity}</td>
+                            
+                            <td className="px-4 py-4 text-right">
+                              {tariff === 'GUEST' ? (
+                                <span className="inline-flex items-center gap-1 text-muted-foreground bg-muted px-2 py-1 rounded text-xs whitespace-nowrap">
+                                  <Lock className="w-3 h-3" /> Скрыто
+                                </span>
+                              ) : useMyPrices ? (
+                                <div className="flex items-center justify-end gap-1">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    value={item.pricePerUnit || ''}
+                                    onChange={(e) => handlePriceChange(item.id, e.target.value)}
+                                    className="w-20 text-right bg-background border border-primary/50 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all font-medium text-foreground"
+                                  />
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground whitespace-nowrap">{item.pricePerUnit.toLocaleString('ru-RU')} ₽</span>
+                              )}
+                            </td>
+                            
+                            <td className="px-4 py-4 text-right">
+                              {tariff === 'GUEST' ? (
+                                <span className="inline-flex items-center gap-1 text-muted-foreground bg-muted px-2 py-1 rounded text-xs whitespace-nowrap">
+                                  <Lock className="w-3 h-3" /> Скрыто
+                                </span>
+                              ) : (
+                                <span className="font-bold text-foreground whitespace-nowrap">{item.total.toLocaleString('ru-RU')} ₽</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot>
+                        <tr className="bg-muted/10 font-bold text-foreground text-base border-t border-border">
+                          <td colSpan={4} className="px-4 py-5 text-right uppercase text-xs text-muted-foreground tracking-wider">Итого:</td>
+                          <td className="px-4 py-5 text-right whitespace-nowrap text-primary">
+                            {estimateData.reduce((acc, curr) => acc + curr.total, 0).toLocaleString('ru-RU')} ₽
                           </td>
                         </tr>
-                      ))}
-                    </tbody>
-                    <tfoot>
-                      <tr className="bg-muted/10 border-y border-border font-bold text-foreground text-base">
-                        <td colSpan={4} className="px-4 py-5 text-right uppercase text-xs text-muted-foreground tracking-wider">Итого:</td>
-                        <td className="px-4 py-5 text-right whitespace-nowrap text-primary">
-                          {estimateData.reduce((acc, curr) => acc + curr.total, 0).toLocaleString('ru-RU')} ₽
-                        </td>
-                      </tr>
-                    </tfoot>
-                  </table>
+                      </tfoot>
+                    </table>
+                  </div>
 
                   {tariff === 'GUEST' && (
                     <div className="mt-8 bg-primary/5 border border-primary/20 rounded-xl p-5 flex flex-col md:flex-row items-center justify-between gap-4 print:hidden">
