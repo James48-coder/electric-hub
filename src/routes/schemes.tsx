@@ -508,8 +508,22 @@ function PanelSchemeDetail({ onBack }: { onBack: () => void }) {
         <p className="text-muted-foreground text-lg">Базовая компоновка оборудования на DIN-рейке.</p>
       </div>
 
+      <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden mb-8 p-6 md:p-8 space-y-6">
+        <p className="text-foreground leading-relaxed">
+          Современный электрощит собирается по каскадной схеме: Вводной автомат → Реле напряжения → Групповые УЗО (дифзащита) → Линейные автоматы.
+        </p>
+        <div className="bg-muted/30 border border-border rounded-xl p-6">
+          <h3 className="flex items-center gap-2 font-bold text-foreground mb-2">
+            <BookOpen className="h-5 w-5 text-primary" /> Правила хорошего тона
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Питание на автоматы и шины-гребенки принято заводить сверху. Реле напряжения (УЗМ/РН) защищает технику от отгорания нуля и скачков напряжения. Разделение на несколько УЗО позволяет не обесточивать всю квартиру при утечке на одной линии.
+          </p>
+        </div>
+      </div>
+
       <div className="bg-card border border-border rounded-2xl p-6 md:p-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div className="flex justify-between items-center mb-8">
           <h3 className="font-bold text-foreground">Интерактивный электрощит</h3>
           <button 
             onClick={() => setMainPower(!mainPower)} 
@@ -519,7 +533,7 @@ function PanelSchemeDetail({ onBack }: { onBack: () => void }) {
           </button>
         </div>
 
-        {/* Контейнер щитка (скроллится на телефонах, чтобы не ломать пропорции) */}
+        {/* Контейнер щитка */}
         <div className="w-full overflow-x-auto pb-4">
           <div className="relative w-[800px] h-[480px] bg-neutral-900 border-2 border-neutral-800 rounded-xl shadow-2xl mx-auto flex-shrink-0 overflow-hidden">
             
@@ -532,21 +546,27 @@ function PanelSchemeDetail({ onBack }: { onBack: () => void }) {
                
                {/* Фаза (L) */}
                <g className={`transition-all duration-500 ${mainPower ? 'stroke-amber-500 drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]' : 'stroke-neutral-700'}`} strokeWidth="4" fill="none">
+                 {/* Ввод -> Автомат */}
                  <path d="M 85 0 L 85 110" />
+                 {/* Автомат -> Реле */}
                  <path d="M 85 190 L 85 215 L 205 215 L 205 190" />
+                 {/* Реле -> Кросс */}
                  <path d="M 205 110 L 205 75 L 585 75 L 585 110" />
+                 {/* Кросс -> УЗО 1 */}
                  <path d="M 585 190 L 585 265 L 135 265 L 135 310" />
+                 {/* Ответвление на УЗО 2 */}
                  <path d="M 435 265 L 435 310" />
                  
+                 {/* ===== ШИНЫ-ГРЕБЕНКИ ПЕРЕНЕСЕНЫ НАВЕРХ ===== */}
                  {/* Шина-гребенка (Свет) */}
-                 <line x1="125" y1="396" x2="300" y2="396" strokeWidth="8" />
-                 {/* Зубья гребенки (Свет) */}
-                 <path d="M 135 396 L 135 390 M 210 396 L 210 390 M 250 396 L 250 390 M 290 396 L 290 390" />
+                 <line x1="125" y1="302" x2="300" y2="302" strokeWidth="8" />
+                 {/* Зубья гребенки (Свет) - опускаются вниз в клеммы */}
+                 <path d="M 135 302 L 135 310 M 210 302 L 210 310 M 250 302 L 250 310 M 290 302 L 290 310" />
                  
                  {/* Шина-гребенка (Розетки) */}
-                 <line x1="425" y1="396" x2="560" y2="396" strokeWidth="8" />
-                 {/* Зубья гребенки (Розетки) */}
-                 <path d="M 435 396 L 435 390 M 510 396 L 510 390 M 550 396 L 550 390" />
+                 <line x1="425" y1="302" x2="560" y2="302" strokeWidth="8" />
+                 {/* Зубья гребенки (Розетки) - опускаются вниз в клеммы */}
+                 <path d="M 435 302 L 435 310 M 510 302 L 510 310 M 550 302 L 550 310" />
                </g>
 
                {/* Ноль (N) */}
