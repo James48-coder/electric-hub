@@ -74,97 +74,98 @@ function ColorsCalculatorPage() {
   const inactiveClass = "bg-background border-border text-muted-foreground hover:border-amber-500/50 hover:text-foreground"
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl animate-in fade-in duration-500 text-foreground pb-24">
-      <Link to="/calculators" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-6 group">
+    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in fade-in duration-500 text-foreground pb-24">
+      <Link to="/calculators" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-4 sm:mb-6 group">
         <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> 
         Назад к инженерному набору
       </Link>
 
       <div className="bg-card border border-border rounded-[var(--radius)] shadow-sm overflow-hidden">
-        <div className="border-b border-border p-6 bg-primary/5 flex items-center gap-4">
-          <div className="p-3 bg-primary/10 rounded-xl text-primary shrink-0">
-            <Palette className="h-6 w-6" />
+        {/* Адаптивная шапка карточки */}
+        <div className="border-b border-border p-4 sm:p-6 bg-primary/5 flex items-start sm:items-center gap-3 sm:gap-4">
+          <div className="p-2 sm:p-3 bg-primary/10 rounded-xl text-primary shrink-0 mt-1 sm:mt-0">
+            <Palette className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Цветовая маркировка</h1>
-            <p className="text-sm text-muted-foreground mt-1">Стандарты маркировки проводов (фаза, ноль, земля) по ПУЭ и ГОСТ</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground leading-tight">Цветовая маркировка</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">Стандарты маркировки проводов (фаза, ноль, земля) по ПУЭ и ГОСТ</p>
           </div>
         </div>
 
-        <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="p-4 sm:p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           
-          <div className="space-y-6">
+          <div className="space-y-5 sm:space-y-6">
             
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               <label className="text-sm font-bold text-foreground">Напряжение сети</label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 <button
                   onClick={() => setVoltage('220')}
-                  className={`h-12 rounded-lg border text-sm font-bold transition-all duration-300 ${voltage === '220' ? activeClass : inactiveClass}`}
+                  className={`h-10 sm:h-12 rounded-lg border text-xs sm:text-sm font-bold transition-all duration-300 ${voltage === '220' ? activeClass : inactiveClass}`}
                 >
-                  220 В (1 фаза)
+                  220 В <span className="hidden sm:inline">(1 фаза)</span>
                 </button>
                 <button
                   onClick={() => setVoltage('380')}
-                  className={`h-12 rounded-lg border text-sm font-bold transition-all duration-300 ${voltage === '380' ? activeClass : inactiveClass}`}
+                  className={`h-10 sm:h-12 rounded-lg border text-xs sm:text-sm font-bold transition-all duration-300 ${voltage === '380' ? activeClass : inactiveClass}`}
                 >
-                  380 В (3 фазы)
+                  380 В <span className="hidden sm:inline">(3 фазы)</span>
                 </button>
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               <label className="text-sm font-bold text-foreground">Элемент проводки</label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 <button
                   onClick={() => setStandard('cable')}
-                  className={`h-12 rounded-lg border text-sm font-bold transition-all duration-300 flex flex-col items-center justify-center gap-0.5 ${standard === 'cable' ? activeClass : inactiveClass}`}
+                  className={`py-2 min-h-[3rem] sm:py-0 sm:h-12 rounded-lg border text-xs sm:text-sm font-bold transition-all duration-300 flex flex-col items-center justify-center gap-0.5 sm:gap-1 ${standard === 'cable' ? activeClass : inactiveClass}`}
                 >
-                  <span>Кабель / Провод</span>
-                  <span className="text-[10px] font-normal opacity-70">ГОСТ 31946-2012</span>
+                  <span className="text-center leading-tight">Кабель / Провод</span>
+                  <span className="text-[9px] sm:text-[10px] font-normal opacity-70">ГОСТ 31946-2012</span>
                 </button>
                 <button
                   onClick={() => setStandard('busbar')}
-                  className={`h-12 rounded-lg border text-sm font-bold transition-all duration-300 flex flex-col items-center justify-center gap-0.5 ${standard === 'busbar' ? activeClass : inactiveClass}`}
+                  className={`py-2 min-h-[3rem] sm:py-0 sm:h-12 rounded-lg border text-xs sm:text-sm font-bold transition-all duration-300 flex flex-col items-center justify-center gap-0.5 sm:gap-1 ${standard === 'busbar' ? activeClass : inactiveClass}`}
                 >
-                  <span>Жесткие шины</span>
-                  <span className="text-[10px] font-normal opacity-70">ПУЭ гл. 1.1</span>
+                  <span className="text-center leading-tight">Жесткие шины</span>
+                  <span className="text-[9px] sm:text-[10px] font-normal opacity-70">ПУЭ гл. 1.1</span>
                 </button>
               </div>
             </div>
 
-            <div className="bg-muted/50 p-4 rounded-xl border border-border flex items-start gap-3 mt-4">
-              <Info className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
-              <p className="text-xs text-muted-foreground leading-relaxed">
+            <div className="bg-muted/50 p-3 sm:p-4 rounded-xl border border-border flex items-start gap-3 mt-4">
+              <Info className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground shrink-0 mt-0.5" />
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                 {getInfoText()}
               </p>
             </div>
           </div>
 
-          <div className="bg-muted/30 rounded-2xl p-6 border border-border flex flex-col justify-center">
+          <div className="bg-muted/30 rounded-2xl p-4 sm:p-6 border border-border flex flex-col justify-start sm:justify-center">
             <div className="space-y-4 animate-in zoom-in-95 duration-300">
               
-              <div className="flex items-center gap-2 mb-2">
-                {standard === 'cable' ? <Cable className="h-5 w-5 text-primary" /> : <Zap className="h-5 w-5 text-primary" />}
-                <p className="text-sm font-bold text-foreground uppercase tracking-wider">
+              <div className="flex items-center gap-2 mb-2 sm:mb-4 px-1 sm:px-0">
+                {standard === 'cable' ? <Cable className="h-4 w-4 sm:h-5 sm:w-5 text-primary" /> : <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />}
+                <p className="text-xs sm:text-sm font-bold text-foreground uppercase tracking-wider">
                   {standard === 'cable' ? 'Жилы кабеля' : 'Расцветка шин'}
                 </p>
               </div>
 
-              <div className="bg-background rounded-xl p-2 sm:p-4 border border-border shadow-sm flex flex-col gap-3">
+              <div className="bg-background rounded-xl p-2 sm:p-4 border border-border shadow-sm flex flex-col gap-2 sm:gap-3">
                 {wires.map((wire, idx) => (
-                  <div key={idx} className="flex items-center gap-4 p-2 hover:bg-muted/50 rounded-lg transition-colors">
+                  <div key={idx} className="flex items-center gap-3 sm:gap-4 p-2 hover:bg-muted/50 rounded-lg transition-colors">
                     
                     {wire.color === 'pe' ? (
                       <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden flex flex-col border border-border/20 shadow-inner shrink-0 relative">
                         <div className="w-full h-1/2 bg-yellow-400"></div>
                         <div className="w-full h-1/2 bg-green-500"></div>
-                        <div className="absolute inset-0 flex items-center justify-center font-black text-black/50 text-xs sm:text-sm">
+                        <div className="absolute inset-0 flex items-center justify-center font-black text-black/50 text-[10px] sm:text-sm">
                           {wire.label}
                         </div>
                       </div>
                     ) : (
-                      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-border/20 shadow-inner shrink-0 flex items-center justify-center font-black text-xs sm:text-sm ${
+                      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-border/20 shadow-inner shrink-0 flex items-center justify-center font-black text-[10px] sm:text-sm ${
                         wire.color.includes('text-neutral') || wire.color.includes('text-black') 
                           ? wire.color 
                           : `${wire.color} text-white/90`
@@ -174,8 +175,8 @@ function ColorsCalculatorPage() {
                     )}
 
                     <div className="flex-1">
-                      <p className="text-sm sm:text-base font-bold text-foreground">{wire.name}</p>
-                      <p className="text-xs text-muted-foreground">{wire.desc}</p>
+                      <p className="text-sm sm:text-base font-bold text-foreground leading-tight">{wire.name}</p>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">{wire.desc}</p>
                     </div>
 
                   </div>
