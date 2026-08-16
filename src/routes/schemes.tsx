@@ -32,26 +32,26 @@ function SchemesPage() {
   ]
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl animate-in fade-in duration-500 text-foreground pb-24">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground">Схемы</h1>
+    <div className="container mx-auto p-4 sm:p-6 max-w-6xl animate-in fade-in duration-500 text-foreground pb-24">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Схемы</h1>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {schemesList.map((scheme) => {
           const Icon = scheme.icon
           return (
             <div 
               key={scheme.id}
               onClick={() => setActiveScheme(scheme.id)}
-              className="bg-card border border-border hover:border-primary/50 transition-all duration-300 rounded-2xl p-6 cursor-pointer group flex flex-col h-full shadow-sm hover:shadow-md"
+              className="bg-card border border-border hover:border-primary/50 transition-all duration-300 rounded-2xl p-4 sm:p-6 cursor-pointer group flex flex-col h-full shadow-sm hover:shadow-md"
             >
-              <div className="flex items-start justify-between mb-4">
-                <Icon className="h-6 w-6 text-muted-foreground group-hover:text-primary transition-colors" />
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 border border-border rounded text-muted-foreground">{scheme.cat}</span>
+              <div className="flex items-start justify-between mb-3 sm:mb-4">
+                <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground group-hover:text-primary transition-colors" />
+                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-2 py-1 border border-border rounded text-muted-foreground">{scheme.cat}</span>
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">{scheme.title}</h3>
-              <p className="text-sm text-muted-foreground flex-grow mb-6">{scheme.desc}</p>
-              <div className="pt-4 border-t border-border flex items-center text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+              <h3 className="text-lg sm:text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">{scheme.title}</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground flex-grow mb-4 sm:mb-6">{scheme.desc}</p>
+              <div className="pt-3 sm:pt-4 border-t border-border flex items-center text-xs sm:text-sm font-bold text-foreground group-hover:text-primary transition-colors">
                 Описание схемы <ChevronRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
@@ -67,23 +67,25 @@ function SimpleSchemeDetail({ onBack }: { onBack: () => void }) {
   const wirePhaseActive = "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]"
   const wireInactive = "bg-black/40"
   return (
-    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24">
-      <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-8 group"><ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> К списку схем</button>
-      <div className="mb-8"><div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Управление светом</div><h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">Обычный выключатель</h1></div>
-      <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden mb-8 p-6 md:p-8 space-y-6">
-        <p className="text-foreground leading-relaxed">Базовая схема подключения одноклавишного выключателя.</p>
-        <div className="bg-muted/30 border border-border rounded-xl p-6">
-          <h3 className="flex items-center gap-2 font-bold text-foreground mb-4"><BookOpen className="h-5 w-5 text-primary" />Технические требования</h3>
-          <ul className="space-y-3 text-sm text-muted-foreground"><li>Кабель: ВВГнг-LS 3x1.5 мм²</li><li>Автомат: 10 А</li></ul>
+    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24 overflow-x-hidden">
+      <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-6 sm:mb-8 group"><ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> К списку схем</button>
+      <div className="mb-6 sm:mb-8"><div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-[10px] sm:text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3 sm:mb-4">Управление светом</div><h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">Обычный выключатель</h1></div>
+      <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden mb-6 sm:mb-8 p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6">
+        <p className="text-sm sm:text-base text-foreground leading-relaxed">Базовая схема подключения одноклавишного выключателя.</p>
+        <div className="bg-muted/30 border border-border rounded-xl p-4 sm:p-6">
+          <h3 className="flex items-center gap-2 font-bold text-foreground mb-3 sm:mb-4 text-sm sm:text-base"><BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />Технические требования</h3>
+          <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-muted-foreground"><li>Кабель: ВВГнг-LS 3x1.5 мм²</li><li>Автомат: 10 А</li></ul>
         </div>
       </div>
-      <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden p-6 md:p-8">
-        <div className="relative bg-neutral-900 rounded-2xl p-8 border border-border/50 flex flex-col items-center justify-center min-h-[250px]">
-          <div className={`transition-all duration-500 mb-12 flex flex-col items-center ${sw ? 'scale-110' : 'opacity-50 grayscale'}`}><Lightbulb className={`h-12 w-12 ${sw ? 'text-amber-400 drop-shadow-[0_0_15px_rgba(245,158,11,0.8)]' : 'text-neutral-500'}`} /></div>
-          <div className="flex items-center w-full max-w-md justify-between relative">
-            <div className={`h-2 w-16 sm:w-24 rounded-full ${wirePhaseActive}`}></div>
-            <button onClick={() => setSw(!sw)} className="w-16 h-24 bg-neutral-950 border-2 border-neutral-700 rounded-lg flex items-center justify-center cursor-pointer hover:border-amber-500 z-10 shadow-lg"><div className={`w-10 h-10 bg-neutral-800 rounded transition-transform duration-300 ${sw ? '-translate-y-4 border-t-2 border-amber-500' : 'translate-y-4 border-b-2 border-neutral-600'}`}></div></button>
-            <div className={`h-2 w-16 sm:w-24 rounded-full transition-colors duration-300 ${sw ? wirePhaseActive : wireInactive}`}></div>
+      <div className="w-full overflow-x-auto rounded-2xl shadow-sm border border-border bg-card scrollbar-hide">
+        <div className="p-4 sm:p-6 md:p-8 min-w-[320px]">
+          <div className="relative bg-neutral-900 rounded-2xl p-6 sm:p-8 border border-border/50 flex flex-col items-center justify-center min-h-[250px]">
+            <div className={`transition-all duration-500 mb-12 flex flex-col items-center ${sw ? 'scale-110' : 'opacity-50 grayscale'}`}><Lightbulb className={`h-10 w-10 sm:h-12 sm:w-12 ${sw ? 'text-amber-400 drop-shadow-[0_0_15px_rgba(245,158,11,0.8)]' : 'text-neutral-500'}`} /></div>
+            <div className="flex items-center w-full max-w-md justify-between relative">
+              <div className={`h-1.5 sm:h-2 w-16 sm:w-24 rounded-full ${wirePhaseActive}`}></div>
+              <button onClick={() => setSw(!sw)} className="w-14 h-20 sm:w-16 sm:h-24 bg-neutral-950 border-2 border-neutral-700 rounded-lg flex items-center justify-center cursor-pointer hover:border-amber-500 z-10 shadow-lg"><div className={`w-8 h-8 sm:w-10 sm:h-10 bg-neutral-800 rounded transition-transform duration-300 ${sw ? '-translate-y-3 sm:-translate-y-4 border-t-2 border-amber-500' : 'translate-y-3 sm:translate-y-4 border-b-2 border-neutral-600'}`}></div></button>
+              <div className={`h-1.5 sm:h-2 w-16 sm:w-24 rounded-full transition-colors duration-300 ${sw ? wirePhaseActive : wireInactive}`}></div>
+            </div>
           </div>
         </div>
       </div>
@@ -95,25 +97,27 @@ function DoubleSchemeDetail({ onBack }: { onBack: () => void }) {
   const [sw1, setSw1] = useState(false); const [sw2, setSw2] = useState(false) 
   const wirePhaseActive = "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]"; const wireInactive = "bg-black/40"
   return (
-    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24">
-      <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-8 group"><ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> К списку схем</button>
-      <div className="mb-8"><div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Управление светом</div><h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">Двухклавишный выключатель</h1></div>
-      <div className="bg-card border border-border rounded-2xl p-6 md:p-8 space-y-6 mb-8"><p>Управление двумя независимыми группами светильников.</p></div>
-      <div className="bg-card border border-border rounded-2xl p-6 md:p-8">
-        <div className="relative bg-neutral-900 rounded-2xl p-8 border border-border/50 flex flex-col items-center min-h-[300px]">
-          <div className="flex gap-12 sm:gap-24 mb-12">
-            <Lightbulb className={`h-10 w-10 transition-all duration-300 ${sw1 ? 'text-amber-400 drop-shadow-[0_0_15px_rgba(245,158,11,0.8)] scale-110' : 'text-neutral-500 opacity-50 grayscale'}`} />
-            <Lightbulb className={`h-10 w-10 transition-all duration-300 ${sw2 ? 'text-amber-400 drop-shadow-[0_0_15px_rgba(245,158,11,0.8)] scale-110' : 'text-neutral-500 opacity-50 grayscale'}`} />
-          </div>
-          <div className="flex items-center w-full max-w-lg justify-between">
-            <div className={`h-2 w-12 sm:w-20 rounded-full ${wirePhaseActive}`}></div>
-            <div className="w-20 sm:w-24 h-24 bg-neutral-950 border-2 border-neutral-700 rounded-lg flex p-1 gap-1 z-10 shadow-lg">
-              <button onClick={() => setSw1(!sw1)} className="flex-1 bg-neutral-900 rounded relative border border-neutral-700"><div className={`absolute left-1 right-1 h-8 bg-neutral-800 rounded transition-all duration-300 ${sw1 ? 'top-1 border-t-2 border-amber-500' : 'bottom-1 border-b-2 border-neutral-600'}`}></div></button>
-              <button onClick={() => setSw2(!sw2)} className="flex-1 bg-neutral-900 rounded relative border border-neutral-700"><div className={`absolute left-1 right-1 h-8 bg-neutral-800 rounded transition-all duration-300 ${sw2 ? 'top-1 border-t-2 border-amber-500' : 'bottom-1 border-b-2 border-neutral-600'}`}></div></button>
+    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24 overflow-x-hidden">
+      <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-6 sm:mb-8 group"><ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> К списку схем</button>
+      <div className="mb-6 sm:mb-8"><div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-[10px] sm:text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3 sm:mb-4">Управление светом</div><h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">Двухклавишный выключатель</h1></div>
+      <div className="bg-card border border-border rounded-2xl p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6 mb-6 sm:mb-8"><p className="text-sm sm:text-base">Управление двумя независимыми группами светильников.</p></div>
+      <div className="w-full overflow-x-auto rounded-2xl shadow-sm border border-border bg-card scrollbar-hide">
+        <div className="p-4 sm:p-6 md:p-8 min-w-[320px]">
+          <div className="relative bg-neutral-900 rounded-2xl p-6 sm:p-8 border border-border/50 flex flex-col items-center min-h-[300px]">
+            <div className="flex gap-10 sm:gap-24 mb-12">
+              <Lightbulb className={`h-8 w-8 sm:h-10 sm:w-10 transition-all duration-300 ${sw1 ? 'text-amber-400 drop-shadow-[0_0_15px_rgba(245,158,11,0.8)] scale-110' : 'text-neutral-500 opacity-50 grayscale'}`} />
+              <Lightbulb className={`h-8 w-8 sm:h-10 sm:w-10 transition-all duration-300 ${sw2 ? 'text-amber-400 drop-shadow-[0_0_15px_rgba(245,158,11,0.8)] scale-110' : 'text-neutral-500 opacity-50 grayscale'}`} />
             </div>
-            <div className="flex flex-col gap-4">
-              <div className={`h-2 w-12 sm:w-20 rounded-full transition-colors duration-300 ${sw1 ? wirePhaseActive : wireInactive}`}></div>
-              <div className={`h-2 w-12 sm:w-20 rounded-full transition-colors duration-300 ${sw2 ? wirePhaseActive : wireInactive}`}></div>
+            <div className="flex items-center w-full max-w-lg justify-between">
+              <div className={`h-1.5 sm:h-2 w-10 sm:w-20 rounded-full ${wirePhaseActive}`}></div>
+              <div className="w-16 sm:w-24 h-20 sm:h-24 bg-neutral-950 border-2 border-neutral-700 rounded-lg flex p-1 gap-1 z-10 shadow-lg">
+                <button onClick={() => setSw1(!sw1)} className="flex-1 bg-neutral-900 rounded relative border border-neutral-700"><div className={`absolute left-0.5 right-0.5 sm:left-1 sm:right-1 h-6 sm:h-8 bg-neutral-800 rounded transition-all duration-300 ${sw1 ? 'top-1 border-t-2 border-amber-500' : 'bottom-1 border-b-2 border-neutral-600'}`}></div></button>
+                <button onClick={() => setSw2(!sw2)} className="flex-1 bg-neutral-900 rounded relative border border-neutral-700"><div className={`absolute left-0.5 right-0.5 sm:left-1 sm:right-1 h-6 sm:h-8 bg-neutral-800 rounded transition-all duration-300 ${sw2 ? 'top-1 border-t-2 border-amber-500' : 'bottom-1 border-b-2 border-neutral-600'}`}></div></button>
+              </div>
+              <div className="flex flex-col gap-3 sm:gap-4">
+                <div className={`h-1.5 sm:h-2 w-10 sm:w-20 rounded-full transition-colors duration-300 ${sw1 ? wirePhaseActive : wireInactive}`}></div>
+                <div className={`h-1.5 sm:h-2 w-10 sm:w-20 rounded-full transition-colors duration-300 ${sw2 ? wirePhaseActive : wireInactive}`}></div>
+              </div>
             </div>
           </div>
         </div>
@@ -126,22 +130,24 @@ function TwoWaySchemeDetail({ onBack }: { onBack: () => void }) {
   const [sw1, setSw1] = useState(true); const [sw2, setSw2] = useState(true)
   const wirePhaseActive = "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]"; const wireInactive = "bg-black/40"
   return (
-    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24">
-      <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-8 group"><ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> К списку схем</button>
-      <div className="mb-8"><div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Управление светом</div><h1 className="text-3xl font-bold mb-2">Проходные выключатели</h1></div>
-      <div className="bg-card border border-border rounded-2xl p-6 md:p-8 space-y-6 mb-8"><p>Схема управления светом из двух разных мест.</p></div>
-      <div className="bg-card border border-border rounded-2xl p-6 md:p-8">
-        <div className="relative bg-neutral-900 rounded-2xl p-8 border border-border/50 flex flex-col items-center min-h-[300px]">
-          <Lightbulb className={`mb-12 h-12 w-12 transition-all duration-300 ${((sw1 && sw2) || (!sw1 && !sw2)) ? 'text-amber-400 drop-shadow-[0_0_15px_rgba(245,158,11,0.8)] scale-110' : 'text-neutral-500 opacity-50 grayscale'}`} />
-          <div className="flex items-center w-full max-w-2xl justify-between relative">
-            <div className={`h-2 w-8 sm:w-12 rounded-full ${wirePhaseActive}`}></div>
-            <button onClick={() => setSw1(!sw1)} className="w-12 sm:w-16 h-20 sm:h-24 bg-neutral-950 border-2 border-neutral-700 rounded-lg relative flex justify-center shadow-lg"><div className={`w-6 sm:w-8 h-8 sm:h-10 bg-neutral-800 rounded absolute transition-all duration-300 ${sw1 ? 'top-2 border-t-2 border-amber-500' : 'bottom-2 border-b-2 border-neutral-600'}`}></div></button>
-            <div className="flex flex-col justify-between h-12 sm:h-16 w-24 sm:w-48 mx-2">
-              <div className={`h-2 w-full rounded-full transition-colors duration-300 ${sw1 ? wirePhaseActive : wireInactive}`}></div>
-              <div className={`h-2 w-full rounded-full transition-colors duration-300 ${!sw1 ? wirePhaseActive : wireInactive}`}></div>
+    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24 overflow-x-hidden">
+      <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-6 sm:mb-8 group"><ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> К списку схем</button>
+      <div className="mb-6 sm:mb-8"><div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-[10px] sm:text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3 sm:mb-4">Управление светом</div><h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">Проходные выключатели</h1></div>
+      <div className="bg-card border border-border rounded-2xl p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6 mb-6 sm:mb-8"><p className="text-sm sm:text-base">Схема управления светом из двух разных мест.</p></div>
+      <div className="w-full overflow-x-auto rounded-2xl shadow-sm border border-border bg-card scrollbar-hide">
+        <div className="p-4 sm:p-6 md:p-8 min-w-[400px]">
+          <div className="relative bg-neutral-900 rounded-2xl p-6 sm:p-8 border border-border/50 flex flex-col items-center min-h-[300px]">
+            <Lightbulb className={`mb-12 h-10 w-10 sm:h-12 sm:w-12 transition-all duration-300 ${((sw1 && sw2) || (!sw1 && !sw2)) ? 'text-amber-400 drop-shadow-[0_0_15px_rgba(245,158,11,0.8)] scale-110' : 'text-neutral-500 opacity-50 grayscale'}`} />
+            <div className="flex items-center w-full max-w-2xl justify-between relative">
+              <div className={`h-1.5 sm:h-2 w-6 sm:w-12 rounded-full ${wirePhaseActive}`}></div>
+              <button onClick={() => setSw1(!sw1)} className="w-12 sm:w-16 h-20 sm:h-24 bg-neutral-950 border-2 border-neutral-700 rounded-lg relative flex justify-center shadow-lg"><div className={`w-6 sm:w-8 h-8 sm:h-10 bg-neutral-800 rounded absolute transition-all duration-300 ${sw1 ? 'top-2 border-t-2 border-amber-500' : 'bottom-2 border-b-2 border-neutral-600'}`}></div></button>
+              <div className="flex flex-col justify-between h-12 sm:h-16 w-16 sm:w-48 mx-2">
+                <div className={`h-1.5 sm:h-2 w-full rounded-full transition-colors duration-300 ${sw1 ? wirePhaseActive : wireInactive}`}></div>
+                <div className={`h-1.5 sm:h-2 w-full rounded-full transition-colors duration-300 ${!sw1 ? wirePhaseActive : wireInactive}`}></div>
+              </div>
+              <button onClick={() => setSw2(!sw2)} className="w-12 sm:w-16 h-20 sm:h-24 bg-neutral-950 border-2 border-neutral-700 rounded-lg relative flex justify-center shadow-lg"><div className={`w-6 sm:w-8 h-8 sm:h-10 bg-neutral-800 rounded absolute transition-all duration-300 ${sw2 ? 'top-2 border-t-2 border-amber-500' : 'bottom-2 border-b-2 border-neutral-600'}`}></div></button>
+              <div className={`h-1.5 sm:h-2 w-6 sm:w-12 rounded-full transition-colors duration-300 ${((sw1 && sw2) || (!sw1 && !sw2)) ? wirePhaseActive : wireInactive}`}></div>
             </div>
-            <button onClick={() => setSw2(!sw2)} className="w-12 sm:w-16 h-20 sm:h-24 bg-neutral-950 border-2 border-neutral-700 rounded-lg relative flex justify-center shadow-lg"><div className={`w-6 sm:w-8 h-8 sm:h-10 bg-neutral-800 rounded absolute transition-all duration-300 ${sw2 ? 'top-2 border-t-2 border-amber-500' : 'bottom-2 border-b-2 border-neutral-600'}`}></div></button>
-            <div className={`h-2 w-8 sm:w-12 rounded-full transition-colors duration-300 ${((sw1 && sw2) || (!sw1 && !sw2)) ? wirePhaseActive : wireInactive}`}></div>
           </div>
         </div>
       </div>
@@ -155,27 +161,31 @@ function CrossSchemeDetail({ onBack }: { onBack: () => void }) {
   const isLightOn = sw2 ? t1_out : t2_out
   const wirePhaseActive = "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]"; const wireInactive = "bg-black/40"
   return (
-    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24">
-      <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-8 group"><ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> К списку схем</button>
-      <div className="mb-8"><div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Управление светом</div><h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">Проходные + перекрестные</h1></div>
-      <div className="bg-card border border-border rounded-2xl p-6 md:p-8"><div className="relative bg-neutral-900 rounded-2xl p-8 border border-border/50 flex flex-col items-center min-h-[300px] overflow-hidden">
-          <Lightbulb className={`mb-12 h-12 w-12 transition-all duration-300 ${isLightOn ? 'text-amber-400 drop-shadow-[0_0_15px_rgba(245,158,11,0.8)] scale-110' : 'text-neutral-500 opacity-50 grayscale'}`} />
-          <div className="flex items-center w-full max-w-3xl justify-between">
-            <div className={`h-2 w-4 sm:w-8 rounded-full ${wirePhaseActive}`}></div>
-            <button onClick={() => setSw1(!sw1)} className="w-10 sm:w-14 h-16 sm:h-20 bg-neutral-950 border-2 border-neutral-700 rounded-lg relative flex justify-center shadow-lg"><div className={`w-6 sm:w-8 h-6 sm:h-8 bg-neutral-800 rounded absolute transition-all duration-300 ${sw1 ? 'top-2 border-t-2 border-amber-500' : 'bottom-2 border-b-2 border-neutral-600'}`}></div></button>
-            <div className="flex flex-col justify-between h-10 sm:h-12 flex-1 mx-2">
-              <div className={`h-2 w-full rounded-full transition-colors duration-300 ${sw1 ? wirePhaseActive : wireInactive}`}></div>
-              <div className={`h-2 w-full rounded-full transition-colors duration-300 ${!sw1 ? wirePhaseActive : wireInactive}`}></div>
+    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24 overflow-x-hidden">
+      <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-6 sm:mb-8 group"><ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> К списку схем</button>
+      <div className="mb-6 sm:mb-8"><div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-[10px] sm:text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3 sm:mb-4">Управление светом</div><h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">Проходные + перекрестные</h1></div>
+      <div className="w-full overflow-x-auto rounded-2xl shadow-sm border border-border bg-card scrollbar-hide">
+        <div className="p-4 sm:p-6 md:p-8 min-w-[500px]">
+          <div className="relative bg-neutral-900 rounded-2xl p-6 sm:p-8 border border-border/50 flex flex-col items-center min-h-[300px] overflow-hidden">
+            <Lightbulb className={`mb-12 h-10 w-10 sm:h-12 sm:w-12 transition-all duration-300 ${isLightOn ? 'text-amber-400 drop-shadow-[0_0_15px_rgba(245,158,11,0.8)] scale-110' : 'text-neutral-500 opacity-50 grayscale'}`} />
+            <div className="flex items-center w-full max-w-3xl justify-between">
+              <div className={`h-1.5 sm:h-2 w-4 sm:w-8 rounded-full ${wirePhaseActive}`}></div>
+              <button onClick={() => setSw1(!sw1)} className="w-10 sm:w-14 h-16 sm:h-20 bg-neutral-950 border-2 border-neutral-700 rounded-lg relative flex justify-center shadow-lg"><div className={`w-6 sm:w-8 h-6 sm:h-8 bg-neutral-800 rounded absolute transition-all duration-300 ${sw1 ? 'top-2 border-t-2 border-amber-500' : 'bottom-2 border-b-2 border-neutral-600'}`}></div></button>
+              <div className="flex flex-col justify-between h-10 sm:h-12 flex-1 mx-2 sm:mx-4">
+                <div className={`h-1.5 sm:h-2 w-full rounded-full transition-colors duration-300 ${sw1 ? wirePhaseActive : wireInactive}`}></div>
+                <div className={`h-1.5 sm:h-2 w-full rounded-full transition-colors duration-300 ${!sw1 ? wirePhaseActive : wireInactive}`}></div>
+              </div>
+              <button onClick={() => setSwCross(!swCross)} className="w-12 sm:w-16 h-20 sm:h-24 bg-neutral-950 border-2 border-neutral-700 rounded-lg relative flex flex-col items-center justify-center shadow-lg"><div className="text-[8px] sm:text-[10px] font-bold text-muted-foreground mb-1">КРЕСТ</div><div className="flex items-center justify-center w-full h-8">{swCross ? (<div className="flex flex-col gap-2 sm:gap-3 w-full px-2"><div className="h-1 sm:h-1.5 w-full bg-neutral-500 rounded"></div><div className="h-1 sm:h-1.5 w-full bg-neutral-500 rounded"></div></div>) : (<svg className="w-full h-full text-neutral-500" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor" fill="none"><path d="M4 4l16 16M4 20L20 4"/></svg>)}</div></button>
+              <div className="flex flex-col justify-between h-10 sm:h-12 flex-1 mx-2 sm:mx-4">
+                <div className={`h-1.5 sm:h-2 w-full rounded-full transition-colors duration-300 ${t1_out ? wirePhaseActive : wireInactive}`}></div>
+                <div className={`h-1.5 sm:h-2 w-full rounded-full transition-colors duration-300 ${t2_out ? wirePhaseActive : wireInactive}`}></div>
+              </div>
+              <button onClick={() => setSw2(!sw2)} className="w-10 sm:w-14 h-16 sm:h-20 bg-neutral-950 border-2 border-neutral-700 rounded-lg relative flex justify-center shadow-lg"><div className={`w-6 sm:w-8 h-6 sm:h-8 bg-neutral-800 rounded absolute transition-all duration-300 ${sw2 ? 'top-2 border-t-2 border-amber-500' : 'bottom-2 border-b-2 border-neutral-600'}`}></div></button>
+              <div className={`h-1.5 sm:h-2 w-4 sm:w-8 rounded-full transition-colors duration-300 ${isLightOn ? wirePhaseActive : wireInactive}`}></div>
             </div>
-            <button onClick={() => setSwCross(!swCross)} className="w-12 sm:w-16 h-20 sm:h-24 bg-neutral-950 border-2 border-neutral-700 rounded-lg relative flex flex-col items-center justify-center shadow-lg"><div className="text-[10px] font-bold text-muted-foreground mb-1">КРЕСТ</div><div className="flex items-center justify-center w-full h-8">{swCross ? (<div className="flex flex-col gap-3 w-full px-2"><div className="h-1.5 w-full bg-neutral-500 rounded"></div><div className="h-1.5 w-full bg-neutral-500 rounded"></div></div>) : (<svg className="w-full h-full text-neutral-500" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor" fill="none"><path d="M4 4l16 16M4 20L20 4"/></svg>)}</div></button>
-            <div className="flex flex-col justify-between h-10 sm:h-12 flex-1 mx-2">
-              <div className={`h-2 w-full rounded-full transition-colors duration-300 ${t1_out ? wirePhaseActive : wireInactive}`}></div>
-              <div className={`h-2 w-full rounded-full transition-colors duration-300 ${t2_out ? wirePhaseActive : wireInactive}`}></div>
-            </div>
-            <button onClick={() => setSw2(!sw2)} className="w-10 sm:w-14 h-16 sm:h-20 bg-neutral-950 border-2 border-neutral-700 rounded-lg relative flex justify-center shadow-lg"><div className={`w-6 sm:w-8 h-6 sm:h-8 bg-neutral-800 rounded absolute transition-all duration-300 ${sw2 ? 'top-2 border-t-2 border-amber-500' : 'bottom-2 border-b-2 border-neutral-600'}`}></div></button>
-            <div className={`h-2 w-4 sm:w-8 rounded-full transition-colors duration-300 ${isLightOn ? wirePhaseActive : wireInactive}`}></div>
           </div>
-      </div></div>
+        </div>
+      </div>
     </div>
   )
 }
@@ -183,31 +193,36 @@ function CrossSchemeDetail({ onBack }: { onBack: () => void }) {
 function SocketsSchemeDetail({ onBack }: { onBack: () => void }) {
   const [powerOn, setPowerOn] = useState(false)
   return (
-    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24">
-      <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-8 group"><ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> К списку схем</button>
-      <div className="mb-8"><div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Силовые и розеточные</div><h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">Группа розеток (шлейф)</h1></div>
-      <div className="bg-card border border-border rounded-2xl p-6 md:p-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
-          <h3 className="font-bold text-foreground">Правильное подключение</h3>
-          <button onClick={() => setPowerOn(!powerOn)} className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${powerOn ? 'bg-amber-500 text-neutral-900 shadow-[0_0_15px_rgba(245,158,11,0.5)]' : 'bg-neutral-800 text-white hover:bg-neutral-700'}`}>{powerOn ? 'Отключить питание' : 'Подать питание'}</button>
+    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24 overflow-x-hidden">
+      <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-6 sm:mb-8 group"><ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> К списку схем</button>
+      <div className="mb-6 sm:mb-8"><div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-[10px] sm:text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3 sm:mb-4">Силовые и розеточные</div><h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">Группа розеток (шлейф)</h1></div>
+      
+      <div className="bg-card border border-border rounded-2xl p-4 sm:p-8 w-full max-w-[calc(100vw-2rem)] sm:max-w-full overflow-hidden mx-auto">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-10">
+          <h3 className="font-bold text-foreground text-sm sm:text-base">Правильное подключение</h3>
+          <button onClick={() => setPowerOn(!powerOn)} className={`w-full sm:w-auto h-10 sm:h-10 px-4 rounded-lg font-bold text-xs sm:text-sm transition-colors ${powerOn ? 'bg-amber-500 text-neutral-900 shadow-[0_0_15px_rgba(245,158,11,0.5)]' : 'bg-neutral-800 text-white hover:bg-neutral-700'}`}>{powerOn ? 'Отключить питание' : 'Подать питание'}</button>
         </div>
-        <div className="relative bg-neutral-900 rounded-2xl p-4 sm:p-8 pt-12 border border-border/50 flex flex-col items-center min-h-[420px] overflow-hidden">
-          <div className="relative w-full max-w-md h-72">
-            <div className="absolute font-black text-amber-500 -left-6 sm:-left-8 top-1">L</div>
-            <div className={`absolute left-0 right-[20%] top-2 h-2 rounded-full transition-colors duration-500 ${powerOn ? 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]' : 'bg-amber-900/50'}`}></div>
-            <div className={`absolute left-[10%] top-2 w-1.5 h-40 transition-colors duration-500 ${powerOn ? 'bg-amber-500' : 'bg-amber-900/50'}`}></div><div className={`absolute left-[45%] top-2 w-1.5 h-40 transition-colors duration-500 ${powerOn ? 'bg-amber-500' : 'bg-amber-900/50'}`}></div><div className={`absolute left-[80%] top-2 w-1.5 h-40 transition-colors duration-500 ${powerOn ? 'bg-amber-500' : 'bg-amber-900/50'}`}></div>
-            <div className="absolute font-black text-blue-500 -left-6 sm:-left-8 top-7">N</div>
-            <div className="absolute left-0 right-[10%] top-8 h-2 bg-blue-600 rounded-full"></div>
-            <div className="absolute left-[20%] top-8 w-1.5 h-34 bg-blue-600"></div><div className="absolute left-[55%] top-8 w-1.5 h-34 bg-blue-600"></div><div className="absolute left-[90%] top-8 w-1.5 h-34 bg-blue-600"></div>
-            <div className="absolute font-black text-green-500 -left-8 sm:-left-10 top-13">PE</div>
-            <div className="absolute left-0 w-[50%] top-14 h-2 bg-green-500 rounded-l-full"></div>
-            <div className="absolute left-[50%] -translate-x-1/2 top-10 w-14 h-9 bg-neutral-200/90 border border-neutral-400 rounded-lg shadow-lg flex flex-col justify-between p-1 z-20"><div className="flex justify-evenly w-full mt-0.5"><div className="w-1.5 h-3.5 bg-orange-500 rounded-sm"></div><div className="w-1.5 h-3.5 bg-orange-500 rounded-sm"></div><div className="w-1.5 h-3.5 bg-orange-500 rounded-sm"></div><div className="w-1.5 h-3.5 bg-orange-500 rounded-sm"></div></div><span className="text-[9px] font-black text-neutral-600 text-center tracking-widest leading-none mb-0.5">WAGO</span></div>
-            <div className="absolute left-[50%] -translate-x-1/2 top-18 w-1.5 h-24 bg-green-500 z-10"></div>
-            <div className="absolute left-[47%] top-18 w-1.5 h-4 bg-green-500 z-10"></div><div className="absolute left-[15%] right-[53%] top-22 h-1.5 bg-green-500 rounded-l z-10"></div><div className="absolute left-[15%] -translate-x-1/2 top-22 w-1.5 h-20 bg-green-500 z-10"></div>
-            <div className="absolute left-[53%] top-18 w-1.5 h-6 bg-green-500 z-10"></div><div className="absolute left-[53%] right-[15%] top-24 h-1.5 bg-green-500 rounded-r z-10"></div><div className="absolute left-[85%] -translate-x-1/2 top-24 w-1.5 h-18 bg-green-500 z-10"></div>
-            <div className="absolute bottom-0 left-[15%] -translate-x-1/2 w-16 h-16 sm:w-20 sm:h-20 bg-neutral-100 rounded-xl border-2 border-neutral-300 flex items-center justify-center shadow-xl z-20"><div className="w-12 h-12 sm:w-14 sm:h-14 bg-neutral-200 rounded-full border border-neutral-300 flex flex-col items-center justify-center relative"><div className="absolute top-0 w-2 h-2 bg-neutral-400 rounded-b"></div><div className="flex gap-3 sm:gap-4"><div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-colors duration-500 ${powerOn ? 'bg-amber-500 shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]' : 'bg-neutral-800'}`}></div><div className="w-2 h-2 sm:w-3 sm:h-3 bg-neutral-800 rounded-full shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]"></div></div><div className="absolute bottom-0 w-2 h-2 bg-neutral-400 rounded-t"></div></div></div>
-            <div className="absolute bottom-0 left-[50%] -translate-x-1/2 w-16 h-16 sm:w-20 sm:h-20 bg-neutral-100 rounded-xl border-2 border-neutral-300 flex items-center justify-center shadow-xl z-20"><div className="w-12 h-12 sm:w-14 sm:h-14 bg-neutral-200 rounded-full border border-neutral-300 flex flex-col items-center justify-center relative"><div className="absolute top-0 w-2 h-2 bg-neutral-400 rounded-b"></div><div className="flex gap-3 sm:gap-4"><div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-colors duration-500 ${powerOn ? 'bg-amber-500 shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]' : 'bg-neutral-800'}`}></div><div className="w-2 h-2 sm:w-3 sm:h-3 bg-neutral-800 rounded-full shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]"></div></div><div className="absolute bottom-0 w-2 h-2 bg-neutral-400 rounded-t"></div></div></div>
-            <div className="absolute bottom-0 left-[85%] -translate-x-1/2 w-16 h-16 sm:w-20 sm:h-20 bg-neutral-100 rounded-xl border-2 border-neutral-300 flex items-center justify-center shadow-xl z-20"><div className="w-12 h-12 sm:w-14 sm:h-14 bg-neutral-200 rounded-full border border-neutral-300 flex flex-col items-center justify-center relative"><div className="absolute top-0 w-2 h-2 bg-neutral-400 rounded-b"></div><div className="flex gap-3 sm:gap-4"><div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-colors duration-500 ${powerOn ? 'bg-amber-500 shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]' : 'bg-neutral-800'}`}></div><div className="w-2 h-2 sm:w-3 sm:h-3 bg-neutral-800 rounded-full shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]"></div></div><div className="absolute bottom-0 w-2 h-2 bg-neutral-400 rounded-t"></div></div></div>
+        
+        {/* Адаптивный скролл контейнер */}
+        <div className="w-full overflow-x-auto rounded-2xl border border-border/50 bg-neutral-900 scrollbar-hide">
+          <div className="relative min-w-[450px] p-4 sm:p-8 pt-12 flex flex-col items-center min-h-[420px]">
+            <div className="relative w-full max-w-md h-72">
+              <div className="absolute font-black text-amber-500 -left-6 sm:-left-8 top-1">L</div>
+              <div className={`absolute left-0 right-[20%] top-2 h-2 rounded-full transition-colors duration-500 ${powerOn ? 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]' : 'bg-amber-900/50'}`}></div>
+              <div className={`absolute left-[10%] top-2 w-1.5 h-40 transition-colors duration-500 ${powerOn ? 'bg-amber-500' : 'bg-amber-900/50'}`}></div><div className={`absolute left-[45%] top-2 w-1.5 h-40 transition-colors duration-500 ${powerOn ? 'bg-amber-500' : 'bg-amber-900/50'}`}></div><div className={`absolute left-[80%] top-2 w-1.5 h-40 transition-colors duration-500 ${powerOn ? 'bg-amber-500' : 'bg-amber-900/50'}`}></div>
+              <div className="absolute font-black text-blue-500 -left-6 sm:-left-8 top-7">N</div>
+              <div className="absolute left-0 right-[10%] top-8 h-2 bg-blue-600 rounded-full"></div>
+              <div className="absolute left-[20%] top-8 w-1.5 h-34 bg-blue-600"></div><div className="absolute left-[55%] top-8 w-1.5 h-34 bg-blue-600"></div><div className="absolute left-[90%] top-8 w-1.5 h-34 bg-blue-600"></div>
+              <div className="absolute font-black text-green-500 -left-8 sm:-left-10 top-13">PE</div>
+              <div className="absolute left-0 w-[50%] top-14 h-2 bg-green-500 rounded-l-full"></div>
+              <div className="absolute left-[50%] -translate-x-1/2 top-10 w-14 h-9 bg-neutral-200/90 border border-neutral-400 rounded-lg shadow-lg flex flex-col justify-between p-1 z-20"><div className="flex justify-evenly w-full mt-0.5"><div className="w-1.5 h-3.5 bg-orange-500 rounded-sm"></div><div className="w-1.5 h-3.5 bg-orange-500 rounded-sm"></div><div className="w-1.5 h-3.5 bg-orange-500 rounded-sm"></div><div className="w-1.5 h-3.5 bg-orange-500 rounded-sm"></div></div><span className="text-[9px] font-black text-neutral-600 text-center tracking-widest leading-none mb-0.5">WAGO</span></div>
+              <div className="absolute left-[50%] -translate-x-1/2 top-18 w-1.5 h-24 bg-green-500 z-10"></div>
+              <div className="absolute left-[47%] top-18 w-1.5 h-4 bg-green-500 z-10"></div><div className="absolute left-[15%] right-[53%] top-22 h-1.5 bg-green-500 rounded-l z-10"></div><div className="absolute left-[15%] -translate-x-1/2 top-22 w-1.5 h-20 bg-green-500 z-10"></div>
+              <div className="absolute left-[53%] top-18 w-1.5 h-6 bg-green-500 z-10"></div><div className="absolute left-[53%] right-[15%] top-24 h-1.5 bg-green-500 rounded-r z-10"></div><div className="absolute left-[85%] -translate-x-1/2 top-24 w-1.5 h-18 bg-green-500 z-10"></div>
+              <div className="absolute bottom-0 left-[15%] -translate-x-1/2 w-16 h-16 sm:w-20 sm:h-20 bg-neutral-100 rounded-xl border-2 border-neutral-300 flex items-center justify-center shadow-xl z-20"><div className="w-12 h-12 sm:w-14 sm:h-14 bg-neutral-200 rounded-full border border-neutral-300 flex flex-col items-center justify-center relative"><div className="absolute top-0 w-2 h-2 bg-neutral-400 rounded-b"></div><div className="flex gap-3 sm:gap-4"><div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-colors duration-500 ${powerOn ? 'bg-amber-500 shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]' : 'bg-neutral-800'}`}></div><div className="w-2 h-2 sm:w-3 sm:h-3 bg-neutral-800 rounded-full shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]"></div></div><div className="absolute bottom-0 w-2 h-2 bg-neutral-400 rounded-t"></div></div></div>
+              <div className="absolute bottom-0 left-[50%] -translate-x-1/2 w-16 h-16 sm:w-20 sm:h-20 bg-neutral-100 rounded-xl border-2 border-neutral-300 flex items-center justify-center shadow-xl z-20"><div className="w-12 h-12 sm:w-14 sm:h-14 bg-neutral-200 rounded-full border border-neutral-300 flex flex-col items-center justify-center relative"><div className="absolute top-0 w-2 h-2 bg-neutral-400 rounded-b"></div><div className="flex gap-3 sm:gap-4"><div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-colors duration-500 ${powerOn ? 'bg-amber-500 shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]' : 'bg-neutral-800'}`}></div><div className="w-2 h-2 sm:w-3 sm:h-3 bg-neutral-800 rounded-full shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]"></div></div><div className="absolute bottom-0 w-2 h-2 bg-neutral-400 rounded-t"></div></div></div>
+              <div className="absolute bottom-0 left-[85%] -translate-x-1/2 w-16 h-16 sm:w-20 sm:h-20 bg-neutral-100 rounded-xl border-2 border-neutral-300 flex items-center justify-center shadow-xl z-20"><div className="w-12 h-12 sm:w-14 sm:h-14 bg-neutral-200 rounded-full border border-neutral-300 flex flex-col items-center justify-center relative"><div className="absolute top-0 w-2 h-2 bg-neutral-400 rounded-b"></div><div className="flex gap-3 sm:gap-4"><div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-colors duration-500 ${powerOn ? 'bg-amber-500 shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]' : 'bg-neutral-800'}`}></div><div className="w-2 h-2 sm:w-3 sm:h-3 bg-neutral-800 rounded-full shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]"></div></div><div className="absolute bottom-0 w-2 h-2 bg-neutral-400 rounded-t"></div></div></div>
+            </div>
           </div>
         </div>
       </div>
@@ -221,35 +236,40 @@ function ApplianceSchemeDetail({ onBack }: { onBack: () => void }) {
   const inactiveClass = "bg-background border-border text-muted-foreground hover:border-amber-500/50 hover:text-foreground"
   
   return (
-    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24">
+    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24 overflow-x-hidden">
       <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-6 sm:mb-8 group"><ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> К списку схем</button>
-      <div className="mb-8"><div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Силовые и розеточные</div><h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">Стационарная техника</h1></div>
-      <div className="bg-card border border-border rounded-2xl p-4 sm:p-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-          <h3 className="font-bold text-foreground">Схема установки перемычек</h3>
+      <div className="mb-6 sm:mb-8"><div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-[10px] sm:text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3 sm:mb-4">Силовые и розеточные</div><h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">Стационарная техника</h1></div>
+      
+      <div className="bg-card border border-border rounded-2xl p-4 sm:p-8 w-full max-w-[calc(100vw-2rem)] sm:max-w-full overflow-hidden mx-auto">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+          <h3 className="font-bold text-foreground text-sm sm:text-base">Схема установки перемычек</h3>
           <div className="flex bg-background border border-border rounded-lg p-1 w-full sm:w-auto">
-            <button onClick={() => setVoltage('220')} className={`flex-1 sm:flex-none px-4 py-2 rounded-md text-sm font-bold transition-all ${voltage === '220' ? activeClass : inactiveClass} border-transparent`}>1 фаза (220 В)</button>
-            <button onClick={() => setVoltage('380')} className={`flex-1 sm:flex-none px-4 py-2 rounded-md text-sm font-bold transition-all ${voltage === '380' ? activeClass : inactiveClass} border-transparent`}>2 фазы (380 В)</button>
+            <button onClick={() => setVoltage('220')} className={`flex-1 sm:flex-none h-10 sm:h-10 px-2 sm:px-4 rounded-md text-xs sm:text-sm font-bold transition-all ${voltage === '220' ? activeClass : inactiveClass} border-transparent`}>1 фаза (220 В)</button>
+            <button onClick={() => setVoltage('380')} className={`flex-1 sm:flex-none h-10 sm:h-10 px-2 sm:px-4 rounded-md text-xs sm:text-sm font-bold transition-all ${voltage === '380' ? activeClass : inactiveClass} border-transparent`}>2 фазы (380 В)</button>
           </div>
         </div>
-        <div className="relative bg-neutral-900 rounded-2xl p-4 sm:p-8 border border-border/50 flex flex-col items-center min-h-[350px]">
-          <div className="w-full flex items-start sm:items-center gap-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs sm:text-sm font-bold px-4 py-3 rounded-lg mb-8">
-            <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5 sm:mt-0" />
-            <p className="leading-tight">{voltage === '220' ? 'Внимание! Обязательно поставьте перемычку на 1-2-3, иначе половина конфорок не включится.' : 'Внимание! Обязательно снимите перемычку 1-2, иначе произойдет межфазное КЗ!'}</p>
-          </div>
-          
-          <div className="w-full max-w-sm bg-neutral-800 border-2 border-neutral-700 rounded-xl p-4 sm:p-6 shadow-2xl">
-             <div className="grid grid-cols-6 mb-2 px-1 text-[10px] sm:text-xs font-bold text-neutral-400 text-center"><span>L1</span><span>L2</span><span>L3</span><span>N1</span><span>N2</span><span>PE</span></div>
-             <div className="flex justify-between items-center bg-neutral-950 p-2 sm:p-3 rounded-lg border border-neutral-800 relative">
-               {voltage === '220' && (<div className="absolute left-[8%] right-[58%] top-1/2 -translate-y-1/2 h-2 bg-amber-600 rounded-full shadow-[0_0_5px_rgba(217,119,6,0.5)] z-10 border-y border-amber-500"></div>)}
-               <div className="absolute left-[60%] right-[25%] top-1/2 -translate-y-1/2 h-2 bg-amber-600 rounded-full shadow-[0_0_5px_rgba(217,119,6,0.5)] z-10 border-y border-amber-500"></div>
-               {[1, 2, 3, 4, 5, 6].map((num) => (<div key={num} className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-neutral-300 border-2 border-neutral-500 flex items-center justify-center z-20 shadow-inner"><div className="w-2 sm:w-3 h-0.5 bg-neutral-600"></div></div>))}
-             </div>
-             <div className="grid grid-cols-6 mt-2 px-1 text-[10px] font-black text-neutral-500 text-center"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span className="text-green-600">⏚</span></div>
-             <div className="flex justify-between items-start mt-8 px-3 relative h-16">
-               {voltage === '220' ? (<><div className="w-2 h-16 bg-amber-800 rounded-t-sm absolute left-[10%] bottom-0 shadow-[0_0_10px_rgba(180,83,9,0.5)] border-x border-amber-700"></div><div className="w-2 h-16 bg-blue-600 rounded-t-sm absolute left-[60%] bottom-0 border-x border-blue-500"></div></>) : (<><div className="w-2 h-16 bg-amber-800 rounded-t-sm absolute left-[10%] bottom-0 shadow-[0_0_10px_rgba(180,83,9,0.5)] border-x border-amber-700"></div><div className="w-2 h-16 bg-neutral-900 rounded-t-sm absolute left-[27%] bottom-0 border-x border-neutral-700"></div><div className="w-2 h-16 bg-blue-600 rounded-t-sm absolute left-[60%] bottom-0 border-x border-blue-500"></div></>)}
-               <div className="w-2 h-16 bg-green-500 rounded-t-sm absolute right-[9%] bottom-0 flex flex-col overflow-hidden border-x border-green-400"><div className="w-full h-1/2 bg-yellow-400"></div></div>
-             </div>
+        
+        {/* Адаптивный скролл контейнер */}
+        <div className="w-full overflow-x-auto rounded-2xl border border-border/50 bg-neutral-900 scrollbar-hide">
+          <div className="relative min-w-[350px] p-4 sm:p-8 flex flex-col items-center min-h-[350px]">
+            <div className="w-full flex items-start sm:items-center gap-2 sm:gap-3 bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] sm:text-sm font-bold px-3 sm:px-4 py-2 sm:py-3 rounded-lg mb-6 sm:mb-8">
+              <ShieldAlert className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 mt-0.5 sm:mt-0" />
+              <p className="leading-tight">{voltage === '220' ? 'Внимание! Обязательно поставьте перемычку на 1-2-3, иначе половина конфорок не включится.' : 'Внимание! Обязательно снимите перемычку 1-2, иначе произойдет межфазное КЗ!'}</p>
+            </div>
+            
+            <div className="w-full max-w-sm bg-neutral-800 border-2 border-neutral-700 rounded-xl p-4 sm:p-6 shadow-2xl">
+               <div className="grid grid-cols-6 mb-2 px-1 text-[10px] sm:text-xs font-bold text-neutral-400 text-center"><span>L1</span><span>L2</span><span>L3</span><span>N1</span><span>N2</span><span>PE</span></div>
+               <div className="flex justify-between items-center bg-neutral-950 p-2 sm:p-3 rounded-lg border border-neutral-800 relative">
+                 {voltage === '220' && (<div className="absolute left-[8%] right-[58%] top-1/2 -translate-y-1/2 h-1.5 sm:h-2 bg-amber-600 rounded-full shadow-[0_0_5px_rgba(217,119,6,0.5)] z-10 border-y border-amber-500"></div>)}
+                 <div className="absolute left-[60%] right-[25%] top-1/2 -translate-y-1/2 h-1.5 sm:h-2 bg-amber-600 rounded-full shadow-[0_0_5px_rgba(217,119,6,0.5)] z-10 border-y border-amber-500"></div>
+                 {[1, 2, 3, 4, 5, 6].map((num) => (<div key={num} className="w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-neutral-300 border-2 border-neutral-500 flex items-center justify-center z-20 shadow-inner"><div className="w-2 sm:w-3 h-0.5 bg-neutral-600"></div></div>))}
+               </div>
+               <div className="grid grid-cols-6 mt-2 px-1 text-[10px] font-black text-neutral-500 text-center"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span className="text-green-600">⏚</span></div>
+               <div className="flex justify-between items-start mt-8 px-2 sm:px-3 relative h-16">
+                 {voltage === '220' ? (<><div className="w-1.5 sm:w-2 h-16 bg-amber-800 rounded-t-sm absolute left-[10%] bottom-0 shadow-[0_0_10px_rgba(180,83,9,0.5)] border-x border-amber-700"></div><div className="w-1.5 sm:w-2 h-16 bg-blue-600 rounded-t-sm absolute left-[60%] bottom-0 border-x border-blue-500"></div></>) : (<><div className="w-1.5 sm:w-2 h-16 bg-amber-800 rounded-t-sm absolute left-[10%] bottom-0 shadow-[0_0_10px_rgba(180,83,9,0.5)] border-x border-amber-700"></div><div className="w-1.5 sm:w-2 h-16 bg-neutral-900 rounded-t-sm absolute left-[27%] bottom-0 border-x border-neutral-700"></div><div className="w-1.5 sm:w-2 h-16 bg-blue-600 rounded-t-sm absolute left-[60%] bottom-0 border-x border-blue-500"></div></>)}
+                 <div className="w-1.5 sm:w-2 h-16 bg-green-500 rounded-t-sm absolute right-[9%] bottom-0 flex flex-col overflow-hidden border-x border-green-400"><div className="w-full h-1/2 bg-yellow-400"></div></div>
+               </div>
+            </div>
           </div>
         </div>
       </div>
@@ -261,20 +281,20 @@ function Motor1SchemeDetail({ onBack }: { onBack: () => void }) {
   const [connection, setConnection] = useState('star')
   const activeClass = "bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-400 shadow-sm"; const inactiveClass = "bg-background border-border text-muted-foreground hover:border-amber-500/50 hover:text-foreground"
   return (
-    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24">
+    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24 overflow-x-hidden">
       <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-6 sm:mb-8 group"><ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> К списку схем</button>
-      <div className="mb-8"><div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Электродвигатели</div><h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">Звезда и Треугольник</h1></div>
+      <div className="mb-6 sm:mb-8"><div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-[10px] sm:text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3 sm:mb-4">Электродвигатели</div><h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">Звезда и Треугольник</h1></div>
       <div className="bg-card border border-border rounded-2xl p-4 sm:p-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-          <h3 className="font-bold text-foreground">Положение перемычек</h3>
-          <div className="flex bg-background border border-border rounded-lg p-1 w-full sm:w-auto"><button onClick={() => setConnection('star')} className={`flex-1 sm:flex-none px-4 py-2 rounded-md text-sm font-bold transition-all ${connection === 'star' ? activeClass : inactiveClass} border-transparent`}>Звезда (Y)</button><button onClick={() => setConnection('delta')} className={`flex-1 sm:flex-none px-4 py-2 rounded-md text-sm font-bold transition-all ${connection === 'delta' ? activeClass : inactiveClass} border-transparent`}>Треугольник (Δ)</button></div>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+          <h3 className="font-bold text-foreground text-sm sm:text-base">Положение перемычек</h3>
+          <div className="flex bg-background border border-border rounded-lg p-1 w-full sm:w-auto"><button onClick={() => setConnection('star')} className={`flex-1 sm:flex-none h-10 sm:h-10 px-2 sm:px-4 rounded-md text-xs sm:text-sm font-bold transition-all ${connection === 'star' ? activeClass : inactiveClass} border-transparent`}>Звезда (Y)</button><button onClick={() => setConnection('delta')} className={`flex-1 sm:flex-none h-10 sm:h-10 px-2 sm:px-4 rounded-md text-xs sm:text-sm font-bold transition-all ${connection === 'delta' ? activeClass : inactiveClass} border-transparent`}>Треугольник (Δ)</button></div>
         </div>
-        <div className="relative bg-neutral-900 rounded-2xl p-8 border border-border/50 flex flex-col items-center justify-center min-h-[350px]">
-          <div className="w-64 h-48 bg-neutral-800 border-4 border-neutral-700 rounded-xl p-6 shadow-2xl relative">
-             <div className="flex justify-between px-4 mb-12 relative z-20"><div className="flex flex-col items-center gap-2"><span className="text-xs font-bold text-neutral-400">W2</span><div className="w-6 h-6 rounded-full bg-neutral-300 border-2 border-neutral-500 shadow-inner"></div></div><div className="flex flex-col items-center gap-2"><span className="text-xs font-bold text-neutral-400">U2</span><div className="w-6 h-6 rounded-full bg-neutral-300 border-2 border-neutral-500 shadow-inner"></div></div><div className="flex flex-col items-center gap-2"><span className="text-xs font-bold text-neutral-400">V2</span><div className="w-6 h-6 rounded-full bg-neutral-300 border-2 border-neutral-500 shadow-inner"></div></div></div>
-             <div className="flex justify-between px-4 relative z-20"><div className="flex flex-col items-center gap-2"><div className="w-6 h-6 rounded-full bg-neutral-300 border-2 border-neutral-500 shadow-inner"></div><span className="text-xs font-bold text-neutral-400">U1</span></div><div className="flex flex-col items-center gap-2"><div className="w-6 h-6 rounded-full bg-neutral-300 border-2 border-neutral-500 shadow-inner"></div><span className="text-xs font-bold text-neutral-400">V1</span></div><div className="flex flex-col items-center gap-2"><div className="w-6 h-6 rounded-full bg-neutral-300 border-2 border-neutral-500 shadow-inner"></div><span className="text-xs font-bold text-neutral-400">W1</span></div></div>
-             {connection === 'star' ? (<div className="absolute top-[48px] left-[40px] right-[40px] h-3 bg-amber-600 rounded-sm shadow-md border border-amber-500 z-10 transition-all duration-500"></div>) : (<><div className="absolute top-[48px] bottom-[48px] left-[46px] w-3 bg-amber-600 rounded-sm shadow-md border border-amber-500 z-10 transition-all duration-500"></div><div className="absolute top-[48px] bottom-[48px] left-[110px] w-3 bg-amber-600 rounded-sm shadow-md border border-amber-500 z-10 transition-all duration-500"></div><div className="absolute top-[48px] bottom-[48px] right-[46px] w-3 bg-amber-600 rounded-sm shadow-md border border-amber-500 z-10 transition-all duration-500"></div></>)}
-             <div className="absolute -bottom-12 left-0 right-0 flex justify-between px-[50px] z-0"><div className="w-2 h-12 bg-amber-800 shadow-[0_0_10px_rgba(180,83,9,0.5)]"></div><div className="w-2 h-12 bg-neutral-950"></div><div className="w-2 h-12 bg-neutral-500"></div></div>
+        <div className="relative bg-neutral-900 rounded-2xl p-6 sm:p-8 border border-border/50 flex flex-col items-center justify-center min-h-[350px]">
+          <div className="w-56 sm:w-64 h-48 bg-neutral-800 border-4 border-neutral-700 rounded-xl p-4 sm:p-6 shadow-2xl relative">
+             <div className="flex justify-between px-2 sm:px-4 mb-12 relative z-20"><div className="flex flex-col items-center gap-1 sm:gap-2"><span className="text-[10px] sm:text-xs font-bold text-neutral-400">W2</span><div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-neutral-300 border-2 border-neutral-500 shadow-inner"></div></div><div className="flex flex-col items-center gap-1 sm:gap-2"><span className="text-[10px] sm:text-xs font-bold text-neutral-400">U2</span><div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-neutral-300 border-2 border-neutral-500 shadow-inner"></div></div><div className="flex flex-col items-center gap-1 sm:gap-2"><span className="text-[10px] sm:text-xs font-bold text-neutral-400">V2</span><div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-neutral-300 border-2 border-neutral-500 shadow-inner"></div></div></div>
+             <div className="flex justify-between px-2 sm:px-4 relative z-20"><div className="flex flex-col items-center gap-1 sm:gap-2"><div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-neutral-300 border-2 border-neutral-500 shadow-inner"></div><span className="text-[10px] sm:text-xs font-bold text-neutral-400">U1</span></div><div className="flex flex-col items-center gap-1 sm:gap-2"><div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-neutral-300 border-2 border-neutral-500 shadow-inner"></div><span className="text-[10px] sm:text-xs font-bold text-neutral-400">V1</span></div><div className="flex flex-col items-center gap-1 sm:gap-2"><div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-neutral-300 border-2 border-neutral-500 shadow-inner"></div><span className="text-[10px] sm:text-xs font-bold text-neutral-400">W1</span></div></div>
+             {connection === 'star' ? (<div className="absolute top-[48px] left-[32px] right-[32px] sm:left-[40px] sm:right-[40px] h-2.5 sm:h-3 bg-amber-600 rounded-sm shadow-md border border-amber-500 z-10 transition-all duration-500"></div>) : (<><div className="absolute top-[48px] bottom-[48px] left-[38px] sm:left-[46px] w-2.5 sm:w-3 bg-amber-600 rounded-sm shadow-md border border-amber-500 z-10 transition-all duration-500"></div><div className="absolute top-[48px] bottom-[48px] left-[98px] sm:left-[110px] w-2.5 sm:w-3 bg-amber-600 rounded-sm shadow-md border border-amber-500 z-10 transition-all duration-500"></div><div className="absolute top-[48px] bottom-[48px] right-[38px] sm:right-[46px] w-2.5 sm:w-3 bg-amber-600 rounded-sm shadow-md border border-amber-500 z-10 transition-all duration-500"></div></>)}
+             <div className="absolute -bottom-12 left-0 right-0 flex justify-between px-[42px] sm:px-[50px] z-0"><div className="w-1.5 sm:w-2 h-12 bg-amber-800 shadow-[0_0_10px_rgba(180,83,9,0.5)]"></div><div className="w-1.5 sm:w-2 h-12 bg-neutral-950"></div><div className="w-1.5 sm:w-2 h-12 bg-neutral-500"></div></div>
           </div>
         </div>
       </div>
@@ -286,53 +306,55 @@ function Motor2SchemeDetail({ onBack }: { onBack: () => void }) {
   const [direction, setDirection] = useState<'off' | 'forward' | 'reverse'>('off')
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24">
+    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24 overflow-x-hidden">
       <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-6 sm:mb-8 group">
         <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> К списку схем
       </button>
 
-      <div className="mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">
+      <div className="mb-6 sm:mb-8">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-[10px] sm:text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3 sm:mb-4">
           Электродвигатели
         </div>
-        <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">Реверсивная схема</h1>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">Реверсивная схема</h1>
       </div>
 
-      <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden mb-8 p-6 md:p-8 space-y-6">
-        <p className="text-foreground leading-relaxed">
+      <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden mb-6 sm:mb-8 p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6">
+        <p className="text-sm sm:text-base text-foreground leading-relaxed">
           Для изменения направления вращения трехфазного двигателя (реверса) достаточно поменять местами любые две фазы (обычно L1 и L3). Это реализуется с помощью двух магнитных пускателей.
         </p>
       </div>
 
-      <div className="bg-card border border-border rounded-2xl p-4 sm:p-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-          <h3 className="font-bold text-foreground">Пульт управления</h3>
+      {/* ЖЕСТКОЕ ОГРАНИЧЕНИЕ ШИРИНЫ ДЛЯ МОБИЛЬНЫХ ЭКРАНОВ */}
+      <div className="bg-card border border-border rounded-2xl p-4 sm:p-8 w-full max-w-[calc(100vw-2rem)] sm:max-w-full overflow-hidden mx-auto">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+          <h3 className="font-bold text-foreground text-sm sm:text-base">Пульт управления</h3>
           <div className="flex gap-2 w-full sm:w-auto">
              <button 
                onClick={() => setDirection('forward')}
                disabled={direction === 'reverse'}
-               className={`flex-1 sm:flex-none px-3 py-2 flex items-center justify-center gap-2 rounded-lg font-bold text-sm transition-all ${direction === 'forward' ? 'bg-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.5)]' : 'bg-neutral-800 text-white hover:bg-neutral-700 disabled:opacity-30 disabled:cursor-not-allowed'}`}
+               className={`flex-1 sm:flex-none h-10 sm:h-10 px-2 sm:px-4 flex items-center justify-center gap-1 sm:gap-2 rounded-lg font-bold text-[10px] sm:text-sm transition-all ${direction === 'forward' ? 'bg-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.5)]' : 'bg-neutral-800 text-white hover:bg-neutral-700 disabled:opacity-30 disabled:cursor-not-allowed'}`}
              >
-               <RotateCw className="w-4 h-4 hidden sm:block" /> Вперед
+               <RotateCw className="w-3 h-3 sm:w-4 sm:h-4 hidden sm:block" /> Вперед
              </button>
              <button 
                onClick={() => setDirection('off')}
-               className="px-4 py-2 rounded-lg font-bold text-sm bg-red-500 text-white hover:bg-red-600 shadow-[0_0_10px_rgba(239,68,6,0.3)] transition-all"
+               className="h-10 sm:h-10 px-3 sm:px-4 rounded-lg font-bold text-xs sm:text-sm bg-red-500 text-white hover:bg-red-600 shadow-[0_0_10px_rgba(239,68,6,0.3)] transition-all"
              >
                СТОП
              </button>
              <button 
                onClick={() => setDirection('reverse')}
                disabled={direction === 'forward'}
-               className={`flex-1 sm:flex-none px-3 py-2 flex items-center justify-center gap-2 rounded-lg font-bold text-sm transition-all ${direction === 'reverse' ? 'bg-amber-500 text-white shadow-[0_0_15px_rgba(245,158,11,0.5)]' : 'bg-neutral-800 text-white hover:bg-neutral-700 disabled:opacity-30 disabled:cursor-not-allowed'}`}
+               className={`flex-1 sm:flex-none h-10 sm:h-10 px-2 sm:px-4 flex items-center justify-center gap-1 sm:gap-2 rounded-lg font-bold text-[10px] sm:text-sm transition-all ${direction === 'reverse' ? 'bg-amber-500 text-white shadow-[0_0_15px_rgba(245,158,11,0.5)]' : 'bg-neutral-800 text-white hover:bg-neutral-700 disabled:opacity-30 disabled:cursor-not-allowed'}`}
              >
-               <RotateCcw className="w-4 h-4 hidden sm:block" /> Назад
+               <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 hidden sm:block" /> Назад
              </button>
           </div>
         </div>
 
-        <div className="relative w-[calc(100vw-2rem)] sm:w-full overflow-x-auto bg-neutral-900 rounded-xl border border-neutral-800 pb-4">
-          <div className="relative w-[500px] mx-auto flex flex-col items-center justify-center min-h-[450px]">
+        {/* Адаптивный скролл контейнер */}
+        <div className="w-full overflow-x-auto rounded-xl border border-neutral-800 bg-neutral-900 pb-4 scrollbar-hide">
+          <div className="relative min-w-[500px] w-[500px] mx-auto flex flex-col items-center justify-center min-h-[450px]">
             <div className="flex gap-16 absolute top-8">
                <div className="font-black text-amber-500">L1</div><div className="font-black text-neutral-400">L2</div><div className="font-black text-neutral-600">L3</div>
             </div>
@@ -422,31 +444,31 @@ function PanelSchemeDetail({ onBack }: { onBack: () => void }) {
   const [mainPower, setMainPower] = useState(false)
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24 overflow-hidden">
+    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24 overflow-x-hidden">
       <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-6 sm:mb-8 group">
         <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> К списку схем
       </button>
 
-      <div className="mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Щитовое</div>
-        <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">Сборка щита (Квартира)</h1>
+      <div className="mb-6 sm:mb-8">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-[10px] sm:text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3 sm:mb-4">Щитовое</div>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">Сборка щита (Квартира)</h1>
       </div>
 
       {/* ЖЕСТКОЕ ОГРАНИЧЕНИЕ ШИРИНЫ ДЛЯ МОБИЛЬНЫХ ЭКРАНОВ */}
       <div className="bg-card border border-border rounded-2xl p-4 sm:p-8 w-full max-w-[calc(100vw-2rem)] sm:max-w-full overflow-hidden mx-auto">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
-          <h3 className="font-bold text-foreground text-lg">Интерактивный щит</h3>
+          <h3 className="font-bold text-foreground text-sm sm:text-base">Интерактивный щит</h3>
           <button 
             onClick={() => setMainPower(!mainPower)} 
-            className={`w-full sm:w-auto px-6 py-3 sm:py-2 flex justify-center items-center gap-2 rounded-lg font-bold text-sm transition-all ${mainPower ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,6,0.5)]' : 'bg-neutral-800 text-white hover:bg-neutral-700'}`}
+            className={`w-full sm:w-auto h-10 sm:h-10 px-4 sm:px-6 flex justify-center items-center gap-2 rounded-lg font-bold text-xs sm:text-sm transition-all ${mainPower ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,6,0.5)]' : 'bg-neutral-800 text-white hover:bg-neutral-700'}`}
           >
             <Power className="w-4 h-4" /> {mainPower ? 'Отключить ввод' : 'Включить ввод'}
           </button>
         </div>
 
         {/* ГОРИЗОНТАЛЬНЫЙ СКРОЛЛ ТОЛЬКО ВНУТРИ ЭТОГО БЛОКА */}
-        <div className="w-full overflow-x-auto rounded-xl border-2 border-neutral-800 bg-neutral-900 pb-2 touch-pan-x">
-          <div className="relative w-[800px] min-w-[800px] h-[480px] overflow-hidden">
+        <div className="w-full overflow-x-auto rounded-xl border-2 border-neutral-800 bg-neutral-900 pb-2 touch-pan-x scrollbar-hide">
+          <div className="relative min-w-[800px] w-[800px] h-[480px] overflow-hidden">
             
             <div className="absolute top-[130px] w-full h-[40px] bg-gradient-to-b from-neutral-500 via-neutral-300 to-neutral-500 border-y border-neutral-400 shadow-md"></div>
             <div className="absolute top-[330px] w-full h-[40px] bg-gradient-to-b from-neutral-500 via-neutral-300 to-neutral-500 border-y border-neutral-400 shadow-md"></div>
