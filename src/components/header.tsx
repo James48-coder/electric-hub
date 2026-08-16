@@ -71,7 +71,7 @@ export function Header() {
         </div>
 
         <div className="ml-auto flex items-center gap-2">
-          {/* Search Mobile Button */}
+          {/* Search Mobile Button (Лупа) */}
           <button
             aria-label="Поиск"
             className="grid h-11 w-11 place-items-center rounded-xl text-foreground active:scale-95 lg:hidden hover:bg-muted/50 transition-colors"
@@ -79,7 +79,12 @@ export function Header() {
             <Search className="h-5 w-5" />
           </button>
 
-          {/* Notifications Dropdown */}
+          {/* Mobile Theme Toggle (Кнопка тем для мобильных - строго между лупой и колокольчиком) */}
+          <div className="lg:hidden flex items-center">
+            <ThemeToggle />
+          </div>
+
+          {/* Notifications Dropdown (Колокольчик) */}
           <div className="relative" ref={notifRef}>
             <button
               aria-label="Уведомления"
