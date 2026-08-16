@@ -66,28 +66,30 @@ function GofraCalculatorPage() {
   const result = calculate()
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl animate-in fade-in duration-500 text-foreground pb-24">
-      <Link to="/calculators" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-6 group">
+    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in fade-in duration-500 text-foreground pb-24">
+      <Link to="/calculators" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-4 sm:mb-6 group">
         <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> 
         Назад к инженерному набору
       </Link>
 
       <div className="bg-card border border-border rounded-[var(--radius)] shadow-sm overflow-hidden">
-        <div className="border-b border-border p-6 bg-primary/5 flex items-center gap-4">
-          <div className="p-3 bg-primary/10 rounded-xl text-primary shrink-0">
-            <CircleDashed className="h-6 w-6" />
+        {/* Адаптивная шапка карточки */}
+        <div className="border-b border-border p-4 sm:p-6 bg-primary/5 flex items-start sm:items-center gap-3 sm:gap-4">
+          <div className="p-2 sm:p-3 bg-primary/10 rounded-xl text-primary shrink-0 mt-1 sm:mt-0">
+            <CircleDashed className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Заполняемость гофры/трубы</h1>
-            <p className="text-sm text-muted-foreground mt-1">Подбор диаметра трубы по наружному диаметру кабеля и нормам ПУЭ</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground leading-tight">Заполняемость гофры/трубы</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">Подбор диаметра трубы по наружному диаметру кабеля и нормам ПУЭ</p>
           </div>
         </div>
 
-        <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Сетка перестраивается в одну колонку на мобилках */}
+        <div className="p-4 sm:p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           
           {/* Левая колонка: Ввод данных */}
-          <div className="space-y-6">
-            <div className="space-y-3">
+          <div className="space-y-5 sm:space-y-6">
+            <div className="space-y-2 sm:space-y-3">
               <label className="text-sm font-bold text-foreground">Наружный диаметр кабеля (мм)</label>
               <div className="relative">
                 <input
@@ -97,15 +99,15 @@ function GofraCalculatorPage() {
                   value={diameter}
                   onChange={(e) => setDiameter(e.target.value)}
                   placeholder="Напр: 10.5 (для ВВГнг 3х2.5)"
-                  className="w-full bg-background border border-border rounded-lg h-12 px-4 focus:outline-none focus:ring-2 focus:ring-primary text-foreground font-medium transition-all"
+                  className="w-full bg-background border border-border rounded-lg h-10 sm:h-12 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base text-foreground font-medium transition-all"
                 />
               </div>
               <p className="text-xs text-muted-foreground">Используйте штангенциркуль или данные завода-изготовителя.</p>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               <label className="text-sm font-bold text-foreground">Количество кабелей (шт)</label>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 sm:gap-4">
                 <input
                   type="range"
                   min="1"
@@ -115,14 +117,14 @@ function GofraCalculatorPage() {
                   onChange={(e) => setCount(e.target.value)}
                   className="flex-1 accent-amber-500"
                 />
-                <div className="w-16 h-12 bg-background border border-border rounded-lg flex items-center justify-center font-bold text-foreground shadow-sm">
+                <div className="w-14 sm:w-16 h-10 sm:h-12 bg-background border border-border rounded-lg flex items-center justify-center font-bold text-foreground shadow-sm text-sm sm:text-base">
                   {count}
                 </div>
               </div>
             </div>
 
-            <div className="bg-muted/50 p-4 rounded-xl border border-border flex gap-3 mt-4">
-              <ScrollText className="h-5 w-5 text-muted-foreground shrink-0" />
+            <div className="bg-muted/50 p-3 sm:p-4 rounded-xl border border-border flex items-start gap-3 mt-4">
+              <ScrollText className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Согласно нормам, площадь кабелей вместе с изоляцией не должна превышать <strong className="text-foreground">35%</strong> площади внутреннего сечения трубы для пучка кабелей, и <strong className="text-foreground">40%</strong> для одного кабеля.
               </p>
@@ -130,50 +132,51 @@ function GofraCalculatorPage() {
           </div>
 
           {/* Правая колонка: Результат */}
-          <div className="bg-muted/30 rounded-2xl p-6 border border-border flex flex-col justify-center">
+          <div className="bg-muted/30 rounded-2xl p-4 sm:p-6 border border-border flex flex-col justify-center">
             {!result ? (
-              <div className="text-center text-muted-foreground space-y-3">
-                <Info className="h-10 w-10 mx-auto opacity-20" />
-                <p className="text-sm">Введите диаметр и количество кабелей для расчета.</p>
+              <div className="text-center text-muted-foreground space-y-3 py-6 sm:py-0">
+                <Info className="h-8 w-8 sm:h-10 sm:w-10 mx-auto opacity-20" />
+                <p className="text-xs sm:text-sm px-4">Введите диаметр и количество кабелей для расчета.</p>
               </div>
             ) : (
-              <div className="space-y-6 animate-in zoom-in-95 duration-300">
-                <div className={`rounded-xl p-5 border shadow-sm relative overflow-hidden ${
+              <div className="space-y-4 sm:space-y-6 animate-in zoom-in-95 duration-300">
+                <div className={`rounded-xl p-4 sm:p-5 border shadow-sm relative overflow-hidden ${
                   result.isOk ? 'bg-primary/10 border-primary/20' : 'bg-destructive/10 border-destructive/20'
                 }`}>
-                  <div className="flex justify-between items-start mb-4 relative z-10">
+                  <div className="flex justify-between items-start mb-4 relative z-10 gap-2">
                     <div>
-                      <p className={`text-xs font-bold uppercase tracking-wider mb-1 ${result.isOk ? 'text-primary' : 'text-destructive'}`}>
+                      <p className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 ${result.isOk ? 'text-primary' : 'text-destructive'}`}>
                         Рекомендуемая гофра
                       </p>
-                      <div className="flex items-baseline gap-2">
-                        <span className={`text-5xl font-black ${result.isOk ? 'text-primary' : 'text-destructive'}`}>
+                      <div className="flex items-baseline gap-1 sm:gap-2">
+                        <span className={`text-4xl sm:text-5xl font-black tracking-tight ${result.isOk ? 'text-primary' : 'text-destructive'}`}>
                           {result.recommended}
                         </span>
-                        {result.isOk && <span className={`text-xl font-bold ${result.isOk ? 'text-primary/70' : 'text-destructive/70'}`}>мм</span>}
+                        {result.isOk && <span className={`text-lg sm:text-xl font-bold ${result.isOk ? 'text-primary/70' : 'text-destructive/70'}`}>мм</span>}
                       </div>
                     </div>
                     {result.isOk ? (
-                      <CheckCircle2 className="h-8 w-8 text-primary" />
+                      <CheckCircle2 className="h-6 w-6 sm:h-8 sm:w-8 text-primary shrink-0" />
                     ) : (
-                      <AlertTriangle className="h-8 w-8 text-destructive" />
+                      <AlertTriangle className="h-6 w-6 sm:h-8 sm:w-8 text-destructive shrink-0" />
                     )}
                   </div>
                   
-                  <div className="flex items-center justify-between border-t border-border/50 pt-4 mt-2 relative z-10">
-                    <span className="text-sm font-medium text-foreground">Заполнение трубы:</span>
-                    <span className={`font-bold ${parseFloat(result.fillRate) > result.norm ? 'text-destructive' : 'text-foreground'}`}>
-                      {result.fillRate}% <span className="text-xs text-muted-foreground font-normal">(норма до {result.norm}%)</span>
+                  {/* Строка с заполнением перестраивается на мобилке */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between border-t border-border/50 pt-3 sm:pt-4 mt-2 relative z-10 gap-1 sm:gap-0">
+                    <span className="text-xs sm:text-sm font-medium text-foreground">Заполнение трубы:</span>
+                    <span className={`text-sm sm:text-base font-bold ${parseFloat(result.fillRate) > result.norm ? 'text-destructive' : 'text-foreground'}`}>
+                      {result.fillRate}% <span className="text-[10px] sm:text-xs text-muted-foreground font-normal">(норма до {result.norm}%)</span>
                     </span>
                   </div>
                 </div>
 
-                <div className="bg-background rounded-xl p-4 border border-border shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${result.isOk ? 'bg-primary/10 text-primary' : 'bg-destructive/10 text-destructive'}`}>
-                      <Info className="h-5 w-5" />
+                <div className="bg-background rounded-xl p-3 sm:p-4 border border-border shadow-sm">
+                  <div className="flex items-start sm:items-center gap-3">
+                    <div className={`p-2 rounded-lg shrink-0 mt-0.5 sm:mt-0 ${result.isOk ? 'bg-primary/10 text-primary' : 'bg-destructive/10 text-destructive'}`}>
+                      <Info className="h-4 w-4 sm:h-5 sm:w-5" />
                     </div>
-                    <p className="text-sm text-foreground font-medium">
+                    <p className="text-xs sm:text-sm text-foreground font-medium leading-relaxed">
                       {result.isOk 
                         ? 'Протяжка кабеля пройдет без затруднений. Перегрева не ожидается.' 
                         : 'Стандартные гофры (до 63 мм) малы для такого пучка. Рекомендуется разбить трассу или использовать лотки.'}
