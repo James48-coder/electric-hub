@@ -27,11 +27,11 @@ function RootComponent() {
       <div className="flex min-h-screen w-full bg-background text-foreground selection:bg-primary selection:text-primary-foreground relative">
         
         {/* ========================================= */}
-        {/* МОБИЛЬНОЕ МЕНЮ (100% НЕПРОЗРАЧНОЕ) */}
+        {/* МОБИЛЬНОЕ МЕНЮ (Глухой непрозрачный фон) */}
         {/* ========================================= */}
         {isMobileMenuOpen && (
-          <div className="md:hidden fixed inset-0 z-[100] bg-background flex flex-col animate-in slide-in-from-left-full duration-300">
-            <div className="h-16 border-b border-border flex items-center justify-between px-4 shrink-0 shadow-sm bg-card">
+          <div className="md:hidden fixed inset-0 z-[100] flex flex-col animate-in slide-in-from-left-full duration-300 bg-card text-card-foreground shadow-2xl">
+            <div className="h-16 border-b border-border flex items-center justify-between px-4 shrink-0 bg-card">
               <div className="flex items-center gap-2 text-primary font-bold text-lg">
                 <div className="bg-primary/10 p-1.5 rounded-lg">
                   <Zap className="h-5 w-5 fill-primary" />
@@ -43,7 +43,7 @@ function RootComponent() {
               </button>
             </div>
             
-            <div className="flex flex-col p-4 gap-2 overflow-y-auto pb-24 h-full">
+            <div className="flex flex-col p-4 gap-2 overflow-y-auto pb-24 h-full bg-card">
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1 ml-3 mt-2">Навигация</p>
               <MobileNavLink to="/" icon={<Home className="w-5 h-5"/>} label="Главная" onClick={() => setIsMobileMenuOpen(false)} />
               <MobileNavLink to="/knowledge" icon={<BookOpen className="w-5 h-5"/>} label="База знаний" onClick={() => setIsMobileMenuOpen(false)} />
@@ -63,7 +63,7 @@ function RootComponent() {
         {/* ========================================= */}
         {/* ДЕСКТОПНОЕ БОКОВОЕ МЕНЮ */}
         {/* ========================================= */}
-        <div className="hidden md:block h-screen shrink-0 border-r border-border bg-card">
+        <div className="hidden md:block shrink-0 border-r border-border bg-card">
           <AppSidebar />
         </div>
         
@@ -72,7 +72,7 @@ function RootComponent() {
         {/* ========================================= */}
         <div className="flex flex-1 flex-col overflow-hidden w-full relative">
           
-          {/* ВЕРХНЯЯ ПАНЕЛЬ ДЛЯ МОБИЛОК (ТОЛЬКО ГАМБУРГЕР И ЛОГОТИП) */}
+          {/* ВЕРХНЯЯ ПАНЕЛЬ ДЛЯ МОБИЛОК (ТОЛЬКО БУРГЕР И ЛОГОТИП) */}
           <div className="md:hidden flex items-center justify-between px-4 py-3 bg-card border-b border-border shadow-sm shrink-0">
             <div className="flex items-center gap-2 text-primary font-bold text-lg">
               <Zap className="h-5 w-5 fill-primary text-primary" />
@@ -83,11 +83,8 @@ function RootComponent() {
             </button>
           </div>
 
-          {/* МЫ ВЕРНУЛИ ТВОЙ РОДНОЙ HEADER НА ВСЕ ЭКРАНЫ! */}
-          {/* Твоя оригинальная кнопка тем из Header теперь доступна и работает на телефонах */}
-          <div className="w-full overflow-x-auto bg-card">
-            <Header />
-          </div>
+          {/* ТВОЯ ОРИГИНАЛЬНАЯ ШАПКА (Без всяких оберток и скроллов!) */}
+          <Header />
           
           <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 lg:p-6 bg-background">
             <Outlet />
