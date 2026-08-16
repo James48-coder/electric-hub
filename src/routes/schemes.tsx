@@ -69,9 +69,8 @@ function SchemesPage() {
 }
 
 // ----------------------------------------------------------------------------
-// 1-7. СТАРЫЕ СХЕМЫ (БЕЗ ИЗМЕНЕНИЙ)
+// 1. ОДНОКЛАВИШНЫЙ ВЫКЛЮЧАТЕЛЬ
 // ----------------------------------------------------------------------------
-
 function SimpleSchemeDetail({ onBack }: { onBack: () => void }) {
   const [sw, setSw] = useState(false) 
   const wirePhaseActive = "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]"
@@ -101,6 +100,9 @@ function SimpleSchemeDetail({ onBack }: { onBack: () => void }) {
   )
 }
 
+// ----------------------------------------------------------------------------
+// 2. ДВУХКЛАВИШНЫЙ ВЫКЛЮЧАТЕЛЬ
+// ----------------------------------------------------------------------------
 function DoubleSchemeDetail({ onBack }: { onBack: () => void }) {
   const [sw1, setSw1] = useState(false); const [sw2, setSw2] = useState(false) 
   const wirePhaseActive = "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]"; const wireInactive = "bg-black/40"
@@ -132,6 +134,9 @@ function DoubleSchemeDetail({ onBack }: { onBack: () => void }) {
   )
 }
 
+// ----------------------------------------------------------------------------
+// 3. ПРОХОДНОЙ ВЫКЛЮЧАТЕЛЬ
+// ----------------------------------------------------------------------------
 function TwoWaySchemeDetail({ onBack }: { onBack: () => void }) {
   const [sw1, setSw1] = useState(true); const [sw2, setSw2] = useState(true)
   const wirePhaseActive = "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]"; const wireInactive = "bg-black/40"
@@ -159,6 +164,9 @@ function TwoWaySchemeDetail({ onBack }: { onBack: () => void }) {
   )
 }
 
+// ----------------------------------------------------------------------------
+// 4. ПРОХОДНЫЕ + ПЕРЕКРЕСТНЫЕ
+// ----------------------------------------------------------------------------
 function CrossSchemeDetail({ onBack }: { onBack: () => void }) {
   const [sw1, setSw1] = useState(true); const [swCross, setSwCross] = useState(true); const [sw2, setSw2] = useState(true)
   const t1_out = swCross ? sw1 : !sw1; const t2_out = swCross ? !sw1 : sw1
@@ -190,6 +198,9 @@ function CrossSchemeDetail({ onBack }: { onBack: () => void }) {
   )
 }
 
+// ----------------------------------------------------------------------------
+// 5. ГРУППА РОЗЕТОК
+// ----------------------------------------------------------------------------
 function SocketsSchemeDetail({ onBack }: { onBack: () => void }) {
   const [powerOn, setPowerOn] = useState(false)
   return (
@@ -225,30 +236,43 @@ function SocketsSchemeDetail({ onBack }: { onBack: () => void }) {
   )
 }
 
+// ----------------------------------------------------------------------------
+// 6. СТАЦИОНАРНАЯ ТЕХНИКА (ВАРОЧНАЯ ПАНЕЛЬ) - ИСПРАВЛЕНО ДЛЯ МОБИЛОК
+// ----------------------------------------------------------------------------
 function ApplianceSchemeDetail({ onBack }: { onBack: () => void }) {
   const [voltage, setVoltage] = useState('220')
-  const activeClass = "bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-400 shadow-sm"; const inactiveClass = "bg-background border-border text-muted-foreground hover:border-amber-500/50 hover:text-foreground"
+  const activeClass = "bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-400 shadow-sm"
+  const inactiveClass = "bg-background border-border text-muted-foreground hover:border-amber-500/50 hover:text-foreground"
+  
   return (
-    <div className="container mx-auto p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24">
-      <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-8 group"><ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> К списку схем</button>
+    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24">
+      <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-6 sm:mb-8 group"><ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> К списку схем</button>
       <div className="mb-8"><div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Силовые и розеточные</div><h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">Стационарная техника</h1></div>
-      <div className="bg-card border border-border rounded-2xl p-6 md:p-8"><div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="bg-card border border-border rounded-2xl p-4 sm:p-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <h3 className="font-bold text-foreground">Схема установки перемычек</h3>
-          <div className="flex bg-background border border-border rounded-lg p-1"><button onClick={() => setVoltage('220')} className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${voltage === '220' ? activeClass : inactiveClass} border-transparent`}>1 фаза (220 В)</button><button onClick={() => setVoltage('380')} className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${voltage === '380' ? activeClass : inactiveClass} border-transparent`}>2 фазы (380 В)</button></div>
+          <div className="flex bg-background border border-border rounded-lg p-1 w-full sm:w-auto">
+            <button onClick={() => setVoltage('220')} className={`flex-1 sm:flex-none px-4 py-2 rounded-md text-sm font-bold transition-all ${voltage === '220' ? activeClass : inactiveClass} border-transparent`}>1 фаза (220 В)</button>
+            <button onClick={() => setVoltage('380')} className={`flex-1 sm:flex-none px-4 py-2 rounded-md text-sm font-bold transition-all ${voltage === '380' ? activeClass : inactiveClass} border-transparent`}>2 фазы (380 В)</button>
+          </div>
         </div>
-        <div className="relative bg-neutral-900 rounded-2xl p-8 border border-border/50 flex flex-col items-center justify-center min-h-[350px]">
-          <div className="absolute top-4 left-4 right-4 flex items-center justify-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold px-4 py-2 rounded-lg"><ShieldAlert className="w-4 h-4" />{voltage === '220' ? 'Внимание! Если не поставить перемычку на 1-2-3, половина конфорок не будет работать.' : 'Внимание! Обязательно снимите перемычку между 1-2, иначе произойдет межфазное КЗ!'}</div>
-          <div className="w-full max-w-sm bg-neutral-800 border-2 border-neutral-700 rounded-xl p-6 shadow-2xl mt-8">
-             <div className="flex justify-between items-end mb-2 px-2 text-xs font-bold text-neutral-400"><span>L1</span><span>L2</span><span>L3</span><span>N1</span><span>N2</span><span>PE</span></div>
-             <div className="flex justify-between items-center bg-neutral-950 p-3 rounded-lg border border-neutral-800 relative">
+        <div className="relative bg-neutral-900 rounded-2xl p-4 sm:p-8 border border-border/50 flex flex-col items-center min-h-[350px]">
+          <div className="w-full flex items-start sm:items-center gap-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs sm:text-sm font-bold px-4 py-3 rounded-lg mb-8">
+            <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5 sm:mt-0" />
+            <p className="leading-tight">{voltage === '220' ? 'Внимание! Обязательно поставьте перемычку на 1-2-3, иначе половина конфорок не включится.' : 'Внимание! Обязательно снимите перемычку 1-2, иначе произойдет межфазное КЗ!'}</p>
+          </div>
+          
+          <div className="w-full max-w-sm bg-neutral-800 border-2 border-neutral-700 rounded-xl p-4 sm:p-6 shadow-2xl">
+             <div className="grid grid-cols-6 mb-2 px-1 text-[10px] sm:text-xs font-bold text-neutral-400 text-center"><span>L1</span><span>L2</span><span>L3</span><span>N1</span><span>N2</span><span>PE</span></div>
+             <div className="flex justify-between items-center bg-neutral-950 p-2 sm:p-3 rounded-lg border border-neutral-800 relative">
                {voltage === '220' && (<div className="absolute left-[8%] right-[58%] top-1/2 -translate-y-1/2 h-2 bg-amber-600 rounded-full shadow-[0_0_5px_rgba(217,119,6,0.5)] z-10 border-y border-amber-500"></div>)}
                <div className="absolute left-[60%] right-[25%] top-1/2 -translate-y-1/2 h-2 bg-amber-600 rounded-full shadow-[0_0_5px_rgba(217,119,6,0.5)] z-10 border-y border-amber-500"></div>
-               {[1, 2, 3, 4, 5, 6].map((num) => (<div key={num} className="w-6 h-6 rounded-full bg-neutral-300 border-2 border-neutral-500 flex items-center justify-center z-20 shadow-inner"><div className="w-3 h-0.5 bg-neutral-600"></div></div>))}
+               {[1, 2, 3, 4, 5, 6].map((num) => (<div key={num} className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-neutral-300 border-2 border-neutral-500 flex items-center justify-center z-20 shadow-inner"><div className="w-2 sm:w-3 h-0.5 bg-neutral-600"></div></div>))}
              </div>
-             <div className="flex justify-between items-start mt-2 px-3 text-[10px] font-black text-neutral-500"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span className="text-green-600">⏚</span></div>
-             <div className="flex justify-between items-start mt-8 px-3 relative">
-               {voltage === '220' ? (<><div className="w-2 h-16 bg-amber-800 rounded-t-sm absolute left-[10%] -bottom-16 shadow-[0_0_10px_rgba(180,83,9,0.5)] border-x border-amber-700"></div><div className="w-2 h-16 bg-blue-600 rounded-t-sm absolute left-[60%] -bottom-16 border-x border-blue-500"></div></>) : (<><div className="w-2 h-16 bg-amber-800 rounded-t-sm absolute left-[10%] -bottom-16 shadow-[0_0_10px_rgba(180,83,9,0.5)] border-x border-amber-700"></div><div className="w-2 h-16 bg-neutral-900 rounded-t-sm absolute left-[27%] -bottom-16 border-x border-neutral-700"></div><div className="w-2 h-16 bg-blue-600 rounded-t-sm absolute left-[60%] -bottom-16 border-x border-blue-500"></div></>)}
-               <div className="w-2 h-16 bg-green-500 rounded-t-sm absolute right-[9%] -bottom-16 flex flex-col overflow-hidden border-x border-green-400"><div className="w-full h-1/2 bg-yellow-400"></div></div>
+             <div className="grid grid-cols-6 mt-2 px-1 text-[10px] font-black text-neutral-500 text-center"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span className="text-green-600">⏚</span></div>
+             <div className="flex justify-between items-start mt-8 px-3 relative h-16">
+               {voltage === '220' ? (<><div className="w-2 h-16 bg-amber-800 rounded-t-sm absolute left-[10%] bottom-0 shadow-[0_0_10px_rgba(180,83,9,0.5)] border-x border-amber-700"></div><div className="w-2 h-16 bg-blue-600 rounded-t-sm absolute left-[60%] bottom-0 border-x border-blue-500"></div></>) : (<><div className="w-2 h-16 bg-amber-800 rounded-t-sm absolute left-[10%] bottom-0 shadow-[0_0_10px_rgba(180,83,9,0.5)] border-x border-amber-700"></div><div className="w-2 h-16 bg-neutral-900 rounded-t-sm absolute left-[27%] bottom-0 border-x border-neutral-700"></div><div className="w-2 h-16 bg-blue-600 rounded-t-sm absolute left-[60%] bottom-0 border-x border-blue-500"></div></>)}
+               <div className="w-2 h-16 bg-green-500 rounded-t-sm absolute right-[9%] bottom-0 flex flex-col overflow-hidden border-x border-green-400"><div className="w-full h-1/2 bg-yellow-400"></div></div>
              </div>
           </div>
         </div>
@@ -257,6 +281,9 @@ function ApplianceSchemeDetail({ onBack }: { onBack: () => void }) {
   )
 }
 
+// ----------------------------------------------------------------------------
+// 7. ЗВЕЗДА И ТРЕУГОЛЬНИК (ДВИГАТЕЛИ)
+// ----------------------------------------------------------------------------
 function Motor1SchemeDetail({ onBack }: { onBack: () => void }) {
   const [connection, setConnection] = useState('star')
   const activeClass = "bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-400 shadow-sm"; const inactiveClass = "bg-background border-border text-muted-foreground hover:border-amber-500/50 hover:text-foreground"
@@ -283,7 +310,7 @@ function Motor1SchemeDetail({ onBack }: { onBack: () => void }) {
 }
 
 // ----------------------------------------------------------------------------
-// 8. НОВАЯ СХЕМА: РЕВЕРСИВНАЯ (ДВИГАТЕЛЬ)
+// 8. РЕВЕРСИВНАЯ СХЕМА (ДВИГАТЕЛИ)
 // ----------------------------------------------------------------------------
 function Motor2SchemeDetail({ onBack }: { onBack: () => void }) {
   const [direction, setDirection] = useState<'off' | 'forward' | 'reverse'>('off')
@@ -351,16 +378,13 @@ function Motor2SchemeDetail({ onBack }: { onBack: () => void }) {
              <div className="font-black text-neutral-600">L3</div>
           </div>
 
-          {/* Входящие линии (Верх) */}
           <div className="flex gap-16 absolute top-16 h-12">
              <div className="w-1 h-full bg-amber-600"></div>
              <div className="w-1 h-full bg-neutral-400"></div>
              <div className="w-1 h-full bg-neutral-600"></div>
           </div>
 
-          {/* Контакторы КМ1 и КМ2 */}
           <div className="flex justify-between w-[320px] absolute top-28 z-20">
-             {/* KM1 */}
              <div className={`w-28 h-20 border-2 rounded-lg flex flex-col items-center justify-center transition-all duration-300 ${direction === 'forward' ? 'bg-green-900/50 border-green-500 shadow-[0_0_20px_rgba(34,197,94,0.3)]' : 'bg-neutral-900 border-neutral-700'}`}>
                 <span className="font-black text-neutral-300 mb-1">КМ1</span>
                 <div className="flex gap-3">
@@ -370,7 +394,6 @@ function Motor2SchemeDetail({ onBack }: { onBack: () => void }) {
                 </div>
              </div>
              
-             {/* KM2 */}
              <div className={`w-28 h-20 border-2 rounded-lg flex flex-col items-center justify-center transition-all duration-300 ${direction === 'reverse' ? 'bg-amber-900/50 border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.3)]' : 'bg-neutral-900 border-neutral-700'}`}>
                 <span className="font-black text-neutral-300 mb-1">КМ2 (Реверс)</span>
                 <div className="flex gap-3">
@@ -381,35 +404,25 @@ function Motor2SchemeDetail({ onBack }: { onBack: () => void }) {
              </div>
           </div>
 
-          {/* Разводка до контакторов */}
           <svg className="absolute top-16 w-[320px] h-12" style={{ zIndex: 10 }}>
              <path d="M 50 0 L 50 48 M 114 0 L 114 48 M 178 0 L 178 48" stroke="#d97706" strokeWidth="4" className="text-amber-600"/>
-             {/* Ответвления на КМ2 (Перехлест) */}
              <path d="M 50 24 L 270 24 L 270 48" fill="none" stroke="#d97706" strokeWidth="4" />
              <path d="M 114 32 L 206 32 L 206 48" fill="none" stroke="#9ca3af" strokeWidth="4" />
              <path d="M 178 40 L 142 40 L 142 48" fill="none" stroke="#4b5563" strokeWidth="4" />
           </svg>
 
-          {/* Разводка после контакторов (Сборка) */}
           <svg className="absolute top-[192px] w-[320px] h-16" style={{ zIndex: 10 }}>
-             {/* КМ1 Прямо */}
              <path d="M 50 0 L 50 64" fill="none" stroke={direction === 'forward' ? "#f59e0b" : "#262626"} strokeWidth="4" />
              <path d="M 114 0 L 114 64" fill="none" stroke={direction === 'forward' ? "#d1d5db" : "#262626"} strokeWidth="4" />
              <path d="M 178 0 L 178 64" fill="none" stroke={direction === 'forward' ? "#6b7280" : "#262626"} strokeWidth="4" />
              
-             {/* КМ2 Крест */}
-             {/* L3 -> L1 */}
              <path d="M 142 0 L 142 40 L 50 40 L 50 64" fill="none" stroke={direction === 'reverse' ? "#f59e0b" : "transparent"} strokeWidth="4" />
-             {/* L2 -> L2 */}
              <path d="M 206 0 L 206 32 L 114 32 L 114 64" fill="none" stroke={direction === 'reverse' ? "#d1d5db" : "transparent"} strokeWidth="4" />
-             {/* L1 -> L3 */}
              <path d="M 270 0 L 270 24 L 178 24 L 178 64" fill="none" stroke={direction === 'reverse' ? "#6b7280" : "transparent"} strokeWidth="4" />
           </svg>
 
-          {/* Двигатель */}
           <div className="absolute bottom-12 w-32 h-32 rounded-full border-8 border-neutral-700 bg-neutral-800 flex items-center justify-center z-30 shadow-2xl overflow-hidden">
              <div className="font-black text-2xl text-neutral-500 mb-2">M</div>
-             {/* Вращающийся ротор */}
              <div className={`absolute inset-2 border-4 border-dashed rounded-full transition-all duration-[2000ms] ease-linear ${direction === 'forward' ? 'border-green-500 animate-[spin_1s_linear_infinite]' : direction === 'reverse' ? 'border-amber-500 animate-[spin_1s_linear_infinite_reverse]' : 'border-neutral-600'}`}></div>
           </div>
 
@@ -420,18 +433,16 @@ function Motor2SchemeDetail({ onBack }: { onBack: () => void }) {
 }
 
 // ----------------------------------------------------------------------------
-// 9. НОВАЯ СХЕМА: СБОРКА ЩИТА (DIN-РЕЙКИ) - УЛУЧШЕННЫЙ ДИЗАЙН
+// 9. СБОРКА ЩИТА (DIN-РЕЙКИ) - ИСПРАВЛЕНО ДЛЯ МОБИЛОК И ПЕРЕНЕСЕНЫ ГРЕБЕНКИ
 // ----------------------------------------------------------------------------
 
 // Вспомогательные компоненты для реалистичной отрисовки модулей
 const PanelModule2P = ({ left, top, label, title, isOn, isRelay }: any) => (
   <div className="absolute bg-gradient-to-b from-neutral-100 to-neutral-300 border-2 border-neutral-400 rounded shadow-xl flex flex-col items-center justify-between py-1 z-20" style={{ left, top, width: 60, height: 80 }}>
-    {/* Верхние клеммы */}
     <div className="flex justify-between w-full px-2">
       <div className="w-3 h-2 bg-neutral-500 rounded-sm shadow-inner border-b border-neutral-600"></div>
       <div className="w-3 h-2 bg-neutral-500 rounded-sm shadow-inner border-b border-neutral-600"></div>
     </div>
-    
     {isRelay ? (
        <div className={`w-12 h-7 bg-black rounded flex items-center justify-center border-2 border-neutral-600 ${isOn ? 'text-red-500 shadow-[inset_0_0_8px_rgba(239,68,6,0.8)]' : 'text-neutral-700'}`}>
           <span className="font-mono font-bold text-[11px] tracking-wider">{isOn ? '232' : '000'}</span>
@@ -444,13 +455,10 @@ const PanelModule2P = ({ left, top, label, title, isOn, isRelay }: any) => (
          </div>
        </div>
     )}
-    
     <div className="flex flex-col items-center">
       <span className="text-[10px] font-black text-neutral-800 leading-none">{label}</span>
       <span className="text-[7px] font-bold text-neutral-600 leading-none mt-0.5">{title}</span>
     </div>
-    
-    {/* Нижние клеммы */}
     <div className="flex justify-between w-full px-2">
       <div className="w-3 h-2 bg-neutral-500 rounded-sm shadow-inner border-t border-neutral-600"></div>
       <div className="w-3 h-2 bg-neutral-500 rounded-sm shadow-inner border-t border-neutral-600"></div>
@@ -495,81 +503,50 @@ function PanelSchemeDetail({ onBack }: { onBack: () => void }) {
   const [mainPower, setMainPower] = useState(false)
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24">
-      <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-8 group">
+    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in slide-in-from-right-4 duration-300 text-foreground pb-24 overflow-hidden">
+      <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-6 sm:mb-8 group">
         <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> К списку схем
       </button>
 
       <div className="mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">
-          Щитовое
-        </div>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Щитовое</div>
         <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">Сборка щита (Квартира)</h1>
-        <p className="text-muted-foreground text-lg">Базовая компоновка оборудования на DIN-рейке.</p>
       </div>
 
-      <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden mb-8 p-6 md:p-8 space-y-6">
-        <p className="text-foreground leading-relaxed">
-          Современный электрощит собирается по каскадной схеме: Вводной автомат → Реле напряжения → Групповые УЗО (дифзащита) → Линейные автоматы.
-        </p>
-        <div className="bg-muted/30 border border-border rounded-xl p-6">
-          <h3 className="flex items-center gap-2 font-bold text-foreground mb-2">
-            <BookOpen className="h-5 w-5 text-primary" /> Правила хорошего тона
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            Питание на автоматы и шины-гребенки принято заводить сверху. Реле напряжения (УЗМ/РН) защищает технику от отгорания нуля и скачков напряжения. Разделение на несколько УЗО позволяет не обесточивать всю квартиру при утечке на одной линии.
-          </p>
-        </div>
-      </div>
-
-      <div className="bg-card border border-border rounded-2xl p-6 md:p-8">
-        <div className="flex justify-between items-center mb-8">
-          <h3 className="font-bold text-foreground">Интерактивный электрощит</h3>
+      <div className="bg-card border border-border rounded-2xl p-4 sm:p-8">
+        {/* Кнопка включения и заголовок теперь корректно переносятся на телефонах */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+          <h3 className="font-bold text-foreground text-lg">Интерактивный щит</h3>
           <button 
             onClick={() => setMainPower(!mainPower)} 
-            className={`px-6 py-2 flex items-center gap-2 rounded-lg font-bold text-sm transition-all ${mainPower ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,6,0.5)]' : 'bg-neutral-800 text-white hover:bg-neutral-700'}`}
+            className={`w-full sm:w-auto px-6 py-3 sm:py-2 flex justify-center items-center gap-2 rounded-lg font-bold text-sm transition-all ${mainPower ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,6,0.5)]' : 'bg-neutral-800 text-white hover:bg-neutral-700'}`}
           >
             <Power className="w-4 h-4" /> {mainPower ? 'Отключить ввод' : 'Включить ввод'}
           </button>
         </div>
 
-        {/* Контейнер щитка */}
-        <div className="w-full overflow-x-auto pb-4">
-          <div className="relative w-[800px] h-[480px] bg-neutral-900 border-2 border-neutral-800 rounded-xl shadow-2xl mx-auto flex-shrink-0 overflow-hidden">
+        {/* Жесткая фиксация скролла: на телефоне появится ползунок прокрутки схемы влево-вправо */}
+        <div className="w-full overflow-x-auto rounded-xl border-2 border-neutral-800 bg-neutral-900 pb-2">
+          <div className="relative w-[800px] min-w-[800px] h-[480px] mx-auto overflow-hidden">
             
-            {/* Металлические DIN-рейки */}
             <div className="absolute top-[130px] w-full h-[40px] bg-gradient-to-b from-neutral-500 via-neutral-300 to-neutral-500 border-y border-neutral-400 shadow-md"></div>
             <div className="absolute top-[330px] w-full h-[40px] bg-gradient-to-b from-neutral-500 via-neutral-300 to-neutral-500 border-y border-neutral-400 shadow-md"></div>
 
-            {/* Вся проводка и шины-гребенки (Строгая SVG-графика под 90 градусов) */}
             <svg viewBox="0 0 800 480" className="absolute inset-0 w-full h-full z-10 pointer-events-none">
-               
-               {/* Фаза (L) */}
                <g className={`transition-all duration-500 ${mainPower ? 'stroke-amber-500 drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]' : 'stroke-neutral-700'}`} strokeWidth="4" fill="none">
-                 {/* Ввод -> Автомат */}
                  <path d="M 85 0 L 85 110" />
-                 {/* Автомат -> Реле */}
                  <path d="M 85 190 L 85 215 L 205 215 L 205 190" />
-                 {/* Реле -> Кросс */}
                  <path d="M 205 110 L 205 75 L 585 75 L 585 110" />
-                 {/* Кросс -> УЗО 1 */}
                  <path d="M 585 190 L 585 265 L 135 265 L 135 310" />
-                 {/* Ответвление на УЗО 2 */}
                  <path d="M 435 265 L 435 310" />
                  
-                 {/* ===== ШИНЫ-ГРЕБЕНКИ ПЕРЕНЕСЕНЫ НАВЕРХ ===== */}
-                 {/* Шина-гребенка (Свет) */}
                  <line x1="125" y1="302" x2="300" y2="302" strokeWidth="8" />
-                 {/* Зубья гребенки (Свет) - опускаются вниз в клеммы */}
                  <path d="M 135 302 L 135 310 M 210 302 L 210 310 M 250 302 L 250 310 M 290 302 L 290 310" />
                  
-                 {/* Шина-гребенка (Розетки) */}
                  <line x1="425" y1="302" x2="560" y2="302" strokeWidth="8" />
-                 {/* Зубья гребенки (Розетки) - опускаются вниз в клеммы */}
                  <path d="M 435 302 L 435 310 M 510 302 L 510 310 M 550 302 L 550 310" />
                </g>
 
-               {/* Ноль (N) */}
                <g className={`transition-all duration-500 ${mainPower ? 'stroke-blue-500 drop-shadow-[0_0_6px_rgba(59,130,246,0.8)]' : 'stroke-neutral-800'}`} strokeWidth="4" fill="none">
                  <path d="M 115 0 L 115 110" />
                  <path d="M 115 190 L 115 225 L 235 225 L 235 190" />
@@ -579,24 +556,18 @@ function PanelSchemeDetail({ onBack }: { onBack: () => void }) {
                </g>
             </svg>
 
-            {/* Модульное оборудование (Реалистичное позиционирование) */}
-            
-            {/* Верхняя рейка */}
             <PanelModule2P left={70} top={110} label="C40" title="ВВОД" isOn={mainPower} />
             <PanelModule2P left={190} top={110} label="232" title="РЕЛЕ НАПР." isOn={mainPower} isRelay={true} />
             <PanelCrossModule left={570} top={110} isOn={mainPower} />
 
-            {/* Нижняя рейка (Группа 1 - Свет) */}
             <PanelModule2P left={120} top={310} label="40A 30mA" title="УЗО СВЕТ" isOn={mainPower} />
             <PanelModule1P left={195} top={310} label="C10" isOn={mainPower} />
             <PanelModule1P left={235} top={310} label="C10" isOn={mainPower} />
             <PanelModule1P left={275} top={310} label="C10" isOn={mainPower} />
 
-            {/* Нижняя рейка (Группа 2 - Розетки) */}
             <PanelModule2P left={420} top={310} label="40A 30mA" title="УЗО РОЗ." isOn={mainPower} />
             <PanelModule1P left={495} top={310} label="C16" isOn={mainPower} />
             <PanelModule1P left={535} top={310} label="C16" isOn={mainPower} />
-
           </div>
         </div>
       </div>
