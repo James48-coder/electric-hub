@@ -1,93 +1,65 @@
-import { useRef, useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { Home, BookOpen, Calculator, Network, FileText, MessageSquare, User, Zap, Bot, Users } from "lucide-react";
-
-const navItems = [
-  { to: "/", icon: Home, label: "Главная" },
-  { to: "/knowledge", icon: BookOpen, label: "База знаний" },
-  { to: "/articles", icon: FileText, label: "Статьи" },
-  { to: "/calculators", icon: Calculator, label: "Калькуляторы" },
-  { to: "/schemes", icon: Network, label: "Схемы" },
-  { to: "/estimator", icon: Bot, label: "ИИ-сметчик" },
-  { to: "/chat", icon: MessageSquare, label: "Чат с ИИ" },
-  { to: "/masters-chat", icon: Users, label: "Чат мастеров" },
-  { to: "/profile", icon: User, label: "Профиль" },
-];
-
-// Специальный микро-компонент для ссылок меню с эффектом фонарика
-function SidebarLink({ item }: { item: typeof navItems[0] }) {
-  const divRef = useRef<HTMLAnchorElement>(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [opacity, setOpacity] = useState(0);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (!divRef.current) return;
-    const rect = divRef.current.getBoundingClientRect();
-    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
-
-  return (
-    <Link
-      to={item.to}
-      ref={divRef}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setOpacity(1)}
-      onMouseLeave={() => setOpacity(0)}
-      className="relative overflow-hidden flex items-center gap-3 rounded-[var(--radius)] px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground [&.active]:text-primary [&.active]:bg-primary/10 group outline-none"
-    >
-      {/* Мягкое свечение */}
-      <div
-        className="pointer-events-none absolute -inset-px transition-opacity duration-300 z-0"
-        style={{
-          opacity,
-          background: `radial-gradient(120px circle at ${position.x}px ${position.y}px, color-mix(in srgb, var(--primary) 15%, transparent), transparent 40%)`,
-        }}
-      />
-      {/* Иконка и текст */}
-      <div className="relative z-10 flex items-center gap-3 w-full">
-        <item.icon className="h-4 w-4 transition-transform group-hover:scale-110" />
-        {item.label}
-      </div>
-    </Link>
-  );
-}
+import { Link } from '@tanstack/react-router'
+import { Zap, Home, BookOpen, FileText, Calculator, Waypoints, Bot, MessageSquare, Users, User, HelpCircle } from 'lucide-react'
+import React from 'react'
 
 export function AppSidebar() {
   return (
-    <aside className="hidden w-64 flex-col border-r border-border bg-card/30 lg:flex h-full">
-      
-      {/* Логотип: Исправленный, 100% видимый текст */}
-      <div className="flex h-16 items-center px-6 mb-4 mt-2 shrink-0">
-        <Link to="/" className="flex items-center gap-3 outline-none group w-full">
-          <div className="relative grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary transition-all duration-500 group-hover:bg-primary/20 group-hover:shadow-[0_0_20px_color-mix(in_srgb,var(--primary)_50%,transparent)]">
-            <Zap className="h-5 w-5 drop-shadow-[0_0_8px_var(--primary)]" />
-          </div>
-          <div>
-            <div className="text-xl font-black tracking-tight text-foreground transition-all duration-300 drop-shadow-sm group-hover:text-primary group-hover:drop-shadow-[0_0_8px_color-mix(in_srgb,var(--primary)_40%,transparent)]">
-              ВольтПро
-            </div>
-            <div className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase opacity-80">
-              Электрик • MVP
-            </div>
+    <aside className="w-64 h-full flex flex-col bg-card overflow-y-auto">
+      {/* Логотип из скриншота */}
+      <div className="h-16 flex items-center px-6 shrink-0 border-b border-border/50">
+        <Link to="/" className="flex items-center gap-2 outline-none group">
+          <Zap className="h-5 w-5 text-primary" />
+          <div className="flex flex-col">
+            <span className="text-lg font-black tracking-tight text-foreground leading-none">ВольтПро</span>
+            <span className="text-[9px] uppercase tracking-widest text-muted-foreground mt-0.5">Электрик • MVP</span>
           </div>
         </Link>
       </div>
 
       {/* Навигация */}
-      <nav className="flex-1 space-y-1.5 px-4 overflow-y-auto pb-4">
-        {navItems.map((item) => (
-          <SidebarLink key={item.to} item={item} />
-        ))}
+      <nav className="flex-1 px-4 py-4 flex flex-col gap-1">
+        <SidebarLink to="/" icon={<Home className="w-5 h-5" />} label="Главная" />
+        <SidebarLink to="/knowledge" icon={<BookOpen className="w-5 h-5" />} label="База знаний" />
+        <SidebarLink to="/articles" icon={<FileText className="w-5 h-5" />} label="Статьи" />
+        <SidebarLink to="/calculators" icon={<Calculator className="w-5 h-5" />} label="Калькуляторы" />
+        <SidebarLink to="/schemes" icon={<Waypoints className="w-5 h-5" />} label="Схемы" />
+        
+        <div className="my-2 border-t border-border/50"></div>
+        
+        <SidebarLink to="/estimator" icon={<Bot className="w-5 h-5" />} label="ИИ-сметчик" />
+        <SidebarLink to="/chat" icon={<MessageSquare className="w-5 h-5" />} label="Чат с ИИ" />
+        
+        <div className="my-2 border-t border-border/50"></div>
+        
+        <SidebarLink to="/masters-chat" icon={<Users className="w-5 h-5" />} label="Чат мастеров" />
+        <SidebarLink to="/profile" icon={<User className="w-5 h-5" />} label="Профиль" />
+        
+        {/* НОВАЯ ССЫЛКА НА FAQ */}
+        <SidebarLink to="/faq" icon={<HelpCircle className="w-5 h-5" />} label="Частые вопросы" />
       </nav>
 
-      {/* Совет дня */}
-      <div className="p-4 mt-auto shrink-0">
-        <div className="rounded-[var(--radius)] border border-border bg-card/50 p-4 relative overflow-hidden">
-           <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
-           <h4 className="font-bold text-sm mb-1">Совет дня</h4>
-           <p className="text-xs text-muted-foreground">Используйте контрастную тему на солнце для лучшей читаемости.</p>
+      {/* Совет дня (из твоего скриншота) */}
+      <div className="px-4 pb-6 mt-auto">
+        <div className="p-4 rounded-xl border border-border bg-muted/30">
+          <p className="text-xs font-bold text-foreground mb-1">Совет дня</p>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Используйте контрастную тему на солнце для лучшей читаемости.
+          </p>
         </div>
       </div>
     </aside>
-  );
+  )
+}
+
+function SidebarLink({ to, icon, label }: { to: string, icon: React.ReactNode, label: string }) {
+  return (
+    <Link
+      to={to}
+      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-all font-medium"
+      activeProps={{ className: "bg-primary/10 text-primary font-bold shadow-sm" }}
+    >
+      {icon}
+      <span className="text-sm">{label}</span>
+    </Link>
+  )
 }
