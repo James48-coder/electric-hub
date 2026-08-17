@@ -22,6 +22,10 @@ const initialComments: Record<number, any[]> = {
 }
 
 function ArticlesFeedPage() {
+  // ФЛАГ АДМИНИСТРАТОРА (Владельца сайта)
+  // В рабочей версии здесь будет проверка текущего пользователя из профиля
+  const isAdmin = true 
+
   const [posts, setPosts] = useState(initialPosts)
   const [commentsData, setCommentsData] = useState(initialComments)
   
@@ -47,7 +51,7 @@ function ArticlesFeedPage() {
     setActiveCommentPost(id)
   }
 
-  // Отправить комментарий
+  // Отправить комментарий (доступно всем)
   const handleSendComment = (postId: number) => {
     if (!newCommentText.trim()) return
     const newComment = { id: Date.now(), author: 'Вы (Специалист)', text: newCommentText }
@@ -58,11 +62,11 @@ function ArticlesFeedPage() {
     setNewCommentText('')
   }
 
-  // Опубликовать пост
+  // Опубликовать пост (доступно только админу)
   const handlePublishPost = () => {
     if (!newPostText.trim()) return
     const newPost = {
-      id: Date.now(), author: 'Вы (Администратор)', role: 'Автор', date: 'Только что',
+      id: Date.now(), author: 'ВольтПро', role: 'Администратор', date: 'Только что',
       text: newPostText, hasImage: false, likes: 0, views: 0, type: 'post'
     }
     setPosts([newPost, ...posts])
@@ -86,8 +90,8 @@ function ArticlesFeedPage() {
         </div>
       )}
 
-      {/* Модальное окно публикации */}
-      {isPublishModalOpen && (
+      {/* Модальное окно публикации (Только для Админа) */}
+      {isPublishModalOpen && isAdmin && (
         <div className="fixed inset-0 z-[150] bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-card border border-border w-full max-w-lg rounded-2xl shadow-2xl flex flex-col animate-in zoom-in-95">
             <div className="flex justify-between items-center p-4 border-b border-border">
@@ -98,7 +102,7 @@ function ArticlesFeedPage() {
               <textarea 
                 value={newPostText}
                 onChange={(e) => setNewPostText(e.target.value)}
-                placeholder="Что нового на объекте? Поделитесь опытом..."
+                placeholder="Текст новой статьи..."
                 className="w-full h-32 sm:h-40 bg-muted border border-border rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
               ></textarea>
             </div>
@@ -117,15 +121,17 @@ function ArticlesFeedPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Лента ВольтПро</h1>
         </div>
 
-        {/* Кнопка "Написать статью" */}
-        <div onClick={() => setIsPublishModalOpen(true)} className="bg-card border border-border rounded-2xl p-4 shadow-sm flex items-center gap-3 sm:gap-4 cursor-pointer hover:border-primary/50 transition-colors">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+        {/* Кнопка "Написать статью" (Скрыта от обычных пользователей) */}
+        {isAdmin && (
+          <div onClick={() => setIsPublishModalOpen(true)} className="bg-card border border-border rounded-2xl p-4 shadow-sm flex items-center gap-3 sm:gap-4 cursor-pointer hover:border-primary/50 transition-colors">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+            </div>
+            <div className="flex-1 bg-muted rounded-xl px-4 py-2 sm:py-3 text-sm text-muted-foreground select-none">
+              Опубликовать новую статью...
+            </div>
           </div>
-          <div className="flex-1 bg-muted rounded-xl px-4 py-2 sm:py-3 text-sm text-muted-foreground select-none">
-            Опубликовать новую статью...
-          </div>
-        </div>
+        )}
 
         {/* Лента постов */}
         {posts.map((post) => {
