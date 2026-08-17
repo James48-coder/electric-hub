@@ -1,1 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Главная страница (Высший приоритет) -->
+  <url>
+    <loc>https://voltpro.ru/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
 
+  <!-- Инженерные калькуляторы (Основной трафик) -->
+  <url>
+    <loc>https://voltpro.ru/calculators</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Лента статей (Часто обновляется) -->
+  <url>
+    <loc>https://voltpro.ru/articles</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- ИИ-сметчик (Уникальный инструмент) -->
+  <url>
+    <loc>https://voltpro.ru/estimator</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- База знаний -->
+  <url>
+    <loc>https://voltpro.ru/knowledge</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Схемы и распиновки -->
+  <url>
+    <loc>https://voltpro.ru/schemes</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>
