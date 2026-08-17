@@ -2,6 +2,7 @@ import { createRootRoute, Outlet, ScrollRestoration, Link } from "@tanstack/reac
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/header";
 import { AppSidebar } from "@/components/app-sidebar"; 
+import { Footer } from "@/components/footer";
 import React, { useState, useEffect } from "react";
 import { Menu, X, Calculator, Waypoints, MessageSquare, User, Home, BookOpen, Bot, Zap, FileText, Users } from "lucide-react";
 
@@ -72,7 +73,7 @@ function RootComponent() {
         </div>
         
         {/* ========================================= */}
-        {/* ПРАВАЯ ЧАСТЬ: Шапка + Контент */}
+        {/* ПРАВАЯ ЧАСТЬ: Шапка + Контент + Подвал */}
         {/* ========================================= */}
         <div className="flex flex-1 flex-col overflow-hidden w-full relative">
           
@@ -87,11 +88,16 @@ function RootComponent() {
             </button>
           </div>
 
-          {/* ТВОЯ ОРИГИНАЛЬНАЯ ШАПКА (Без всяких оберток и скроллов!) */}
+          {/* ТВОЯ ОРИГИНАЛЬНАЯ ШАПКА */}
           <Header />
           
-          <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 lg:p-6 bg-background">
-            <Outlet />
+          <main className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden bg-background">
+            <div className="flex-1 p-4 lg:p-6">
+              <Outlet />
+            </div>
+            
+            {/* Глобальный подвал */}
+            <Footer />
           </main>
         </div>
         
