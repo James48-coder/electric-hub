@@ -1,1 +1,17 @@
+User-agent: *
+# Разрешаем индексировать основные полезные разделы
+Allow: /
+Allow: /calculators
+Allow: /knowledge
+Allow: /articles
+Allow: /schemes
+Allow: /estimator
 
+# Запрещаем индексировать приватные и системные страницы
+Disallow: /profile
+Disallow: /chat
+Disallow: /masters-chat
+Disallow: /legal/
+
+# Указываем путь к карте сайта
+Sitemap: https://voltpro.ru/sitemap.xml
