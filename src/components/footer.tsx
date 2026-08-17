@@ -32,7 +32,7 @@ export function Footer() {
             <Link to="/articles" className="text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors py-1 sm:py-0">База знаний</Link>
           </div>
 
-          {/* Блок 3: Правовая информация */}
+          {/* Блок 3: Правовая информация (Шаги 1, 2, 3) */}
           <div className="flex flex-col gap-2 sm:gap-3">
             <h4 className="text-[10px] sm:text-xs font-bold text-foreground uppercase tracking-widest mb-1 sm:mb-2">Документы</h4>
             <Link to="/legal/offer" className="text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors py-1 sm:py-0">Публичная оферта</Link>
@@ -40,11 +40,27 @@ export function Footer() {
             <Link to="/legal/tariffs" className="text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors py-1 sm:py-0">Условия тарифов</Link>
           </div>
 
-          {/* Блок 4: Контакты */}
+          {/* Блок 4: Контакты (Шаги 4 и 5) */}
           <div className="flex flex-col gap-2 sm:gap-3">
             <h4 className="text-[10px] sm:text-xs font-bold text-foreground uppercase tracking-widest mb-1 sm:mb-2">Связь</h4>
-            <a href="mailto:support@voltpro.ru" className="text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors py-1 sm:py-0">support@voltpro.ru</a>
-            <a href="#" className="text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors py-1 sm:py-0">Чат поддержки (Telegram)</a>
+            
+            {/* Шаг 4: Почта. Открывает почтовый клиент */}
+            <a 
+              href="mailto:support@voltpro.ru" 
+              className="text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors py-1 sm:py-0"
+            >
+              support@voltpro.ru
+            </a>
+            
+            {/* Шаг 5: Telegram. Открывается в новой вкладке (target="_blank") */}
+            <a 
+              href="https://t.me/voltpro_support" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors py-1 sm:py-0"
+            >
+              Чат поддержки (Telegram)
+            </a>
           </div>
         </div>
 
