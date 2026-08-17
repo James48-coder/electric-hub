@@ -3,9 +3,9 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/header";
 import { AppSidebar } from "@/components/app-sidebar"; 
 import { Footer } from "@/components/footer";
-import { Breadcrumbs } from "@/components/breadcrumbs"; // <-- Добавлен импорт хлебных крошек
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import React, { useState, useEffect } from "react";
-import { Menu, X, Calculator, Waypoints, MessageSquare, User, Home, BookOpen, Bot, Zap, FileText, Users } from "lucide-react";
+import { Menu, X, Calculator, Waypoints, MessageSquare, User, Home, BookOpen, Bot, Zap, FileText, Users, HelpCircle } from "lucide-react";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -14,7 +14,6 @@ export const Route = createRootRoute({
 function RootComponent() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Блокируем скролл основной страницы, когда открыто мобильное меню
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -28,9 +27,7 @@ function RootComponent() {
     <ThemeProvider defaultTheme="dark">
       <div className="flex min-h-screen w-full bg-background text-foreground selection:bg-primary selection:text-primary-foreground relative">
         
-        {/* ========================================= */}
-        {/* МОБИЛЬНОЕ МЕНЮ (Глухой непрозрачный фон) */}
-        {/* ========================================= */}
+        {/* МОБИЛЬНОЕ МЕНЮ */}
         {isMobileMenuOpen && (
           <div className="md:hidden fixed inset-0 z-[100] flex flex-col animate-in slide-in-from-left-full duration-300 bg-card text-card-foreground shadow-2xl">
             <div className="h-16 border-b border-border flex items-center justify-between px-4 shrink-0 bg-card">
@@ -57,28 +54,21 @@ function RootComponent() {
               <MobileNavLink to="/estimator" icon={<Bot className="w-5 h-5"/>} label="ИИ-сметчик" onClick={() => setIsMobileMenuOpen(false)} />
               <MobileNavLink to="/chat" icon={<MessageSquare className="w-5 h-5"/>} label="Чат с ИИ" onClick={() => setIsMobileMenuOpen(false)} />
               
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-4 mb-1 ml-3">Сообщество</p>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-4 mb-1 ml-3">Сообщество и аккаунт</p>
               <MobileNavLink to="/masters-chat" icon={<Users className="w-5 h-5"/>} label="Чат мастеров" onClick={() => setIsMobileMenuOpen(false)} />
-
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-4 mb-1 ml-3">Аккаунт</p>
               <MobileNavLink to="/profile" icon={<User className="w-5 h-5"/>} label="Профиль" onClick={() => setIsMobileMenuOpen(false)} />
+              
+              {/* НОВАЯ ССЫЛКА НА FAQ В МОБИЛКЕ */}
+              <MobileNavLink to="/faq" icon={<HelpCircle className="w-5 h-5"/>} label="Частые вопросы" onClick={() => setIsMobileMenuOpen(false)} />
             </div>
           </div>
         )}
 
-        {/* ========================================= */}
-        {/* ДЕСКТОПНОЕ БОКОВОЕ МЕНЮ */}
-        {/* ========================================= */}
         <div className="hidden md:block shrink-0 border-r border-border bg-card">
           <AppSidebar />
         </div>
         
-        {/* ========================================= */}
-        {/* ПРАВАЯ ЧАСТЬ: Шапка + Контент + Подвал */}
-        {/* ========================================= */}
         <div className="flex flex-1 flex-col overflow-hidden w-full relative">
-          
-          {/* ВЕРХНЯЯ ПАНЕЛЬ ДЛЯ МОБИЛОК (ТОЛЬКО БУРГЕР И ЛОГОТИП) */}
           <div className="md:hidden flex items-center justify-between px-4 py-3 bg-card border-b border-border shadow-sm shrink-0">
             <div className="flex items-center gap-2 text-primary font-bold text-lg">
               <Zap className="h-5 w-5 fill-primary text-primary" />
@@ -89,18 +79,13 @@ function RootComponent() {
             </button>
           </div>
 
-          {/* ШАПКА */}
           <Header />
           
           <main className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden bg-background">
             <div className="flex-1 p-4 lg:p-6">
-              {/* <--- ХЛЕБНЫЕ КРОШКИ ЗДЕСЬ ---> */}
               <Breadcrumbs />
-              
               <Outlet />
             </div>
-            
-            {/* ГЛОБАЛЬНЫЙ ПОДВАЛ */}
             <Footer />
           </main>
         </div>
