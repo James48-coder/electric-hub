@@ -3,7 +3,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/header";
 import { AppSidebar } from "@/components/app-sidebar"; 
 import React, { useState, useEffect } from "react";
-import { Menu, X, Calculator, Waypoints, MessageSquare, User, Home, BookOpen, Bot, Zap } from "lucide-react";
+import { Menu, X, Calculator, Waypoints, MessageSquare, User, Home, BookOpen, Bot, Zap, FileText, Users } from "lucide-react";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -47,6 +47,7 @@ function RootComponent() {
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1 ml-3 mt-2">Навигация</p>
               <MobileNavLink to="/" icon={<Home className="w-5 h-5"/>} label="Главная" onClick={() => setIsMobileMenuOpen(false)} />
               <MobileNavLink to="/knowledge" icon={<BookOpen className="w-5 h-5"/>} label="База знаний" onClick={() => setIsMobileMenuOpen(false)} />
+              <MobileNavLink to="/articles" icon={<FileText className="w-5 h-5"/>} label="Статьи" onClick={() => setIsMobileMenuOpen(false)} />
               <MobileNavLink to="/calculators" icon={<Calculator className="w-5 h-5"/>} label="Калькуляторы" onClick={() => setIsMobileMenuOpen(false)} />
               <MobileNavLink to="/schemes" icon={<Waypoints className="w-5 h-5"/>} label="Схемы" onClick={() => setIsMobileMenuOpen(false)} />
               
@@ -54,6 +55,9 @@ function RootComponent() {
               <MobileNavLink to="/estimator" icon={<Bot className="w-5 h-5"/>} label="ИИ-сметчик" onClick={() => setIsMobileMenuOpen(false)} />
               <MobileNavLink to="/chat" icon={<MessageSquare className="w-5 h-5"/>} label="Чат с ИИ" onClick={() => setIsMobileMenuOpen(false)} />
               
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-4 mb-1 ml-3">Сообщество</p>
+              <MobileNavLink to="/masters-chat" icon={<Users className="w-5 h-5"/>} label="Чат мастеров" onClick={() => setIsMobileMenuOpen(false)} />
+
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-4 mb-1 ml-3">Аккаунт</p>
               <MobileNavLink to="/profile" icon={<User className="w-5 h-5"/>} label="Профиль" onClick={() => setIsMobileMenuOpen(false)} />
             </div>
