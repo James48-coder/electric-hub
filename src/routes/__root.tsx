@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/header";
 import { AppSidebar } from "@/components/app-sidebar"; 
 import { Footer } from "@/components/footer";
+import { Breadcrumbs } from "@/components/breadcrumbs"; // <-- Добавлен импорт хлебных крошек
 import React, { useState, useEffect } from "react";
 import { Menu, X, Calculator, Waypoints, MessageSquare, User, Home, BookOpen, Bot, Zap, FileText, Users } from "lucide-react";
 
@@ -88,15 +89,18 @@ function RootComponent() {
             </button>
           </div>
 
-          {/* ТВОЯ ОРИГИНАЛЬНАЯ ШАПКА */}
+          {/* ШАПКА */}
           <Header />
           
           <main className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden bg-background">
             <div className="flex-1 p-4 lg:p-6">
+              {/* <--- ХЛЕБНЫЕ КРОШКИ ЗДЕСЬ ---> */}
+              <Breadcrumbs />
+              
               <Outlet />
             </div>
             
-            {/* Глобальный подвал */}
+            {/* ГЛОБАЛЬНЫЙ ПОДВАЛ */}
             <Footer />
           </main>
         </div>
