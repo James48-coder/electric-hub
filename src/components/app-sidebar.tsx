@@ -1,14 +1,16 @@
 import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Home, BookOpen, Calculator, Network, FileText, MessageSquare, User, Zap } from "lucide-react";
+import { Home, BookOpen, Calculator, Network, FileText, MessageSquare, User, Zap, Bot, Users } from "lucide-react";
 
 const navItems = [
   { to: "/", icon: Home, label: "Главная" },
   { to: "/knowledge", icon: BookOpen, label: "База знаний" },
+  { to: "/articles", icon: FileText, label: "Статьи" },
   { to: "/calculators", icon: Calculator, label: "Калькуляторы" },
   { to: "/schemes", icon: Network, label: "Схемы" },
-  { to: "/estimator", icon: FileText, label: "ИИ-сметчик" },
+  { to: "/estimator", icon: Bot, label: "ИИ-сметчик" },
   { to: "/chat", icon: MessageSquare, label: "Чат с ИИ" },
+  { to: "/masters-chat", icon: Users, label: "Чат мастеров" },
   { to: "/profile", icon: User, label: "Профиль" },
 ];
 
@@ -52,10 +54,10 @@ function SidebarLink({ item }: { item: typeof navItems[0] }) {
 
 export function AppSidebar() {
   return (
-    <aside className="hidden w-64 flex-col border-r border-border bg-card/30 lg:flex">
+    <aside className="hidden w-64 flex-col border-r border-border bg-card/30 lg:flex h-full">
       
       {/* Логотип: Исправленный, 100% видимый текст */}
-      <div className="flex h-16 items-center px-6 mb-4 mt-2">
+      <div className="flex h-16 items-center px-6 mb-4 mt-2 shrink-0">
         <Link to="/" className="flex items-center gap-3 outline-none group w-full">
           <div className="relative grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary transition-all duration-500 group-hover:bg-primary/20 group-hover:shadow-[0_0_20px_color-mix(in_srgb,var(--primary)_50%,transparent)]">
             <Zap className="h-5 w-5 drop-shadow-[0_0_8px_var(--primary)]" />
@@ -72,14 +74,14 @@ export function AppSidebar() {
       </div>
 
       {/* Навигация */}
-      <nav className="flex-1 space-y-1.5 px-4">
+      <nav className="flex-1 space-y-1.5 px-4 overflow-y-auto pb-4">
         {navItems.map((item) => (
           <SidebarLink key={item.to} item={item} />
         ))}
       </nav>
 
       {/* Совет дня */}
-      <div className="p-4 mt-auto">
+      <div className="p-4 mt-auto shrink-0">
         <div className="rounded-[var(--radius)] border border-border bg-card/50 p-4 relative overflow-hidden">
            <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
            <h4 className="font-bold text-sm mb-1">Совет дня</h4>
