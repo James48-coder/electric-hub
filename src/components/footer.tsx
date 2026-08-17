@@ -52,9 +52,9 @@ export function Footer() {
               support@voltpro.ru
             </a>
             
-            {/* Шаг 5: Telegram. Открывается в новой вкладке (target="_blank") */}
+            {/* Шаг 5: Telegram. Открывается в новой вкладке */}
             <a 
-              href="https://t.me/voltpro_support" 
+              href="https://t.me/voltpro_chat" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors py-1 sm:py-0"
