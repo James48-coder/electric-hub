@@ -125,9 +125,9 @@ const KNOWLEDGE_DOCS: DocItem[] = [
     tags: ["ГОСТ", "Заземление"],
     hasTable: true,
     content: [
-      "Стандарт задает максимальное время, за которое автоматика обязана обесточить линию при пробое фазы на корпус (косвенное прикосновение).",
+      "Стандарт задает максима время, за которое автоматика обязана обесточить линию при пробое фазы на корпус (косвенное прикосновение).",
       "• ОСУП (Основная система): В главную заземляющую шину (ГЗШ) сводятся PE-ввода, контур ЗУ, стальные трубы здания.",
-      "• ДСУП (Дополнительная система): Обязательна в санузлах. Шина КУП соединяет PE-розетки, поддоны, трубы. Минимальное сечение провода ДСУП — 4 мм² (медь без мех. защиты) или 2.5 мм² (с защитой)."
+      "• ДСУП (Дополнительная система): Обязательна в санузлах. Шина КУП соединяет PE-розетки, поддоны, трубы. Минимальное сечение провода ДСУП — 4 мм² (медь без мех. защитой) или 2.5 мм² (с защитой)."
     ],
     tableData: {
       headers: ["Номинальное напряжение Uo (В)", "Время отключения (сеть TN), сек", "Время отключения (сеть TT), сек"],
@@ -549,16 +549,38 @@ function KnowledgePage() {
                 ))}
               </div>
 
-              {/* РЕАЛЬНАЯ ТАБЛИЦА */}
+              {/* РЕАЛЬНАЯ ТАБЛИЦА С АДАПТИВОМ */}
               {selectedDoc.tableData && (
-                <div className="mt-6 border border-border rounded-xl overflow-hidden bg-background">
-                  {/* Горизонтальный скролл для мобилок */}
-                  <div className="overflow-x-auto [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full">
-                    <table className="w-full text-left border-collapse min-w-[500px]">
+                <div className="mt-6">
+                  
+                  {/* === ВЕРСИЯ ДЛЯ МОБИЛОК (КАРТОЧКИ В СТОЛБИК) === */}
+                  <div className="block md:hidden space-y-3">
+                    <p className="text-[10px] text-muted-foreground/70 uppercase tracking-widest text-center mb-3">
+                      💡 Рекомендуется просматривать горизонтально
+                    </p>
+                    {selectedDoc.tableData.rows.map((row, rowIdx) => (
+                      <div key={rowIdx} className="bg-background border border-border rounded-xl p-4 space-y-3 shadow-sm">
+                        {row.map((cell, cellIdx) => (
+                          <div key={cellIdx} className="flex flex-col gap-1">
+                            <span className="text-[10px] font-black text-primary uppercase tracking-wider">
+                              {selectedDoc.tableData!.headers[cellIdx]}
+                            </span>
+                            <span className={`text-sm ${cellIdx === 0 ? 'font-bold text-foreground' : 'text-muted-foreground'}`}>
+                              {cell}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* === ВЕРСИЯ ДЛЯ ДЕСКТОПА (КЛАССИЧЕСКАЯ ТАБЛИЦА БЕЗ СКРОЛЛА) === */}
+                  <div className="hidden md:block border border-border rounded-xl overflow-hidden bg-background">
+                    <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-primary/10">
                           {selectedDoc.tableData.headers.map((header, idx) => (
-                            <th key={idx} className="p-3 text-xs sm:text-sm font-black text-primary border-b border-border/50 uppercase tracking-wider whitespace-nowrap">
+                            <th key={idx} className="p-3 text-sm font-black text-primary border-b border-border/50 uppercase tracking-wider">
                               {header}
                             </th>
                           ))}
@@ -568,7 +590,7 @@ function KnowledgePage() {
                         {selectedDoc.tableData.rows.map((row, rowIdx) => (
                           <tr key={rowIdx} className="hover:bg-muted/30 transition-colors border-b border-border/50 last:border-0">
                             {row.map((cell, cellIdx) => (
-                              <td key={cellIdx} className={`p-3 text-sm sm:text-base ${cellIdx === 0 ? 'font-bold text-foreground' : 'text-muted-foreground'}`}>
+                              <td key={cellIdx} className={`p-3 text-sm ${cellIdx === 0 ? 'font-bold text-foreground' : 'text-muted-foreground'}`}>
                                 {cell}
                               </td>
                             ))}
@@ -577,6 +599,7 @@ function KnowledgePage() {
                       </tbody>
                     </table>
                   </div>
+
                 </div>
               )}
             </div>
