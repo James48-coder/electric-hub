@@ -125,9 +125,9 @@ const KNOWLEDGE_DOCS: DocItem[] = [
     tags: ["ГОСТ", "Заземление"],
     hasTable: true,
     content: [
-      "Стандарт задает максима время, за которое автоматика обязана обесточить линию при пробое фазы на корпус (косвенное прикосновение).",
+      "Стандарт задает максимальное время, за которое автоматика обязана обесточить линию при пробое фазы на корпус (косвенное прикосновение).",
       "• ОСУП (Основная система): В главную заземляющую шину (ГЗШ) сводятся PE-ввода, контур ЗУ, стальные трубы здания.",
-      "• ДСУП (Дополнительная система): Обязательна в санузлах. Шина КУП соединяет PE-розетки, поддоны, трубы. Минимальное сечение провода ДСУП — 4 мм² (медь без мех. защитой) или 2.5 мм² (с защитой)."
+      "• ДСУП (Дополнительная система): Обязательна в санузлах. Шина КУП соединяет PE-розетки, поддоны, трубы. Минимальное сечение провода ДСУП — 4 мм² (медь без мех. защиты) или 2.5 мм² (с защитой)."
     ],
     tableData: {
       headers: ["Номинальное напряжение Uo (В)", "Время отключения (сеть TN), сек", "Время отключения (сеть TT), сек"],
@@ -513,8 +513,9 @@ function KnowledgePage() {
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in"
           onClick={() => setSelectedDoc(null)}
         >
+          {/* ЗДЕСЬ УВЕЛИЧЕНА ШИРИНА ОКНА ДЛЯ ДЕСКТОПА: lg:max-w-5xl md:max-w-4xl */}
           <div 
-            className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95"
+            className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-2xl md:max-w-4xl lg:max-w-5xl max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Шапка модалки */}
@@ -580,7 +581,7 @@ function KnowledgePage() {
                       <thead>
                         <tr className="bg-primary/10">
                           {selectedDoc.tableData.headers.map((header, idx) => (
-                            <th key={idx} className="p-3 text-sm font-black text-primary border-b border-border/50 uppercase tracking-wider">
+                            <th key={idx} className="p-4 text-sm font-black text-primary border-b border-border/50 uppercase tracking-wider">
                               {header}
                             </th>
                           ))}
@@ -590,7 +591,8 @@ function KnowledgePage() {
                         {selectedDoc.tableData.rows.map((row, rowIdx) => (
                           <tr key={rowIdx} className="hover:bg-muted/30 transition-colors border-b border-border/50 last:border-0">
                             {row.map((cell, cellIdx) => (
-                              <td key={cellIdx} className={`p-3 text-sm ${cellIdx === 0 ? 'font-bold text-foreground' : 'text-muted-foreground'}`}>
+                              {/* ДОБАВЛЕНО ВЫРАВНИВАНИЕ ПО ВЕРХУ align-top */}
+                              <td key={cellIdx} className={`p-4 text-sm align-top ${cellIdx === 0 ? 'font-bold text-foreground' : 'text-muted-foreground'}`}>
                                 {cell}
                               </td>
                             ))}
