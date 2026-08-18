@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { User, Settings, LogOut, Zap, Shield, CreditCard, Coffee, HelpCircle, CheckCircle2, ChevronRight, Trash2, ArrowLeft } from 'lucide-react'
+import { User, Settings, LogOut, Zap, Shield, CreditCard, Coffee, HelpCircle, CheckCircle2, ChevronRight, Trash2 } from 'lucide-react'
 import React, { useState } from 'react'
 
 export const Route = createFileRoute('/profile')({
@@ -10,316 +10,240 @@ type TariffType = 'free' | 'master' | 'pro'
 
 function ProfilePage() {
   const [currentTariff, setCurrentTariff] = useState<TariffType>('free')
-  // Состояние для открытия витрины тарифов
-  const [showUpgrade, setShowUpgrade] = useState(false)
 
-  // Обновленные моковые данные
+  // Моковые данные пользователя
   const user = {
     name: "Иван Иванов",
     email: "ivan.electro@mail.ru",
     avatar: "И",
     estimatesUsed: 8,
-    estimatesLimit: 10 // Уменьшили лимит до 10
+    estimatesLimit: 10
   }
 
-  // === ВИТРИНА ТАРИФОВ (MARKETING VIEW) ===
-  if (showUpgrade) {
-    return (
-      <div className="container mx-auto max-w-5xl animate-in fade-in duration-500 pb-24">
-        <button 
-          onClick={() => setShowUpgrade(false)}
-          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6 font-bold text-sm"
-        >
-          <ArrowLeft className="w-4 h-4" /> Назад в профиль
-        </button>
-
-        <div className="text-center mb-10 sm:mb-14">
-          <h1 className="text-3xl sm:text-5xl font-black text-foreground tracking-tight mb-4">
-            Инвестируйте в свое время
-          </h1>
-          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Хватит тратить вечера на составление таблиц и расчеты на коленке. Делегируйте рутину ВольтПро и забирайте объекты быстрее конкурентов.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
-          
-          {/* КАРТОЧКА MASTER */}
-          <div className="bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow flex flex-col relative overflow-hidden group">
-            <h3 className="text-2xl font-black text-foreground mb-2">Master</h3>
-            <p className="text-sm text-muted-foreground mb-6 h-10">
-              Экономия времени. Избавьтесь от рутины расчетов по вечерам.
-            </p>
-            <div className="mb-8">
-              <span className="text-4xl font-black text-foreground">490 ₽</span>
-              <span className="text-muted-foreground font-medium"> / мес</span>
-            </div>
-            
-            <div className="space-y-4 mb-8 flex-1">
-              <UpgradeFeature text="10 ИИ-смет в месяц (экономия 10+ часов)" highlight />
-              <UpgradeFeature text="Сложные калькуляторы (Заземление, Потери напряжения, ТКЗ)" highlight />
-              <UpgradeFeature text="Базовые калькуляторы и схемы" />
-              <UpgradeFeature text="Доступ к Базе знаний (ПУЭ, ГОСТ)" />
-            </div>
-            
-            <button 
-              onClick={() => { setCurrentTariff('master'); setShowUpgrade(false); }}
-              className="w-full bg-background border border-border px-6 py-4 rounded-xl text-sm font-bold text-foreground hover:border-primary hover:text-primary transition-colors"
-            >
-              Выбрать Master
-            </button>
-          </div>
-
-          {/* КАРТОЧКА PRO */}
-          <div className="bg-primary/5 border-2 border-primary/50 rounded-3xl p-6 sm:p-8 shadow-lg flex flex-col relative overflow-hidden">
-            {/* Плашка "Хит" */}
-            <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-widest py-1.5 px-4 rounded-bl-xl">
-              Для профессионалов
-            </div>
-            
-            <h3 className="text-2xl font-black text-primary mb-2 flex items-center gap-2">
-              PRO <Zap className="w-5 h-5" fill="currentColor" />
-            </h3>
-            <p className="text-sm text-muted-foreground mb-6 h-10">
-              Сдавайте сметы прямо на объекте в PDF, пока конкуренты едут домой.
-            </p>
-            
-            <div className="mb-2">
-              <span className="text-4xl font-black text-foreground">1 490 ₽</span>
-              <span className="text-muted-foreground font-medium"> / мес</span>
-            </div>
-            <p className="text-xs text-primary font-bold mb-6">При оплате за год — 1 090 ₽ / мес (Выгода 26%)</p>
-            
-            <div className="space-y-4 mb-8 flex-1">
-              <UpgradeFeature text="Безлимитный ИИ-сметчик" highlight />
-              <UpgradeFeature text="Экспорт смет в фирменный PDF" highlight />
-              <UpgradeFeature text="Облачная история объектов и черновиков" highlight />
-              <UpgradeFeature text="Все премиум-калькуляторы" />
-              <UpgradeFeature text="Приоритетная поддержка" />
-            </div>
-            
-            <button 
-              onClick={() => { setCurrentTariff('pro'); setShowUpgrade(false); }}
-              className="w-full bg-primary text-primary-foreground px-6 py-4 rounded-xl text-sm font-bold shadow-md hover:opacity-90 transition-opacity"
-            >
-              Оформить PRO
-            </button>
-          </div>
-
-        </div>
-      </div>
-    )
-  }
-
-  // === СТАНДАРТНЫЙ ЛИЧНЫЙ КАБИНЕТ ===
   return (
-    <div className="container mx-auto max-w-6xl animate-in fade-in duration-500 pb-24 relative">
+    <div className="container mx-auto max-w-7xl animate-in fade-in duration-500 pb-24 relative">
       
-      {/* 🛠 ДЕБАГ-ПАНЕЛЬ */}
+      {/* 🛠 ДЕБАГ-ПАНЕЛЬ (ТОЛЬКО ДЛЯ РАЗРАБОТКИ) */}
       <div className="mb-8 p-4 bg-muted/50 border border-border rounded-xl flex items-center gap-4 overflow-x-auto">
         <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Тест интерфейса:</span>
-        <button onClick={() => setCurrentTariff('free')} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${currentTariff === 'free' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground hover:bg-muted'}`}>Free</button>
-        <button onClick={() => setCurrentTariff('master')} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${currentTariff === 'master' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground hover:bg-muted'}`}>Master</button>
-        <button onClick={() => setCurrentTariff('pro')} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${currentTariff === 'pro' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground hover:bg-muted'}`}>PRO</button>
+        <button onClick={() => setCurrentTariff('free')} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${currentTariff === 'free' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground hover:bg-muted'}`}>Симуляция: Free</button>
+        <button onClick={() => setCurrentTariff('master')} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${currentTariff === 'master' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground hover:bg-muted'}`}>Симуляция: Master</button>
+        <button onClick={() => setCurrentTariff('pro')} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${currentTariff === 'pro' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground hover:bg-muted'}`}>Симуляция: PRO</button>
       </div>
 
-      <div className="mb-6 sm:mb-8">
+      <div className="mb-8">
         <h1 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight mb-2">Личный кабинет</h1>
         <p className="text-sm sm:text-base text-muted-foreground">Управление аккаунтом и подпиской</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {/* ВЕРХНЯЯ ПАНЕЛЬ: ИНФО ПОЛЬЗОВАТЕЛЯ И СПОСОБ ОПЛАТЫ */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
         
-        {/* ЛЕВАЯ КОЛОНКА */}
-        <div className="lg:col-span-4 space-y-6">
-          <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 flex flex-col items-center text-center shadow-sm relative overflow-hidden">
-            <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center text-3xl font-black text-primary mb-4 relative z-10 border-4 border-background shadow-sm">
-              {user.avatar}
-              {currentTariff === 'pro' && (
-                <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1">
-                  <div className="bg-primary text-primary-foreground w-6 h-6 rounded-full flex items-center justify-center">
-                    <Shield className="w-3.5 h-3.5" />
-                  </div>
+        {/* Карточка пользователя */}
+        <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex items-center gap-6 relative overflow-hidden">
+          <div className="w-20 h-20 shrink-0 bg-primary/10 rounded-full flex items-center justify-center text-3xl font-black text-primary relative z-10 border-4 border-background shadow-sm">
+            {user.avatar}
+            {currentTariff === 'pro' && (
+              <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1">
+                <div className="bg-primary text-primary-foreground w-5 h-5 rounded-full flex items-center justify-center">
+                  <Shield className="w-3 h-3" />
                 </div>
-              )}
-            </div>
-            <h2 className="text-xl font-black text-foreground mb-1">{user.name}</h2>
-            <p className="text-sm text-muted-foreground mb-8">{user.email}</p>
-
-            <div className="w-full space-y-2">
-              <button className="w-full flex items-center justify-center gap-2 bg-background border border-border px-4 py-3 rounded-xl text-sm font-bold text-foreground hover:border-primary/50 hover:text-primary transition-colors">
-                <Settings className="w-4 h-4" /> Настройки профиля
-              </button>
-              <button className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-red-500/80 hover:bg-red-500/10 hover:text-red-500 transition-colors">
-                <LogOut className="w-4 h-4" /> Выйти
-              </button>
-            </div>
-          </div>
-
-          {/* ДОНАТ ТОЛЬКО ДЛЯ FREE И MASTER */}
-          {currentTariff !== 'pro' && (
-            <div className="bg-gradient-to-br from-orange-500/10 to-amber-500/5 border border-orange-500/20 rounded-2xl p-6 shadow-sm">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-orange-500/20 rounded-full flex items-center justify-center text-orange-500">
-                  <Coffee className="w-5 h-5" />
-                </div>
-                <h3 className="font-bold text-foreground">Поддержать проект</h3>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                Сервис сэкономил вам время на объекте? Вы можете сказать «спасибо» и поддержать работу нейросетей.
-              </p>
-              <button className="w-full bg-orange-500/10 text-orange-600 border border-orange-500/20 hover:bg-orange-500 hover:text-white px-4 py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
-                Угостить кофе <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          )}
-
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center gap-3 mb-3">
-              <HelpCircle className="w-5 h-5 text-muted-foreground" />
-              <h3 className="font-bold text-foreground">Помощь</h3>
-            </div>
-            <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-              Возникли вопросы по расчетам или тарифам? Мы на связи.
-            </p>
-            <button className="w-full bg-background border border-border px-4 py-3 rounded-xl text-sm font-bold text-foreground hover:bg-muted transition-colors">
-              Написать в поддержку
-            </button>
-          </div>
-        </div>
-
-        {/* ПРАВАЯ КОЛОНКА */}
-        <div className="lg:col-span-8 space-y-6">
-          
-          <div className={`border rounded-2xl p-6 sm:p-8 shadow-sm relative overflow-hidden transition-colors ${
-            currentTariff === 'pro' ? 'bg-primary/5 border-primary/30' : 'bg-card border-border'
-          }`}>
-            
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-8">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-widest mb-2 text-muted-foreground">
-                  Ваш текущий тариф
-                </p>
-                <h2 className="text-3xl sm:text-4xl font-black text-foreground flex items-center gap-3">
-                  {currentTariff === 'pro' && 'Уровень PRO ⚡'}
-                  {currentTariff === 'master' && 'Уровень Master'}
-                  {currentTariff === 'free' && 'Базовый (Free)'}
-                </h2>
-              </div>
-              
-              {currentTariff !== 'free' && (
-                <div className="bg-background/50 backdrop-blur-sm border border-border px-4 py-2 rounded-xl text-sm font-medium shrink-0">
-                  <span className="text-muted-foreground">Оплачено до: </span>
-                  <span className="font-bold text-foreground">17 сентября 2026</span>
-                </div>
-              )}
-            </div>
-
-            {/* ПРОГРЕСС-БАР MASTER (ОБНОВЛЕННЫЕ ЛИМИТЫ) */}
-            {currentTariff === 'master' && (
-              <div className="mb-8 bg-background border border-border rounded-xl p-4">
-                <div className="flex justify-between text-sm font-bold mb-2">
-                  <span className="text-foreground">Остаток ИИ-смет</span>
-                  <span className="text-primary">{user.estimatesLimit - user.estimatesUsed} из {user.estimatesLimit}</span>
-                </div>
-                <div className="h-2 w-full bg-muted rounded-full overflow-hidden flex justify-end">
-                  <div 
-                    className="h-full bg-primary rounded-full transition-all duration-500"
-                    style={{ width: `${((user.estimatesLimit - user.estimatesUsed) / user.estimatesLimit) * 100}%` }}
-                  ></div>
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">Лимит обновится 17 сентября.</p>
               </div>
             )}
-
-            {/* СПИСОК ФИЧ В ПРОФИЛЕ */}
-            <div className="space-y-3 mb-8">
-              {currentTariff === 'free' && (
-                <>
-                  <FeatureItem text="Базовые инженерные калькуляторы (Автоматы, Сечения)" active={true} />
-                  <FeatureItem text="Доступ к Базе знаний (ПУЭ, ГОСТ)" active={true} />
-                  <FeatureItem text="Сложные расчеты (Заземление, ТКЗ, Потери)" active={false} />
-                  <FeatureItem text="Составление смет через ИИ-сметчик" active={false} />
-                </>
-              )}
-              
-              {currentTariff === 'master' && (
-                <>
-                  <FeatureItem text="Все базовые калькуляторы и База знаний" active={true} />
-                  <FeatureItem text="Сложные премиум-калькуляторы" active={true} highlight={true} />
-                  <FeatureItem text="10 генераций ИИ-смет (сохранение в браузере)" active={true} highlight={true} />
-                  <FeatureItem text="Экспорт профессиональных смет в PDF" active={false} />
-                </>
-              )}
-              
-              {currentTariff === 'pro' && (
-                <>
-                  <FeatureItem text="Все функции Базового и Master тарифа" active={true} />
-                  <FeatureItem text="Безлимитный доступ к ИИ-сметчику" active={true} highlight={true} />
-                  <FeatureItem text="Экспорт смет в фирменный PDF прямо на объекте" active={true} highlight={true} />
-                  <FeatureItem text="Облачная история всех объектов" active={true} />
-                </>
-              )}
-            </div>
-
-            {/* КНОПКИ С ВЫЗОВОМ ВИТРИНЫ */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              {currentTariff === 'free' && (
-                <button 
-                  onClick={() => setShowUpgrade(true)}
-                  className="flex-1 bg-primary text-primary-foreground px-6 py-3.5 rounded-xl text-sm font-bold shadow-sm hover:opacity-90 transition-opacity"
-                >
-                  Улучшить тариф
-                </button>
-              )}
-              {currentTariff === 'master' && (
-                <button 
-                  onClick={() => setShowUpgrade(true)}
-                  className="flex-1 bg-primary text-primary-foreground px-6 py-3.5 rounded-xl text-sm font-bold shadow-sm hover:opacity-90 transition-opacity"
-                >
-                  Улучшить до PRO (Безлимит)
-                </button>
-              )}
-              {currentTariff === 'pro' && (
-                <button className="flex-1 bg-background border border-border px-6 py-3.5 rounded-xl text-sm font-bold text-foreground hover:bg-muted transition-colors">
-                  Управление подпиской
-                </button>
-              )}
+          </div>
+          <div className="flex-1">
+            <h2 className="text-xl font-black text-foreground mb-1">{user.name}</h2>
+            <p className="text-sm text-muted-foreground mb-4">{user.email}</p>
+            <div className="flex gap-2">
+              <button className="flex-1 bg-background border border-border py-2 rounded-lg text-xs font-bold text-foreground hover:border-primary/50 hover:text-primary transition-colors">
+                Настройки
+              </button>
+              <button className="px-3 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white py-2 rounded-lg transition-colors">
+                <LogOut className="w-4 h-4" />
+              </button>
             </div>
           </div>
-
-          {currentTariff !== 'free' && (
-            <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-sm">
-              <div className="flex items-center gap-3 mb-6">
-                <CreditCard className="w-5 h-5 text-muted-foreground" />
-                <h3 className="text-lg font-bold text-foreground">Способ оплаты</h3>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-background border border-border rounded-xl gap-4 mb-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-8 bg-emerald-900/20 border border-emerald-500/20 rounded-md flex items-center justify-center text-[10px] font-black text-emerald-500">
-                    МИР
-                  </div>
-                  <div>
-                    <p className="font-bold text-foreground text-sm">•••• 2026</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Следующее списание: {currentTariff === 'pro' ? '1 490 ₽' : '490 ₽'}
-                    </p>
-                  </div>
-                </div>
-                <button className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-500/10 rounded-lg transition-colors shrink-0">
-                  <Trash2 className="w-3.5 h-3.5" /> Отвязать
-                </button>
-              </div>
-
-              <p className="text-xs text-muted-foreground leading-relaxed flex items-start gap-2">
-                <Shield className="w-4 h-4 shrink-0 text-muted-foreground/50" />
-                В соответствии с законом РФ, вы можете отменить автопродление в любой момент. Доступ к тарифу сохранится до конца оплаченного периода.
-              </p>
-            </div>
-          )}
-
         </div>
+
+        {/* Блок лимитов (показываем только для Master) */}
+        {currentTariff === 'master' ? (
+          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-center">
+            <div className="flex justify-between text-sm font-bold mb-3">
+              <span className="text-foreground">Остаток ИИ-смет</span>
+              <span className="text-primary">{user.estimatesLimit - user.estimatesUsed} из {user.estimatesLimit}</span>
+            </div>
+            <div className="h-2 w-full bg-muted rounded-full overflow-hidden flex justify-end mb-2">
+              <div 
+                className="h-full bg-primary rounded-full transition-all duration-500"
+                style={{ width: `${((user.estimatesLimit - user.estimatesUsed) / user.estimatesLimit) * 100}%` }}
+              ></div>
+            </div>
+            <p className="text-xs text-muted-foreground">Лимит обновится 17 сентября.</p>
+          </div>
+        ) : (
+          /* Донат (показываем для Free) или Способ оплаты (показываем для PRO) */
+          currentTariff === 'free' ? (
+            <div className="bg-gradient-to-br from-orange-500/10 to-amber-500/5 border border-orange-500/20 rounded-2xl p-6 shadow-sm flex flex-col justify-center">
+              <div className="flex items-center gap-3 mb-2">
+                <Coffee className="w-5 h-5 text-orange-500" />
+                <h3 className="font-bold text-foreground">Поддержать проект</h3>
+              </div>
+              <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+                Сервис сэкономил время? Вы можете поддержать сервера.
+              </p>
+              <button className="w-full bg-orange-500/10 text-orange-600 border border-orange-500/20 hover:bg-orange-500 hover:text-white py-2 rounded-lg text-xs font-bold transition-all">
+                Угостить кофе
+              </button>
+            </div>
+          ) : (
+            <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-center">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-bold text-foreground flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-muted-foreground" /> Оплата
+                </h3>
+                <span className="text-xs font-bold text-muted-foreground">До 17 сен 2026</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-background border border-border rounded-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-5 bg-emerald-900/20 border border-emerald-500/20 rounded flex items-center justify-center text-[8px] font-black text-emerald-500">МИР</div>
+                  <span className="font-bold text-sm">•••• 2026</span>
+                </div>
+                <button className="text-red-500 hover:text-red-400 p-1 transition-colors"><Trash2 className="w-4 h-4" /></button>
+              </div>
+            </div>
+          )
+        )}
+
+        {/* Поддержка */}
+        <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-center">
+          <div className="flex items-center gap-3 mb-2">
+            <HelpCircle className="w-5 h-5 text-muted-foreground" />
+            <h3 className="font-bold text-foreground">Помощь</h3>
+          </div>
+          <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+            Возникли вопросы по расчетам, функционалу или тарифам? Мы на связи.
+          </p>
+          <button className="w-full bg-background border border-border py-2 rounded-lg text-xs font-bold text-foreground hover:bg-muted transition-colors">
+            Написать в поддержку
+          </button>
+        </div>
+
+      </div>
+
+      {/* НИЖНЯЯ ПАНЕЛЬ: ВИТРИНА ТАРИФОВ (ВСЕГДА НА ЭКРАНЕ) */}
+      <div className="mb-10 text-center">
+        <h2 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight mb-3">
+          Инвестируйте в свое время
+        </h2>
+        <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
+          Делегируйте рутину ВольтПро и забирайте объекты быстрее конкурентов.
+        </p>
+      </div>
+
+      {/* СЕТКА ТАРИФОВ: 1 КОЛОНКА НА МОБИЛКЕ, 3 НА ДЕСКТОПЕ */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        
+        {/* === ТАРИФ FREE === */}
+        <div className={`bg-card border-2 rounded-3xl p-6 sm:p-8 flex flex-col relative transition-all ${currentTariff === 'free' ? 'border-primary shadow-md' : 'border-border shadow-sm'}`}>
+          <h3 className="text-2xl font-black text-foreground mb-2">Free</h3>
+          <p className="text-sm text-muted-foreground mb-6 h-10">
+            Базовый набор для простых задач.
+          </p>
+          <div className="mb-8">
+            <span className="text-4xl font-black text-foreground">0 ₽</span>
+            <span className="text-muted-foreground font-medium"> / мес</span>
+          </div>
+          
+          <div className="space-y-4 mb-8 flex-1">
+            <FeatureItem text="Базовые калькуляторы (Автоматы, Сечения)" active={true} />
+            <FeatureItem text="Справочники и База знаний" active={true} />
+            <FeatureItem text="Сложные расчеты (Заземление, ТКЗ, Потери)" active={false} />
+            <FeatureItem text="ИИ-сметчик и экспорт в PDF" active={false} />
+          </div>
+          
+          <button 
+            disabled={currentTariff === 'free'}
+            onClick={() => setCurrentTariff('free')}
+            className={`w-full py-4 rounded-xl text-sm font-bold transition-colors ${
+              currentTariff === 'free' 
+              ? 'bg-muted text-muted-foreground cursor-not-allowed' 
+              : 'bg-background border border-border text-foreground hover:border-primary hover:text-primary'
+            }`}
+          >
+            {currentTariff === 'free' ? 'Текущий тариф' : 'Перейти на Free'}
+          </button>
+        </div>
+
+        {/* === ТАРИФ MASTER === */}
+        <div className={`bg-card border-2 rounded-3xl p-6 sm:p-8 flex flex-col relative transition-all ${currentTariff === 'master' ? 'border-primary shadow-md' : 'border-border shadow-sm hover:shadow-md'}`}>
+          <h3 className="text-2xl font-black text-foreground mb-2">Master</h3>
+          <p className="text-sm text-muted-foreground mb-6 h-10">
+            Экономия времени. Избавьтесь от рутины расчетов.
+          </p>
+          <div className="mb-8">
+            <span className="text-4xl font-black text-foreground">490 ₽</span>
+            <span className="text-muted-foreground font-medium"> / мес</span>
+          </div>
+          
+          <div className="space-y-4 mb-8 flex-1">
+            <FeatureItem text="Сложные калькуляторы (Заземление, Потери, ТКЗ)" active={true} highlight={currentTariff !== 'master'} />
+            <FeatureItem text="10 ИИ-смет в месяц" active={true} highlight={currentTariff !== 'master'} />
+            <FeatureItem text="Базовые инструменты и База знаний" active={true} />
+            <FeatureItem text="Экспорт смет в фирменный PDF" active={false} />
+          </div>
+          
+          <button 
+            disabled={currentTariff === 'master'}
+            onClick={() => setCurrentTariff('master')}
+            className={`w-full py-4 rounded-xl text-sm font-bold transition-all ${
+              currentTariff === 'master' 
+              ? 'bg-primary/20 text-primary cursor-not-allowed border border-primary/20' 
+              : 'bg-primary text-primary-foreground hover:opacity-90 shadow-sm'
+            }`}
+          >
+            {currentTariff === 'master' ? 'Текущий тариф' : 'Выбрать Master'}
+          </button>
+        </div>
+
+        {/* === ТАРИФ PRO === */}
+        <div className={`border-2 rounded-3xl p-6 sm:p-8 flex flex-col relative transition-all ${currentTariff === 'pro' ? 'bg-primary/5 border-primary shadow-lg' : 'bg-primary/5 border-primary/30 shadow-md hover:shadow-lg'}`}>
+          <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-widest py-1.5 px-4 rounded-bl-xl">
+            Для профессионалов
+          </div>
+          
+          <h3 className="text-2xl font-black text-primary mb-2 flex items-center gap-2">
+            PRO <Zap className="w-5 h-5" fill="currentColor" />
+          </h3>
+          <p className="text-sm text-muted-foreground mb-6 h-10">
+            Сдавайте объекты быстрее конкурентов.
+          </p>
+          
+          <div className="mb-2">
+            <span className="text-4xl font-black text-foreground">1 490 ₽</span>
+            <span className="text-muted-foreground font-medium"> / мес</span>
+          </div>
+          <p className="text-[10px] text-primary font-bold mb-6">Оплата за год — 1 090 ₽/мес</p>
+          
+          <div className="space-y-4 mb-8 flex-1">
+            <FeatureItem text="Безлимитный ИИ-сметчик" active={true} highlight={currentTariff !== 'pro'} />
+            <FeatureItem text="Экспорт смет в профессиональный PDF" active={true} highlight={currentTariff !== 'pro'} />
+            <FeatureItem text="Облачная история объектов" active={true} highlight={currentTariff !== 'pro'} />
+            <FeatureItem text="Все премиум-калькуляторы и справочники" active={true} />
+          </div>
+          
+          <button 
+            disabled={currentTariff === 'pro'}
+            onClick={() => setCurrentTariff('pro')}
+            className={`w-full py-4 rounded-xl text-sm font-bold transition-all ${
+              currentTariff === 'pro' 
+              ? 'bg-primary text-primary-foreground cursor-not-allowed shadow-md opacity-90' 
+              : 'bg-primary text-primary-foreground hover:opacity-90 shadow-md'
+            }`}
+          >
+            {currentTariff === 'pro' ? 'Текущий тариф' : 'Оформить PRO'}
+          </button>
+        </div>
+
       </div>
     </div>
   )
@@ -327,20 +251,9 @@ function ProfilePage() {
 
 function FeatureItem({ text, active, highlight = false }: { text: string, active: boolean, highlight?: boolean }) {
   return (
-    <div className={`flex items-center gap-3 ${active ? 'opacity-100' : 'opacity-40 grayscale'}`}>
-      <CheckCircle2 className={`w-5 h-5 shrink-0 ${active ? (highlight ? 'text-primary' : 'text-primary/70') : 'text-muted-foreground'}`} />
-      <span className={`text-sm ${active ? (highlight ? 'font-bold text-foreground' : 'font-medium text-foreground') : 'text-muted-foreground line-through'}`}>
-        {text}
-      </span>
-    </div>
-  )
-}
-
-function UpgradeFeature({ text, highlight = false }: { text: string, highlight?: boolean }) {
-  return (
-    <div className="flex items-start gap-3">
-      <CheckCircle2 className={`w-5 h-5 shrink-0 mt-0.5 ${highlight ? 'text-primary' : 'text-muted-foreground'}`} />
-      <span className={`text-sm leading-relaxed ${highlight ? 'font-bold text-foreground' : 'font-medium text-muted-foreground'}`}>
+    <div className={`flex items-start gap-3 ${active ? 'opacity-100' : 'opacity-40 grayscale'}`}>
+      <CheckCircle2 className={`w-5 h-5 shrink-0 mt-0.5 ${active ? (highlight ? 'text-primary' : 'text-primary/70') : 'text-muted-foreground'}`} />
+      <span className={`text-sm leading-relaxed ${active ? (highlight ? 'font-bold text-foreground' : 'font-medium text-foreground') : 'text-muted-foreground line-through'}`}>
         {text}
       </span>
     </div>
