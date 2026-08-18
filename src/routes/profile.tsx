@@ -1,174 +1,249 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { User, CreditCard, LogOut, Zap, CheckCircle2, Shield, Settings, Trash2, AlertTriangle, HelpCircle } from 'lucide-react'
+import { User, Settings, LogOut, Zap, Shield, CreditCard, Coffee, HelpCircle, CheckCircle2, ChevronRight, Trash2 } from 'lucide-react'
 import React, { useState } from 'react'
 
 export const Route = createFileRoute('/profile')({
   component: ProfilePage,
 })
 
-function ProfilePage() {
-  // Имитация состояния привязанной карты и уведомлений
-  const [isCardLinked, setIsCardLinked] = useState(true)
-  const [showToast, setShowToast] = useState(false)
+// Типы тарифов для логики
+type TariffType = 'free' | 'master' | 'pro'
 
-  // Функция отвязки карты (в 1 клик)
-  const handleUnbindCard = () => {
-    setIsCardLinked(false)
-    setShowToast(true)
-    setTimeout(() => setShowToast(false), 3000)
+function ProfilePage() {
+  // Для тестирования интерфейса делаем переключатель тарифов
+  const [currentTariff, setCurrentTariff] = useState<TariffType>('pro')
+
+  // Моковые данные пользователя
+  const user = {
+    name: "Иван Иванов",
+    email: "ivan.electro@mail.ru",
+    avatar: "И",
+    estimatesUsed: 15,
+    estimatesLimit: 20
   }
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in fade-in duration-500 text-foreground pb-24 relative">
+    <div className="container mx-auto max-w-6xl animate-in fade-in duration-500 pb-24 relative">
       
-      {/* Всплывающее уведомление (Тост) */}
-      {showToast && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[200] bg-green-500 text-white px-4 py-2 rounded-full font-bold text-xs sm:text-sm shadow-xl flex items-center gap-2 animate-in slide-in-from-top-4">
-          <CheckCircle2 className="w-4 h-4" /> Карта успешно отвязана
-        </div>
-      )}
-
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Личный кабинет</h1>
-        <p className="text-xs sm:text-sm text-muted-foreground mt-1">Управление аккаунтом и подпиской</p>
+      {/* 🛠 ДЕБАГ-ПАНЕЛЬ (ТОЛЬКО ДЛЯ РАЗРАБОТКИ) - Удалишь перед релизом */}
+      <div className="mb-8 p-4 bg-muted/50 border border-border rounded-xl flex items-center gap-4 overflow-x-auto">
+        <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Тест интерфейса:</span>
+        <button onClick={() => setCurrentTariff('free')} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${currentTariff === 'free' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground hover:bg-muted'}`}>Free (Бесплатный)</button>
+        <button onClick={() => setCurrentTariff('master')} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${currentTariff === 'master' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground hover:bg-muted'}`}>Master (Лимиты)</button>
+        <button onClick={() => setCurrentTariff('pro')} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${currentTariff === 'pro' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground hover:bg-muted'}`}>PRO (Безлимит)</button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+      {/* Шапка */}
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight mb-2">Личный кабинет</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">Управление аккаунтом и подпиской</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        {/* ЛЕВАЯ КОЛОНКА: Профиль и настройки */}
-        <div className="md:col-span-1 space-y-4 sm:space-y-6">
+        {/* === ЛЕВАЯ КОЛОНКА (Инфо пользователя и Донат) === */}
+        <div className="lg:col-span-4 space-y-6">
           
           {/* Карточка пользователя */}
-          <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col items-center text-center">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-primary/10 flex items-center justify-center mb-4 border-2 border-primary/20 relative">
-              <User className="h-10 w-10 sm:h-12 sm:w-12 text-primary" />
-              <div className="absolute bottom-0 right-0 bg-green-500 w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-card flex items-center justify-center">
-                <Shield className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-white" />
-              </div>
+          <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 flex flex-col items-center text-center shadow-sm relative overflow-hidden">
+            <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center text-3xl font-black text-primary mb-4 relative z-10 border-4 border-background shadow-sm">
+              {user.avatar}
+              {currentTariff === 'pro' && (
+                <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1">
+                  <div className="bg-primary text-primary-foreground w-6 h-6 rounded-full flex items-center justify-center">
+                    <Shield className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+              )}
             </div>
-            <h2 className="text-lg sm:text-xl font-bold text-foreground">Иван Иванов</h2>
-            <p className="text-xs sm:text-sm text-muted-foreground mb-4">ivan.electro@mail.ru</p>
-            
-            <div className="w-full flex flex-col gap-2">
-              <button className="w-full flex items-center justify-center gap-2 px-4 py-2 sm:py-2.5 rounded-xl bg-muted text-foreground hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors text-xs sm:text-sm font-bold">
+            <h2 className="text-xl font-black text-foreground mb-1">{user.name}</h2>
+            <p className="text-sm text-muted-foreground mb-8">{user.email}</p>
+
+            <div className="w-full space-y-2">
+              <button className="w-full flex items-center justify-center gap-2 bg-background border border-border px-4 py-3 rounded-xl text-sm font-bold text-foreground hover:border-primary/50 hover:text-primary transition-colors">
                 <Settings className="w-4 h-4" /> Настройки профиля
               </button>
-              <button className="w-full flex items-center justify-center gap-2 px-4 py-2 sm:py-2.5 rounded-xl text-red-500 hover:bg-red-500/10 transition-colors text-xs sm:text-sm font-bold">
+              <button className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-red-500/80 hover:bg-red-500/10 hover:text-red-500 transition-colors">
                 <LogOut className="w-4 h-4" /> Выйти из аккаунта
               </button>
             </div>
           </div>
 
-          {/* Карточка поддержки */}
-          <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm">
-            <div className="flex items-center gap-3 mb-3">
-              <HelpCircle className="h-5 w-5 text-muted-foreground" />
-              <h3 className="font-bold text-foreground text-sm sm:text-base">Помощь</h3>
+          {/* Блок "На чашечку кофе" (Донат). Показываем ТОЛЬКО для Free и Master */}
+          {currentTariff !== 'pro' && (
+            <div className="bg-gradient-to-br from-orange-500/10 to-amber-500/5 border border-orange-500/20 rounded-2xl p-6 shadow-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-orange-500/20 rounded-full flex items-center justify-center text-orange-500">
+                  <Coffee className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-foreground">Поддержать проект</h3>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                ВольтПро разрабатывается одним инженером. Если сервис сэкономил вам время, вы можете сказать «спасибо» и поддержать сервера.
+              </p>
+              <button className="w-full bg-orange-500/10 text-orange-600 border border-orange-500/20 hover:bg-orange-500 hover:text-white px-4 py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                Угостить кофе <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
-            <p className="text-xs sm:text-sm text-muted-foreground mb-4 leading-relaxed">
-              Возникли вопросы по расчетам или списаниям? Напишите нам, мы быстро поможем.
+          )}
+
+          {/* Блок Поддержки */}
+          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center gap-3 mb-3">
+              <HelpCircle className="w-5 h-5 text-muted-foreground" />
+              <h3 className="font-bold text-foreground">Помощь</h3>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+              Возникли вопросы по расчетам ИИ или списаниям? Напишите нам, мы быстро поможем.
             </p>
-            <a href="https://t.me/voltpro_chat" target="_blank" rel="noopener noreferrer" className="block w-full text-center px-4 py-2 sm:py-2.5 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs sm:text-sm font-bold">
+            <button className="w-full bg-background border border-border px-4 py-3 rounded-xl text-sm font-bold text-foreground hover:bg-muted transition-colors">
               Написать в поддержку
-            </a>
+            </button>
           </div>
+
         </div>
 
-        {/* ПРАВАЯ КОЛОНКА: Тарифы и оплата */}
-        <div className="md:col-span-2 space-y-4 sm:space-y-6">
+        {/* === ПРАВАЯ КОЛОНКА (Тариф и Оплата) === */}
+        <div className="lg:col-span-8 space-y-6">
           
-          {/* Блок активного тарифа */}
-          <div className="bg-gradient-to-br from-card to-primary/5 border border-primary/20 rounded-2xl p-5 sm:p-6 shadow-sm relative overflow-hidden">
-            {/* Декоративный элемент */}
-            <div className="absolute -right-6 -top-6 w-32 h-32 bg-primary/10 rounded-full blur-2xl pointer-events-none"></div>
+          {/* Главная карточка тарифа */}
+          <div className={`border rounded-2xl p-6 sm:p-8 shadow-sm relative overflow-hidden transition-colors ${
+            currentTariff === 'pro' ? 'bg-primary/5 border-primary/30' : 
+            currentTariff === 'master' ? 'bg-card border-border' : 
+            'bg-card border-border'
+          }`}>
             
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-8">
               <div>
-                <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-primary mb-1">Ваш текущий тариф</p>
-                <h2 className="text-2xl sm:text-3xl font-black text-foreground flex items-center gap-2">
-                  Уровень 2: PRO <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-amber-500 fill-amber-500" />
+                <p className="text-xs font-bold uppercase tracking-widest mb-2 text-muted-foreground">
+                  Ваш текущий тариф
+                </p>
+                <h2 className="text-3xl sm:text-4xl font-black text-foreground flex items-center gap-3">
+                  {currentTariff === 'pro' && 'Уровень PRO ⚡'}
+                  {currentTariff === 'master' && 'Уровень Master'}
+                  {currentTariff === 'free' && 'Базовый (Free)'}
                 </h2>
               </div>
-              <div className="bg-background/80 backdrop-blur-sm border border-border px-3 py-1.5 rounded-lg text-center shrink-0">
-                <p className="text-[10px] sm:text-xs text-muted-foreground">Оплачено до</p>
-                <p className="text-sm sm:text-base font-bold text-foreground">17 сентября 2026</p>
-              </div>
+              
+              {/* Плашка со статусом */}
+              {currentTariff !== 'free' && (
+                <div className="bg-background/50 backdrop-blur-sm border border-border px-4 py-2 rounded-xl text-sm font-medium shrink-0">
+                  <span className="text-muted-foreground">Оплачено до: </span>
+                  <span className="font-bold text-foreground">17 сентября 2026</span>
+                </div>
+              )}
             </div>
 
-            <div className="space-y-2 sm:space-y-3 mb-6">
-              <div className="flex items-center gap-2 text-xs sm:text-sm text-foreground">
-                <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" /> Безлимитный доступ к ИИ-сметчику
-              </div>
-              <div className="flex items-center gap-2 text-xs sm:text-sm text-foreground">
-                <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" /> Все инженерные калькуляторы и схемы
-              </div>
-              <div className="flex items-center gap-2 text-xs sm:text-sm text-foreground">
-                <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" /> Экспорт смет в PDF и история объектов
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-              <button className="flex-1 bg-primary text-primary-foreground py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm hover:opacity-90 transition-opacity shadow-sm">
-                Улучшить до Командного
-              </button>
-              <button className="flex-1 bg-background border border-border text-foreground py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm hover:bg-muted transition-colors">
-                Сменить тариф
-              </button>
-            </div>
-          </div>
-
-          {/* Блок управления оплатой (Эквайринг и отвязка карты) */}
-          <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm">
-            <h3 className="text-lg sm:text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-              <CreditCard className="h-5 w-5 text-primary" /> Способ оплаты
-            </h3>
-            
-            {isCardLinked ? (
-              <div className="space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-muted/50 p-4 rounded-xl border border-border">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-8 sm:w-14 sm:h-9 bg-background border border-border rounded flex items-center justify-center shrink-0 shadow-sm relative overflow-hidden">
-                      {/* Упрощенный логотип карты МИР */}
-                      <span className="font-black text-green-600 italic text-xs tracking-tighter">МИР</span>
-                    </div>
-                    <div>
-                      <p className="text-sm sm:text-base font-bold text-foreground">•••• 2026</p>
-                      <p className="text-[10px] sm:text-xs text-muted-foreground">Следующее списание: 490 ₽</p>
-                    </div>
-                  </div>
-                  
-                  {/* Кнопка отвязки карты по закону */}
-                  <button 
-                    onClick={handleUnbindCard}
-                    className="flex items-center justify-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-colors text-xs sm:text-sm font-bold shrink-0"
-                  >
-                    <Trash2 className="w-4 h-4" /> Отвязать карту
-                  </button>
+            {/* Прогресс-бар для тарифа Master */}
+            {currentTariff === 'master' && (
+              <div className="mb-8 bg-background border border-border rounded-xl p-4">
+                <div className="flex justify-between text-sm font-bold mb-2">
+                  <span className="text-foreground">Использовано ИИ-смет</span>
+                  <span className="text-primary">{user.estimatesUsed} / {user.estimatesLimit}</span>
                 </div>
-                
-                <div className="flex items-start gap-2 text-[10px] sm:text-xs text-muted-foreground bg-background p-3 rounded-lg border border-border">
-                  <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                  <p>В соответствии с законом РФ, вы можете отменить автопродление и отвязать карту в любой момент. Доступ к тарифу сохранится до конца оплаченного периода.</p>
+                <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-primary rounded-full transition-all duration-500"
+                    style={{ width: `${(user.estimatesUsed / user.estimatesLimit) * 100}%` }}
+                  ></div>
                 </div>
-              </div>
-            ) : (
-              // Состояние когда карта отвязана
-              <div className="flex flex-col items-center justify-center py-6 text-center bg-muted/30 rounded-xl border border-dashed border-border">
-                <div className="w-12 h-12 bg-background rounded-full flex items-center justify-center mb-3 shadow-sm">
-                  <CreditCard className="w-6 h-6 text-muted-foreground opacity-50" />
-                </div>
-                <p className="text-sm font-bold text-foreground mb-1">Нет привязанных карт</p>
-                <p className="text-xs text-muted-foreground mb-4 max-w-xs">Привяжите карту для автоматического продления подписки и бесперебойного доступа к ИИ-сметчику.</p>
-                <button className="px-6 py-2 bg-primary text-primary-foreground rounded-xl font-bold text-xs sm:text-sm hover:opacity-90 transition-opacity shadow-sm">
-                  Добавить карту
-                </button>
+                <p className="text-xs text-muted-foreground mt-2">Лимит обновится 17 сентября.</p>
               </div>
             )}
-            
+
+            {/* Список фич */}
+            <div className="space-y-3 mb-8">
+              {currentTariff === 'free' && (
+                <>
+                  <FeatureItem text="Все инженерные калькуляторы и схемы" active={true} />
+                  <FeatureItem text="Доступ к актуальной Базе знаний" active={true} />
+                  <FeatureItem text="ИИ-сметчик (составление смет по ПУЭ)" active={false} />
+                  <FeatureItem text="Экспорт смет в PDF и сохранение истории" active={false} />
+                </>
+              )}
+              {currentTariff === 'master' && (
+                <>
+                  <FeatureItem text="20 генераций смет через ИИ в месяц" active={true} />
+                  <FeatureItem text="Все инженерные калькуляторы и схемы" active={true} />
+                  <FeatureItem text="Экспорт смет в PDF и история объектов" active={false} />
+                </>
+              )}
+              {currentTariff === 'pro' && (
+                <>
+                  <FeatureItem text="Безлимитный доступ к ИИ-сметчику" active={true} highlight={true} />
+                  <FeatureItem text="Экспорт профессиональных смет в PDF" active={true} />
+                  <FeatureItem text="История объектов и облачное сохранение" active={true} />
+                  <FeatureItem text="Приоритетная поддержка" active={true} />
+                </>
+              )}
+            </div>
+
+            {/* Кнопки управления */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              {currentTariff === 'free' && (
+                <button className="flex-1 bg-primary text-primary-foreground px-6 py-3.5 rounded-xl text-sm font-bold shadow-sm hover:opacity-90 transition-opacity">
+                  Выбрать тариф
+                </button>
+              )}
+              {currentTariff === 'master' && (
+                <button className="flex-1 bg-primary text-primary-foreground px-6 py-3.5 rounded-xl text-sm font-bold shadow-sm hover:opacity-90 transition-opacity">
+                  Улучшить до PRO (Безлимит)
+                </button>
+              )}
+              {currentTariff === 'pro' && (
+                <button className="flex-1 bg-background border border-border px-6 py-3.5 rounded-xl text-sm font-bold text-foreground hover:bg-muted transition-colors">
+                  Управление подпиской
+                </button>
+              )}
+            </div>
           </div>
-          
+
+          {/* Карточка способа оплаты (показываем только для платных тарифов) */}
+          {currentTariff !== 'free' && (
+            <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-sm">
+              <div className="flex items-center gap-3 mb-6">
+                <CreditCard className="w-5 h-5 text-muted-foreground" />
+                <h3 className="text-lg font-bold text-foreground">Способ оплаты</h3>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-background border border-border rounded-xl gap-4 mb-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-8 bg-emerald-900/20 border border-emerald-500/20 rounded-md flex items-center justify-center text-[10px] font-black text-emerald-500">
+                    МИР
+                  </div>
+                  <div>
+                    <p className="font-bold text-foreground text-sm">•••• 2026</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Следующее списание: {currentTariff === 'pro' ? '990 ₽' : '490 ₽'}
+                    </p>
+                  </div>
+                </div>
+                <button className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-500/10 rounded-lg transition-colors shrink-0">
+                  <Trash2 className="w-3.5 h-3.5" /> Отвязать карту
+                </button>
+              </div>
+
+              <p className="text-xs text-muted-foreground leading-relaxed flex items-start gap-2">
+                <Shield className="w-4 h-4 shrink-0 text-muted-foreground/50" />
+                В соответствии с законом РФ, вы можете отменить автопродление и отвязать карту в любой момент. Доступ к тарифу сохранится до конца оплаченного периода.
+              </p>
+            </div>
+          )}
+
         </div>
       </div>
+    </div>
+  )
+}
+
+// Компонент для списка фич
+function FeatureItem({ text, active, highlight = false }: { text: string, active: boolean, highlight?: boolean }) {
+  return (
+    <div className={`flex items-center gap-3 ${active ? 'opacity-100' : 'opacity-40 grayscale'}`}>
+      <CheckCircle2 className={`w-5 h-5 shrink-0 ${active ? (highlight ? 'text-primary' : 'text-primary/70') : 'text-muted-foreground'}`} />
+      <span className={`text-sm ${active ? (highlight ? 'font-bold text-foreground' : 'font-medium text-foreground') : 'text-muted-foreground line-through'}`}>
+        {text}
+      </span>
     </div>
   )
 }
