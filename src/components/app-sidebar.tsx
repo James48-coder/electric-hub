@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Zap, Home, BookOpen, FileText, Calculator, Waypoints, Bot, MessageSquare, Users, User, HelpCircle } from 'lucide-react'
+import { Zap, Home, BookOpen, FileText, Calculator, Waypoints, Bot, MessageSquare, Users, User, HelpCircle, Binary } from 'lucide-react'
 import React from 'react'
 
 export function AppSidebar() {
@@ -24,6 +24,9 @@ export function AppSidebar() {
         <SidebarLink to="/calculators" icon={<Calculator className="w-5 h-5" />} label="Калькуляторы" />
         <SidebarLink to="/schemes" icon={<Waypoints className="w-5 h-5" />} label="Схемы" />
         
+        {/* НОВАЯ ССЫЛКА НА ДЕКОДЕР */}
+        <SidebarLink to="/decoder" icon={<Binary className="w-5 h-5" />} label="Декодер" />
+        
         <div className="my-2 border-t border-border/50"></div>
         
         <SidebarLink to="/estimator" icon={<Bot className="w-5 h-5" />} label="ИИ-сметчик" />
@@ -34,7 +37,6 @@ export function AppSidebar() {
         <SidebarLink to="/masters-chat" icon={<Users className="w-5 h-5" />} label="Чат мастеров" />
         <SidebarLink to="/profile" icon={<User className="w-5 h-5" />} label="Профиль" />
         
-        {/* НОВАЯ ССЫЛКА НА FAQ */}
         <SidebarLink to="/faq" icon={<HelpCircle className="w-5 h-5" />} label="Частые вопросы" />
       </nav>
 
