@@ -10,8 +10,8 @@ function IndexPage() {
   return (
     <div className="animate-in fade-in duration-500 pb-24">
       
-      {/* HERO SECTION */}
-      <div className="relative overflow-hidden rounded-3xl bg-card border border-border p-6 sm:p-10 lg:p-12 mb-8 sm:mb-12 flex flex-col lg:flex-row items-center gap-8 lg:gap-12 shadow-sm">
+      {/* ИСПРАВЛЕННЫЙ HERO SECTION */}
+      <div className="relative overflow-hidden rounded-3xl bg-card border border-border p-6 sm:p-10 lg:p-10 xl:p-12 mb-8 sm:mb-12 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-10 shadow-sm">
         
         {/* Инженерная сетка на фоне */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
@@ -19,26 +19,25 @@ function IndexPage() {
         {/* Неоновый блик */}
         <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/20 blur-[80px] rounded-full pointer-events-none"></div>
 
-        {/* Текстовая часть */}
-        <div className="relative z-10 flex-1 space-y-6 text-center lg:text-left w-full">
+        {/* ТЕКСТОВАЯ ЧАСТЬ (Ограничена по ширине, чтобы не выталкивать карточку) */}
+        <div className="relative z-10 flex flex-col items-center lg:items-start text-center lg:text-left w-full lg:w-[55%] xl:w-[60%] space-y-6">
           
-          {/* Шильдик без версии */}
-          <div className="inline-flex items-center justify-center lg:justify-start gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest border border-primary/20 mx-auto lg:mx-0 w-max shadow-sm">
+          <div className="inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest border border-primary/20 shadow-sm">
             <Zap className="w-3.5 h-3.5" /> ВольтПро
           </div>
           
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-foreground tracking-tight leading-[1.1]">
+          <h1 className="text-4xl sm:text-5xl lg:text-5xl xl:text-6xl font-black text-foreground tracking-tight leading-[1.1]">
             Электромонтаж <br className="hidden sm:block"/>
             <span className="text-emerald-400 drop-shadow-sm">
               нового уровня
             </span>
           </h1>
           
-          <p className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed">
+          <p className="text-base sm:text-lg text-muted-foreground max-w-xl leading-relaxed">
             Забудь про рутину. ИИ-сметчик, точные калькуляторы и профессиональная база знаний в твоем кармане.
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-2">
+          <div className="flex flex-col sm:flex-row items-center w-full sm:w-auto gap-3 sm:gap-4 pt-2">
             <Link to="/estimator" className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-primary text-primary-foreground font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/25 text-sm">
               <Bot className="w-5 h-5" /> ИИ-сметчик
             </Link>
@@ -48,9 +47,9 @@ function IndexPage() {
           </div>
         </div>
 
-        {/* ИСПРАВЛЕННАЯ КАРТОЧКА: Адаптивная ширина, строгий контроль текста */}
-        <div className="relative z-10 w-full max-w-[300px] sm:max-w-sm shrink-0 items-center justify-center mt-6 lg:mt-0">
-          <div className="w-full bg-background/95 backdrop-blur-md border border-border rounded-2xl p-5 sm:p-6 shadow-xl hover:-translate-y-2 transition-transform duration-500 overflow-hidden">
+        {/* ПАНЕЛЬ ИИ-СМЕТЧИКА (Строго зафиксирована, обрезка исключена) */}
+        <div className="relative z-10 w-full max-w-[340px] lg:w-[40%] xl:w-[340px] mx-auto lg:mx-0 shrink-0 mt-6 lg:mt-0">
+          <div className="w-full bg-background/95 backdrop-blur-md border border-border rounded-2xl p-5 shadow-xl hover:-translate-y-1 transition-transform duration-500 overflow-hidden">
             
             {/* Шапка карточки */}
             <div className="flex items-center justify-between mb-5 border-b border-border pb-4">
@@ -87,7 +86,7 @@ function IndexPage() {
             </div>
 
             {/* Подвал карточки */}
-            <div className="pt-4 border-t border-border flex items-center justify-between bg-muted/20 -mx-6 -mb-6 p-4 sm:px-6 rounded-b-2xl">
+            <div className="pt-4 border-t border-border flex items-center justify-between bg-muted/20 -mx-5 -mb-5 p-4 sm:px-5 rounded-b-2xl">
               <div className="flex items-center gap-2 min-w-0 pr-2">
                 <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
                 <span className="text-xs font-bold text-foreground truncate">100% ПУЭ</span>
