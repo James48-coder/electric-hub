@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Shield, Zap, Search, Fingerprint, Info, CheckCircle2 } from 'lucide-react'
+import { Shield, Zap, Search, Fingerprint, CheckCircle2 } from 'lucide-react'
 import React, { useState } from 'react'
 
 export const Route = createFileRoute('/decoder')({
@@ -71,23 +71,35 @@ function DecoderPage() {
         <p className="text-sm sm:text-base text-muted-foreground">Интерактивный справочник маркировок и норм</p>
       </div>
 
-      {/* ВКЛАДКИ */}
-      <div className="flex bg-card p-1.5 rounded-xl sm:rounded-2xl border border-border mb-8 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+      {/* ВКЛАДКИ (Разделены на 3 независимые кнопки) */}
+      <div className="flex gap-3 sm:gap-4 mb-8 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden w-full">
         <button 
           onClick={() => setActiveTab('ip')}
-          className={`flex items-center gap-2 flex-1 min-w-[120px] justify-center px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all ${activeTab === 'ip' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
+          className={`flex items-center justify-center gap-2 flex-1 min-w-[180px] px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl text-sm font-bold transition-all border ${
+            activeTab === 'ip' 
+              ? 'bg-primary border-primary text-primary-foreground shadow-md scale-[1.02]' 
+              : 'bg-card border-border text-muted-foreground hover:border-primary/50 hover:bg-primary/5 hover:text-foreground hover:shadow-sm'
+          }`}
         >
           <Shield className="w-4 h-4" /> Защита IP
         </button>
         <button 
           onClick={() => setActiveTab('cable')}
-          className={`flex items-center gap-2 flex-1 min-w-[120px] justify-center px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all ${activeTab === 'cable' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
+          className={`flex items-center justify-center gap-2 flex-1 min-w-[180px] px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl text-sm font-bold transition-all border ${
+            activeTab === 'cable' 
+              ? 'bg-primary border-primary text-primary-foreground shadow-md scale-[1.02]' 
+              : 'bg-card border-border text-muted-foreground hover:border-primary/50 hover:bg-primary/5 hover:text-foreground hover:shadow-sm'
+          }`}
         >
           <Fingerprint className="w-4 h-4" /> Маркировка кабелей
         </button>
         <button 
           onClick={() => setActiveTab('breaker')}
-          className={`flex items-center gap-2 flex-1 min-w-[120px] justify-center px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all ${activeTab === 'breaker' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
+          className={`flex items-center justify-center gap-2 flex-1 min-w-[180px] px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl text-sm font-bold transition-all border ${
+            activeTab === 'breaker' 
+              ? 'bg-primary border-primary text-primary-foreground shadow-md scale-[1.02]' 
+              : 'bg-card border-border text-muted-foreground hover:border-primary/50 hover:bg-primary/5 hover:text-foreground hover:shadow-sm'
+          }`}
         >
           <Zap className="w-4 h-4" /> Характеристики УЗО
         </button>
@@ -95,7 +107,7 @@ function DecoderPage() {
 
       {/* --- РАЗДЕЛ IP ЗАЩИТА --- */}
       {activeTab === 'ip' && (
-        <div className="space-y-6">
+        <div className="space-y-6 animate-in slide-in-from-bottom-2 duration-300">
           <div className="bg-card border border-border p-6 sm:p-8 rounded-2xl shadow-sm flex flex-col items-center text-center relative overflow-hidden">
             <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-bl-full pointer-events-none"></div>
             
@@ -147,7 +159,7 @@ function DecoderPage() {
 
       {/* --- РАЗДЕЛ КАБЕЛИ --- */}
       {activeTab === 'cable' && (
-        <div className="space-y-6">
+        <div className="space-y-6 animate-in slide-in-from-bottom-2 duration-300">
           <div className="relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input
@@ -174,7 +186,7 @@ function DecoderPage() {
 
       {/* --- РАЗДЕЛ АВТОМАТЫ --- */}
       {activeTab === 'breaker' && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in slide-in-from-bottom-2 duration-300">
           {breakersDict.map((item, idx) => (
             <div key={idx} className="bg-card border border-border rounded-2xl p-6 shadow-sm relative overflow-hidden group hover:border-primary/50 transition-colors">
               <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full group-hover:scale-110 transition-transform"></div>
