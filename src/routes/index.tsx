@@ -10,7 +10,7 @@ function IndexPage() {
   return (
     <div className="animate-in fade-in duration-500 pb-24">
       
-      {/* ИСПРАВЛЕННЫЙ HERO SECTION */}
+      {/* HERO SECTION */}
       <div className="relative overflow-hidden rounded-3xl bg-card border border-border p-6 sm:p-10 lg:p-12 mb-8 sm:mb-12 flex flex-col lg:flex-row items-center gap-8 lg:gap-12 shadow-sm">
         
         {/* Инженерная сетка на фоне */}
@@ -48,27 +48,27 @@ function IndexPage() {
           </div>
         </div>
 
-        {/* ИСПРАВЛЕННЫЙ ВИЗУАЛ: Карточка без обрезки текста */}
-        <div className="hidden lg:flex relative z-10 w-full max-w-sm shrink-0 items-center justify-center">
-          <div className="w-full bg-background/95 backdrop-blur-md border border-border rounded-2xl p-6 shadow-xl hover:-translate-y-2 transition-transform duration-500">
+        {/* ИСПРАВЛЕННАЯ КАРТОЧКА: Адаптивная ширина, строгий контроль текста */}
+        <div className="relative z-10 w-full max-w-[300px] sm:max-w-sm shrink-0 items-center justify-center mt-6 lg:mt-0">
+          <div className="w-full bg-background/95 backdrop-blur-md border border-border rounded-2xl p-5 sm:p-6 shadow-xl hover:-translate-y-2 transition-transform duration-500 overflow-hidden">
             
             {/* Шапка карточки */}
             <div className="flex items-center justify-between mb-5 border-b border-border pb-4">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 min-w-0">
                 <div className="bg-primary/20 p-2 rounded-lg shrink-0">
                   <Bot className="w-5 h-5 text-primary" />
                 </div>
                 <span className="font-bold text-sm text-foreground truncate">Анализ проекта</span>
               </div>
-              <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+              <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0 ml-2 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
             </div>
 
             {/* Тело карточки */}
             <div className="space-y-5 mb-5">
               <div>
-                <div className="flex items-center justify-between text-xs mb-2 gap-4">
-                  <span className="text-muted-foreground truncate">ГОСТ Р 50571.5.52</span>
-                  <span className="font-bold text-foreground animate-pulse shrink-0">Проверка...</span>
+                <div className="flex items-center justify-between text-xs mb-2 gap-2">
+                  <span className="text-muted-foreground truncate mr-2">ГОСТ Р 50571.5.52</span>
+                  <span className="font-bold text-foreground animate-pulse whitespace-nowrap shrink-0">Проверка...</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
                   <div className="bg-primary h-1.5 rounded-full w-2/3 animate-[pulse_2s_ease-in-out_infinite]"></div>
@@ -76,9 +76,9 @@ function IndexPage() {
               </div>
 
               <div>
-                <div className="flex items-center justify-between text-xs mb-2 gap-4">
-                  <span className="text-muted-foreground truncate">Расчет сечения кабеля</span>
-                  <span className="font-bold text-emerald-500 shrink-0">Успешно</span>
+                <div className="flex items-center justify-between text-xs mb-2 gap-2">
+                  <span className="text-muted-foreground truncate mr-2">Расчет сечения кабеля</span>
+                  <span className="font-bold text-emerald-500 whitespace-nowrap shrink-0">Успешно</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
                   <div className="bg-emerald-500 h-1.5 rounded-full w-full"></div>
@@ -87,12 +87,12 @@ function IndexPage() {
             </div>
 
             {/* Подвал карточки */}
-            <div className="pt-4 border-t border-border flex items-center justify-between bg-muted/20 -mx-6 -mb-6 p-4 rounded-b-2xl">
-              <div className="flex items-center gap-2 truncate pr-2">
+            <div className="pt-4 border-t border-border flex items-center justify-between bg-muted/20 -mx-6 -mb-6 p-4 sm:px-6 rounded-b-2xl">
+              <div className="flex items-center gap-2 min-w-0 pr-2">
                 <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
                 <span className="text-xs font-bold text-foreground truncate">100% ПУЭ</span>
               </div>
-              <span className="text-xs font-bold text-primary shrink-0">Готово</span>
+              <span className="text-xs font-bold text-primary whitespace-nowrap shrink-0">Готово</span>
             </div>
 
           </div>
