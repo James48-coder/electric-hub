@@ -129,15 +129,15 @@ function EstimatorPage() {
           </div>
 
           {/* Переключатель "Использовать мои цены" */}
-          <div className="flex items-center justify-between p-4 bg-background border border-border rounded-xl">
-            <div>
+          <div className="flex items-center justify-between gap-4 p-4 bg-background border border-border rounded-xl">
+            <div className="flex-1">
               <p className="font-bold text-sm text-foreground mb-0.5">Использовать мои цены</p>
               <p className="text-xs text-muted-foreground">Алгоритм подставит ваши сохраненные прайсы вместо рыночных</p>
             </div>
             <button 
               type="button"
               onClick={() => setCustomPrices(!customPrices)}
-              className={`w-11 h-6 rounded-full transition-colors relative border ${customPrices ? 'bg-primary border-primary' : 'bg-muted border-border'}`}
+              className={`shrink-0 w-11 h-6 rounded-full transition-colors relative border ${customPrices ? 'bg-primary border-primary' : 'bg-muted border-border'}`}
             >
               <div className={`absolute top-[3px] left-[3px] bg-white w-4 h-4 rounded-full shadow-sm transition-transform ${customPrices ? 'translate-x-5' : 'translate-x-0'}`}></div>
             </button>
