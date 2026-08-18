@@ -10,33 +10,35 @@ function IndexPage() {
   return (
     <div className="animate-in fade-in duration-500 pb-24">
       
-      {/* ОБНОВЛЕННЫЙ HERO SECTION */}
-      <div className="relative overflow-hidden rounded-3xl bg-card border border-border p-6 sm:p-10 md:p-12 mb-8 sm:mb-12 flex flex-col md:flex-row items-center gap-8 shadow-sm">
+      {/* ИСПРАВЛЕННЫЙ HERO SECTION */}
+      <div className="relative overflow-hidden rounded-3xl bg-card border border-border p-6 sm:p-10 lg:p-12 mb-8 sm:mb-12 flex flex-col lg:flex-row items-center gap-8 lg:gap-12 shadow-sm">
         
-        {/* Инженерная сетка на фоне (Миллиметровка) */}
+        {/* Инженерная сетка на фоне */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
         
-        {/* Неоновые эффекты */}
+        {/* Неоновый блик */}
         <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/20 blur-[80px] rounded-full pointer-events-none"></div>
 
         {/* Текстовая часть */}
-        <div className="relative z-10 flex-1 space-y-4 sm:space-y-6 text-center md:text-left">
-          <div className="inline-flex items-center justify-center md:justify-start gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest border border-primary/20 mx-auto md:mx-0 w-max shadow-sm">
-            <Zap className="w-3.5 h-3.5" /> ВольтПро 3.1
+        <div className="relative z-10 flex-1 space-y-6 text-center lg:text-left w-full">
+          
+          {/* Шильдик без версии */}
+          <div className="inline-flex items-center justify-center lg:justify-start gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest border border-primary/20 mx-auto lg:mx-0 w-max shadow-sm">
+            <Zap className="w-3.5 h-3.5" /> ВольтПро
           </div>
           
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-foreground tracking-tight leading-[1.1]">
-            Электромонтаж <br className="hidden lg:block"/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-600 dark:to-emerald-400 drop-shadow-sm">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-foreground tracking-tight leading-[1.1]">
+            Электромонтаж <br className="hidden sm:block"/>
+            <span className="text-emerald-400 drop-shadow-sm">
               нового уровня
             </span>
           </h1>
           
-          <p className="text-sm sm:text-lg text-muted-foreground max-w-xl mx-auto md:mx-0 leading-relaxed">
+          <p className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed">
             Забудь про рутину. ИИ-сметчик, точные калькуляторы и профессиональная база знаний в твоем кармане.
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-3 sm:gap-4 pt-2">
+          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-2">
             <Link to="/estimator" className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-primary text-primary-foreground font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/25 text-sm">
               <Bot className="w-5 h-5" /> ИИ-сметчик
             </Link>
@@ -46,28 +48,27 @@ function IndexPage() {
           </div>
         </div>
 
-        {/* НОВЫЙ ВИЗУАЛ: Парящая панель ИИ-сметчика */}
-        <div className="hidden md:flex relative z-10 w-full max-w-[320px] items-center justify-center shrink-0 perspective-[1000px]">
-          {/* Стеклянная карточка (Glassmorphism) */}
-          <div className="relative w-full bg-background/80 backdrop-blur-xl border border-border rounded-2xl p-6 shadow-2xl transform md:rotate-y-[-10deg] md:rotate-x-[5deg] hover:rotate-y-0 hover:rotate-x-0 transition-transform duration-700 ease-out">
+        {/* ИСПРАВЛЕННЫЙ ВИЗУАЛ: Карточка без обрезки текста */}
+        <div className="hidden lg:flex relative z-10 w-full max-w-sm shrink-0 items-center justify-center">
+          <div className="w-full bg-background/95 backdrop-blur-md border border-border rounded-2xl p-6 shadow-xl hover:-translate-y-2 transition-transform duration-500">
             
             {/* Шапка карточки */}
-            <div className="flex items-center justify-between mb-6 border-b border-border pb-4">
+            <div className="flex items-center justify-between mb-5 border-b border-border pb-4">
               <div className="flex items-center gap-3">
-                <div className="bg-primary/20 p-2 rounded-lg">
+                <div className="bg-primary/20 p-2 rounded-lg shrink-0">
                   <Bot className="w-5 h-5 text-primary" />
                 </div>
-                <span className="font-bold text-sm text-foreground">Анализ проекта</span>
+                <span className="font-bold text-sm text-foreground truncate">Анализ проекта</span>
               </div>
-              <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+              <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
             </div>
 
-            {/* Тело карточки (имитация проверки ГОСТ/ПУЭ) */}
-            <div className="space-y-4 mb-6">
+            {/* Тело карточки */}
+            <div className="space-y-5 mb-5">
               <div>
-                <div className="flex items-center justify-between text-xs mb-1.5">
-                  <span className="text-muted-foreground">ГОСТ Р 50571.5.52</span>
-                  <span className="font-bold text-foreground animate-pulse">Проверка...</span>
+                <div className="flex items-center justify-between text-xs mb-2 gap-4">
+                  <span className="text-muted-foreground truncate">ГОСТ Р 50571.5.52</span>
+                  <span className="font-bold text-foreground animate-pulse shrink-0">Проверка...</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
                   <div className="bg-primary h-1.5 rounded-full w-2/3 animate-[pulse_2s_ease-in-out_infinite]"></div>
@@ -75,9 +76,9 @@ function IndexPage() {
               </div>
 
               <div>
-                <div className="flex items-center justify-between text-xs mb-1.5">
-                  <span className="text-muted-foreground">Расчет сечения кабеля</span>
-                  <span className="font-bold text-emerald-500">Успешно</span>
+                <div className="flex items-center justify-between text-xs mb-2 gap-4">
+                  <span className="text-muted-foreground truncate">Расчет сечения кабеля</span>
+                  <span className="font-bold text-emerald-500 shrink-0">Успешно</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
                   <div className="bg-emerald-500 h-1.5 rounded-full w-full"></div>
@@ -86,12 +87,12 @@ function IndexPage() {
             </div>
 
             {/* Подвал карточки */}
-            <div className="pt-4 border-t border-border flex items-center justify-between bg-muted/30 -mx-6 -mb-6 p-4 rounded-b-2xl">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                <span className="text-xs font-bold text-foreground">100% ПУЭ</span>
+            <div className="pt-4 border-t border-border flex items-center justify-between bg-muted/20 -mx-6 -mb-6 p-4 rounded-b-2xl">
+              <div className="flex items-center gap-2 truncate pr-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
+                <span className="text-xs font-bold text-foreground truncate">100% ПУЭ</span>
               </div>
-              <span className="text-xs font-bold text-primary">Готово</span>
+              <span className="text-xs font-bold text-primary shrink-0">Готово</span>
             </div>
 
           </div>
