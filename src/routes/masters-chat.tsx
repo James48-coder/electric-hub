@@ -45,11 +45,17 @@ const INITIAL_MESSAGES: Message[] = [
 function MastersChatPage() {
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES)
   const [inputValue, setInputValue] = useState('')
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  // Реф теперь висит на самом контейнере с сообщениями
+  const chatContainerRef = useRef<HTMLDivElement>(null)
 
-  // Автоматический скролл вниз при добавлении нового сообщения
+  // Умный скролл ТОЛЬКО внутри контейнера чата
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      })
+    }
   }
 
   useEffect(() => {
@@ -102,8 +108,11 @@ function MastersChatPage() {
           </p>
         </div>
 
-        {/* ОБЛАСТЬ СООБЩЕНИЙ (СКРОЛЛИТСЯ) */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 bg-muted/5 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full">
+        {/* ОБЛАСТЬ СООБЩЕНИЙ (СКРОЛЛИТСЯ ИЗОЛИРОВАННО) */}
+        <div 
+          ref={chatContainerRef}
+          className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 bg-muted/5 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full"
+        >
           {messages.map((msg) => (
             <div key={msg.id} className={`flex flex-col ${msg.isMe ? 'items-end' : 'items-start'} animate-in slide-in-from-bottom-2 duration-300`}>
               
@@ -144,8 +153,6 @@ function MastersChatPage() {
               </div>
             </div>
           ))}
-          {/* Невидимый элемент для автоскролла в самый низ */}
-          <div ref={messagesEndRef} />
         </div>
 
         {/* ОБЛАСТЬ ВВОДА (ЗАКРЕПЛЕНА ВНИЗУ) */}
