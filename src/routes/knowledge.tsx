@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { Search, Tag, ExternalLink, ChevronRight, FileText, CheckCircle2, Info } from 'lucide-react'
+import { createFileRoute } from '@tanstack/react-router'
+import { Search, FileText, ChevronRight, X } from 'lucide-react'
 import React, { useState } from 'react'
 
 export const Route = createFileRoute('/knowledge')({
@@ -17,7 +17,7 @@ type DocItem = {
   hasTable?: boolean;
 };
 
-// ТА САМАЯ ВОССТАНОВЛЕННАЯ БАЗА ИЗ 16 ДОКУМЕНТОВ
+// ТВОЯ ОРИГИНАЛЬНАЯ БАЗА
 const KNOWLEDGE_DOCS: DocItem[] = [
   {
     id: "pue-7",
@@ -223,6 +223,8 @@ const KNOWLEDGE_CATEGORIES = ["Все", "ПУЭ", "ГОСТ", "СНиП", "Ка�
 function KnowledgePage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState("Все")
+  // Состояние для открытого документа
+  const [selectedDoc, setSelectedDoc] = useState<DocItem | null>(null)
 
   // Фильтрация
   const filteredDocs = KNOWLEDGE_DOCS.filter(doc => {
@@ -232,8 +234,18 @@ function KnowledgePage() {
     return matchesSearch && matchesCategory
   })
 
+  // Блокируем скролл фона, если модалка открыта
+  React.useEffect(() => {
+    if (selectedDoc) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; }
+  }, [selectedDoc]);
+
   return (
-    <div className="container mx-auto max-w-5xl animate-in fade-in duration-500 pb-24">
+    <div className="container mx-auto max-w-5xl animate-in fade-in duration-500 pb-24 relative">
       
       {/* Шапка */}
       <div className="mb-6 sm:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -313,14 +325,14 @@ function KnowledgePage() {
                 {doc.subtitle}
               </p>
 
-              {/* Кнопка "Читать" */}
-              <Link 
-                to="/" 
+              {/* Кнопка "Читать" теперь открывает модалку */}
+              <button 
+                onClick={() => setSelectedDoc(doc)}
                 className="mt-auto flex items-center justify-between w-full bg-background border border-border rounded-xl p-3 sm:p-4 text-sm font-bold text-foreground hover:bg-primary/5 hover:border-primary/50 transition-colors group/btn"
               >
                 <span>Изучить норматив</span>
                 <ChevronRight className="w-4 h-4 text-muted-foreground group-hover/btn:text-primary transition-transform group-hover/btn:translate-x-1" />
-              </Link>
+              </button>
             </div>
           ))}
         </div>
@@ -340,6 +352,61 @@ function KnowledgePage() {
           >
             Сбросить фильтры
           </button>
+        </div>
+      )}
+
+      {/* МОДАЛЬНОЕ ОКНО ДЛЯ ЧТЕНИЯ ДОКУМЕНТА */}
+      {selectedDoc && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in"
+          onClick={() => setSelectedDoc(null)} // Закрытие при клике на фон
+        >
+          <div 
+            className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95"
+            onClick={(e) => e.stopPropagation()} // Чтобы окно не закрывалось при клике внутри него
+          >
+            {/* Шапка модалки */}
+            <div className="flex items-start justify-between p-5 sm:p-6 border-b border-border bg-muted/20">
+              <div className="pr-4">
+                <span className="bg-primary/10 text-primary text-[10px] sm:text-xs font-black uppercase tracking-wider px-2 py-1 rounded-md mb-3 inline-block">
+                  {selectedDoc.category}
+                </span>
+                <h2 className="text-xl sm:text-2xl font-black text-foreground leading-tight">
+                  {selectedDoc.title}
+                </h2>
+              </div>
+              <button 
+                onClick={() => setSelectedDoc(null)}
+                className="p-2 -mr-2 -mt-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-colors shrink-0"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Тело модалки */}
+            <div className="p-5 sm:p-6 overflow-y-auto space-y-4 bg-card">
+              <p className="text-sm sm:text-base font-bold text-foreground border-l-4 border-primary pl-4 py-1 mb-6">
+                {selectedDoc.subtitle}
+              </p>
+              
+              <div className="space-y-4">
+                {selectedDoc.content.map((paragraph, index) => (
+                  <p key={index} className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+
+              {selectedDoc.hasTable && (
+                <div className="mt-6 p-4 bg-blue-500/5 border border-blue-500/20 rounded-xl flex items-start gap-3">
+                  <FileText className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
+                  <p className="text-sm text-blue-500/80">
+                    К этому нормативу привязана таблица. В текущей MVP версии графики и таблицы находятся в процессе интеграции.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
