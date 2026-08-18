@@ -1,112 +1,181 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Users, Send, ShieldAlert, AlertTriangle } from 'lucide-react'
+import { Send, Shield, AlertTriangle, Users, Info } from 'lucide-react'
 import React, { useState, useRef, useEffect } from 'react'
 
 export const Route = createFileRoute('/masters-chat')({
   component: MastersChatPage,
 })
 
+// Типизация сообщения
+type Message = {
+  id: string;
+  author: string;
+  isMe: boolean;
+  time: string;
+  text: string;
+  isLinkModerated?: boolean;
+}
+
+// Стартовые (моковые) сообщения из твоего дизайна
+const INITIAL_MESSAGES: Message[] = [
+  {
+    id: '1',
+    author: 'Игорь_Электро',
+    isMe: false,
+    time: '12:30',
+    text: 'Мужики, кто как сейчас делает проходки в деревянном срубе? Гофра или только стальная труба по хардкору?',
+  },
+  {
+    id: '2',
+    author: 'Вы',
+    isMe: true,
+    time: '12:35',
+    text: 'Для деревяшки по ПУЭ вообще лучше металлические трубы, но если чисто про соединения — сварка всегда надежнее. Скрытую проводку в дереве без локализационной трубы технадзор завернет 100%.',
+  },
+  {
+    id: '3',
+    author: 'Алексей_99',
+    isMe: false,
+    time: '14:10',
+    text: 'Посмотри вот эти трубы, мы такие брали на прошлом объекте, очень удобные для гибки:',
+    isLinkModerated: true, // Флаг для отображения плашки модерации
+  }
+]
+
 function MastersChatPage() {
-  const [message, setMessage] = useState('')
-  // Стейт сообщений
-  const [messages, setMessages] = useState([
-    { id: 1, author: 'Иван (Монтажник)', time: '14:02', text: 'Мужики, кто какие клеммники использует для освещения в деревянном доме? Wago 221 или лучше скрутка со сваркой?', isMine: false, isSystem: false },
-    { id: 2, author: 'Вы', time: '14:05', text: 'Для деревяшки по ПУЭ вообще лучше металлические трубы, но если чисто про соединения — сварка всегда надежнее.', isMine: true, isSystem: false },
-    { id: 3, author: 'Алексей_99', time: '14:10', text: 'Посмотри вот эти трубы, мы такие брали:', isMine: false, isSystem: true }, // Ссылка заблокирована
-  ])
+  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES)
+  const [inputValue, setInputValue] = useState('')
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const scrollRef = useRef<HTMLDivElement>(null)
+  // Автоматический скролл вниз при добавлении нового сообщения
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
 
-  // Прокрутка вниз при новом сообщении
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-    }
+    scrollToBottom()
   }, [messages])
 
-  const handleSend = (e?: React.FormEvent) => {
-    if (e) e.preventDefault()
-    if (!message.trim()) return
+  // Функция отправки сообщения
+  const handleSendMessage = (e?: React.FormEvent) => {
+    e?.preventDefault()
+    
+    if (!inputValue.trim()) return
 
-    const now = new Date()
-    const timeString = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`
-
-    // Простая проверка на наличие "http" или "www" (зачаток модерации)
-    const hasLink = /(http|www|\.ru|\.com)/i.test(message)
-
-    setMessages([...messages, {
-      id: Date.now(),
+    const newMessage: Message = {
+      id: Date.now().toString(),
       author: 'Вы',
-      time: timeString,
-      text: message,
-      isMine: true,
-      isSystem: hasLink 
-    }])
-    setMessage('')
+      isMe: true,
+      time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
+      text: inputValue.trim(),
+      // Простейшая симуляция проверки на ссылки (если есть http или .ru)
+      isLinkModerated: /(http|\.ru|\.com)/i.test(inputValue)
+    }
+
+    setMessages(prev => [...prev, newMessage])
+    setInputValue('')
   }
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 max-w-4xl animate-in fade-in duration-500 text-foreground h-[calc(100vh-4rem)] flex flex-col">
+    <div className="container mx-auto max-w-5xl animate-in fade-in duration-500 pb-24">
       
-      <div className="mb-4 sm:mb-6 flex-shrink-0">
-        <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-3">
-          Чат мастеров
-          <span className="bg-green-500/10 text-green-500 text-[10px] sm:text-xs px-2 py-1 rounded-full font-bold flex items-center gap-1.5 border border-green-500/20">
-            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full animate-pulse"></div> 142 онлайн
-          </span>
-        </h1>
-        <p className="text-xs sm:text-sm text-muted-foreground mt-1">Общение, советы по монтажу и обмен опытом.</p>
+      {/* ШАПКА ЧАТА */}
+      <div className="mb-6 sm:mb-8">
+        <div className="flex items-center gap-4 mb-2">
+          <h1 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight">Чат мастеров</h1>
+          <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 shrink-0">
+            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+            142 онлайн
+          </div>
+        </div>
+        <p className="text-sm sm:text-base text-muted-foreground">Общение, советы по монтажу и обмен опытом.</p>
       </div>
 
-      <div className="flex-1 flex flex-col bg-card border border-border rounded-2xl overflow-hidden shadow-sm min-h-0">
+      {/* ГЛАВНЫЙ КОНТЕЙНЕР ЧАТА */}
+      <div className="bg-card border border-border rounded-2xl shadow-sm flex flex-col h-[600px] overflow-hidden relative">
         
-        {/* Инфо-плашка безопасности */}
-        <div className="bg-primary/10 border-b border-primary/20 p-2 sm:p-3 flex items-start sm:items-center gap-2 sm:gap-3 flex-shrink-0">
-          <ShieldAlert className="h-4 w-4 sm:h-5 sm:w-5 text-primary shrink-0 mt-0.5 sm:mt-0" />
-          <p className="text-[10px] sm:text-xs text-primary font-medium leading-tight">
+        {/* ИНФО-ПАНЕЛЬ СВЕРХУ */}
+        <div className="bg-background/80 backdrop-blur-sm border-b border-border p-3 flex items-start sm:items-center gap-3 shrink-0 z-10">
+          <Shield className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5 sm:mt-0" />
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
             Любые ссылки скрываются автоматически и публикуются только после ручной модерации для защиты от спама.
           </p>
         </div>
 
-        {/* Область сообщений */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6 scroll-smooth">
+        {/* ОБЛАСТЬ СООБЩЕНИЙ (СКРОЛЛИТСЯ) */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 bg-muted/5 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full">
           {messages.map((msg) => (
-            <div key={msg.id} className={`flex flex-col max-w-[85%] sm:max-w-[75%] ${msg.isMine ? 'items-end self-end ml-auto' : 'items-start'}`}>
-              <span className={`text-[10px] sm:text-xs text-muted-foreground mb-1 font-medium ${msg.isMine ? 'mr-1' : 'ml-1'}`}>
-                {msg.author} • {msg.time}
-              </span>
+            <div key={msg.id} className={`flex flex-col ${msg.isMe ? 'items-end' : 'items-start'} animate-in slide-in-from-bottom-2 duration-300`}>
               
-              <div className={`p-3 sm:p-4 rounded-2xl text-sm shadow-sm border 
-                ${msg.isMine ? 'bg-primary text-primary-foreground rounded-tr-sm border-transparent' : 'bg-muted text-foreground rounded-tl-sm border-border'}`}
-              >
-                <div className="whitespace-pre-wrap">{msg.text}</div>
+              {/* Имя и время (только для чужих сообщений) */}
+              {!msg.isMe && (
+                <div className="flex items-center gap-2 mb-1.5 ml-1">
+                  <span className="text-xs font-bold text-foreground">{msg.author}</span>
+                  <span className="text-[10px] text-muted-foreground">• {msg.time}</span>
+                </div>
+              )}
+
+              {/* Само сообщение (Баббл) */}
+              <div className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-4 shadow-sm ${
+                msg.isMe 
+                  ? 'bg-primary text-primary-foreground rounded-tr-sm' 
+                  : 'bg-background border border-border text-foreground rounded-tl-sm'
+              }`}>
+                <p className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap break-words">
+                  {msg.text}
+                </p>
+
+                {/* Плашка модерации ссылки */}
+                {msg.isLinkModerated && (
+                  <div className={`mt-3 flex items-center gap-2 p-2.5 rounded-lg text-xs font-bold ${
+                    msg.isMe ? 'bg-black/20 text-white/90' : 'bg-orange-500/10 border border-orange-500/20 text-orange-500'
+                  }`}>
+                    <AlertTriangle className="w-4 h-4 shrink-0" />
+                    Ссылка отправлена на модерацию
+                  </div>
+                )}
                 
-                {/* Блок заблокированной ссылки */}
-                {msg.isSystem && (
-                  <span className={`inline-flex items-center gap-1.5 mt-2 px-2 py-1 rounded text-[10px] sm:text-xs italic border ${msg.isMine ? 'bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground/80' : 'bg-background border-border text-muted-foreground'}`}>
-                    <AlertTriangle className={`h-3 w-3 ${msg.isMine ? 'text-primary-foreground/80' : 'text-amber-500'}`} /> Ссылка отправлена на модерацию
-                  </span>
+                {/* Время для своих сообщений внутри баббла */}
+                {msg.isMe && (
+                  <div className="text-right mt-1 opacity-70 text-[10px]">
+                    {msg.time}
+                  </div>
                 )}
               </div>
             </div>
           ))}
+          {/* Невидимый элемент для автоскролла в самый низ */}
+          <div ref={messagesEndRef} />
         </div>
 
-        {/* Поле ввода (Обернуто в form для срабатывания по Enter) */}
-        <form onSubmit={handleSend} className="p-3 sm:p-4 bg-background border-t border-border flex-shrink-0">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
+        {/* ОБЛАСТЬ ВВОДА (ЗАКРЕПЛЕНА ВНИЗУ) */}
+        <div className="bg-background border-t border-border p-4 shrink-0">
+          <form onSubmit={handleSendMessage} className="relative flex items-end gap-2">
+            <textarea
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
               placeholder="Написать сообщение... (ссылки будут скрыты)"
-              className="flex-1 bg-muted border border-border rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
+              className="w-full bg-card border border-border rounded-xl pl-4 pr-12 py-3.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all resize-none min-h-[52px] max-h-[120px] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-border"
+              rows={1}
             />
-            <button type="submit" disabled={!message.trim()} className="bg-primary text-primary-foreground h-10 w-10 sm:h-12 sm:w-12 rounded-xl flex items-center justify-center hover:bg-primary/90 transition-colors shrink-0 shadow-sm disabled:opacity-50">
-              <Send className="h-4 w-4 sm:h-5 sm:w-5 ml-1" />
+            <button 
+              type="submit"
+              disabled={!inputValue.trim()}
+              className="absolute right-2 bottom-2 p-2 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground rounded-lg transition-colors disabled:opacity-50 disabled:hover:bg-primary/10 disabled:hover:text-primary"
+            >
+              <Send className="w-5 h-5" />
             </button>
-          </div>
-        </form>
+          </form>
+          <p className="text-[10px] text-muted-foreground text-center mt-2">
+            Нажмите Enter для отправки. Shift + Enter для переноса строки.
+          </p>
+        </div>
 
       </div>
     </div>
