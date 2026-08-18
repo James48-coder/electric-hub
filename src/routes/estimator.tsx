@@ -137,9 +137,9 @@ function EstimatorPage() {
             <button 
               type="button"
               onClick={() => setCustomPrices(!customPrices)}
-              className={`w-11 h-6 rounded-full transition-colors relative ${customPrices ? 'bg-primary' : 'bg-muted'}`}
+              className={`w-11 h-6 rounded-full transition-colors relative border ${customPrices ? 'bg-primary border-primary' : 'bg-muted border-border'}`}
             >
-              <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${customPrices ? 'translate-x-5' : 'translate-x-0'}`}></div>
+              <div className={`absolute top-[3px] left-[3px] bg-white w-4 h-4 rounded-full shadow-sm transition-transform ${customPrices ? 'translate-x-5' : 'translate-x-0'}`}></div>
             </button>
           </div>
         </div>
