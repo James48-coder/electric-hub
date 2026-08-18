@@ -1,12 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Search, FileText, ChevronRight, X } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 export const Route = createFileRoute('/knowledge')({
   component: KnowledgePage,
 })
 
-// Типизация документа
+// Обновленная типизация с поддержкой табличных данных
+type TableRow = string[];
+type TableData = {
+  headers: string[];
+  rows: TableRow[];
+};
+
 type DocItem = {
   id: string;
   title: string;
@@ -15,9 +21,10 @@ type DocItem = {
   tags: string[];
   content: string[];
   hasTable?: boolean;
+  tableData?: TableData; // Новое поле для реальных таблиц
 };
 
-// ТВОЯ ОРИГИНАЛЬНАЯ БАЗА
+// БАЗА ДАННЫХ С РЕАЛЬНЫМИ ТАБЛИЦАМИ
 const KNOWLEDGE_DOCS: DocItem[] = [
   {
     id: "pue-7",
@@ -66,12 +73,17 @@ const KNOWLEDGE_DOCS: DocItem[] = [
     tags: ["ПУЭ", "Заземление"],
     hasTable: true,
     content: [
-      "Системы заземления электроустановок зданий по классификации ГОСТ Р 50571.1:",
-      "• TN-C — совмещенный нулевой защитный и рабочий проводник (PEN) на всем протяжении. Устаревшая система.",
-      "• TN-S — раздельные защитный (PE) и рабочий (N) проводники от самого источника питания.",
-      "• TN-C-S — разделение PEN-проводника на PE и N на вводе в здание (самый частый вариант в частном секторе и МКД при реконструкции).",
-      "• TT — глухозаземленная нейтраль источника, а открытые проводящие части заземлены через независимый местный контур (обязательно применение УЗО)."
-    ]
+      "Системы заземления электроустановок зданий по классификации ГОСТ Р 50571.1:"
+    ],
+    tableData: {
+      headers: ["Система", "Проводники", "Применение", "Особенности"],
+      rows: [
+        ["TN-C", "PEN (совмещен)", "Старый фонд", "Небезопасна, УЗО не работает корректно."],
+        ["TN-S", "PE и N (раздельно)", "Новые здания", "Самая безопасная, дорогой 5-жильный кабель."],
+        ["TN-C-S", "PEN разделяется", "Частный сектор, МКД", "Оптимальна при реконструкции сетей."],
+        ["TT", "PE независим", "Бытовки, дачи", "Обязательное применение УЗО на всех линиях."]
+      ]
+    }
   },
   {
     id: "gost-50571",
@@ -116,11 +128,17 @@ const KNOWLEDGE_DOCS: DocItem[] = [
     tags: ["ГОСТ", "Кабельные линии"],
     hasTable: true,
     content: [
-      "Цветовая гамма проводов и кабелей в электроустановках переменного тока согласно стандарту:",
-      "• Фазные проводники (L): коричневый, черный, серый, белый.",
-      "• Нейтральный рабочий проводник (N): голубой / синий.",
-      "• Защитный проводник (PE / заземление): желто-зеленый."
-    ]
+      "Цветовая гамма проводов и кабелей в электроустановках переменного тока согласно стандарту:"
+    ],
+    tableData: {
+      headers: ["Назначение", "Обозначение", "Цвет изоляции"],
+      rows: [
+        ["Фазный проводник", "L", "Коричневый, черный, серый, белый"],
+        ["Нейтральный (рабочий ноль)", "N", "Голубой / синий"],
+        ["Защитный проводник", "PE", "Желто-зеленый (полосатый)"],
+        ["Совмещенный нулевой", "PEN", "Желто-зеленый с синими метками на концах"]
+      ]
+    }
   },
   {
     id: "uzo-diff",
@@ -133,7 +151,15 @@ const KNOWLEDGE_DOCS: DocItem[] = [
       "Устройство защитного отключения (УЗО) отключает сеть при утечке тока на землю (повреждение изоляции, прикосновение человека к фазе).",
       "Правило выбора по току: номинал УЗО должен быть на ступень выше номинала защитного автомата (автомат 16А — УЗО 25А).",
       "Ниже приведена шпаргалка по выбору токов утечки для разных зон:"
-    ]
+    ],
+    tableData: {
+      headers: ["Ток утечки (мА)", "Назначение", "Зона применения"],
+      rows: [
+        ["10 мА", "Сверхчувствительное", "Влажные зоны: стиральные машины, джакузи, бойлеры."],
+        ["30 мА", "Стандартная защита", "Розеточные группы, освещение, общая защита квартир."],
+        ["100 - 300 мА", "Противопожарное", "Ввод в дом (на вводе в щит). Не защищает человека!"]
+      ]
+    }
   },
   {
     id: "co-153",
@@ -177,8 +203,18 @@ const KNOWLEDGE_DOCS: DocItem[] = [
     hasTable: true,
     content: [
       "Устанавливает детальные требования к выбору и монтажу электропроводок в зависимости от внешних воздействий и условий окружающей среды.",
-      "Ниже приведена таблица допустимых длительных токов для медных кабелей (например, ВВГнг-LS) в зависимости от сечения и способа прокладки:"
-    ]
+      "Ниже приведена таблица допустимых длительных токов для медных кабелей (ВВГнг-LS) при скрытой прокладке в стене:"
+    ],
+    tableData: {
+      headers: ["Сечение (мм²)", "Допустимый ток (А)", "Мощность 220В (кВт)", "Автомат (А)"],
+      rows: [
+        ["1.5", "15", "3.3", "10 - 13"],
+        ["2.5", "21", "4.6", "16"],
+        ["4.0", "27", "5.9", "25"],
+        ["6.0", "34", "7.4", "32"],
+        ["10.0", "46", "10.1", "40"]
+      ]
+    }
   },
   {
     id: "gost-32144",
@@ -188,9 +224,15 @@ const KNOWLEDGE_DOCS: DocItem[] = [
     tags: ["ГОСТ"],
     hasTable: true,
     content: [
-      "Определяет показатели и установленные нормы качества электроэнергии в сетях переменного тока частотой 50 Гц.",
-      "Регламентирует допустимые отклонения напряжения: в нормальном режиме работы отклонение напряжения в точке присоединения потребителя не должно превышать ±10% от номинального значения."
-    ]
+      "Определяет показатели и установленные нормы качества электроэнергии в сетях переменного тока частотой 50 Гц."
+    ],
+    tableData: {
+      headers: ["Параметр", "Номинал", "Допустимое откл.", "Предельное откл."],
+      rows: [
+        ["Напряжение фазное (В)", "230 В", "±10% (207 - 253 В)", "±10% (207 - 253 В)"],
+        ["Частота (Гц)", "50 Гц", "±0.2 Гц", "±0.4 Гц"]
+      ]
+    }
   },
   {
     id: "potee",
@@ -201,9 +243,18 @@ const KNOWLEDGE_DOCS: DocItem[] = [
     hasTable: true,
     content: [
       "Обязательный нормативный документ по технике безопасности для всех специалистов, выполняющих работы в электроустановках.",
-      "Регламентирует порядок организации и безопасного выполнения работ, требования к оформлению нарядов-допусков, распоряжений, а также квалификационные группы по электробезопасности.",
-      "Ниже представлена шпаргалка по группам электробезопасности:"
-    ]
+      "Регламентирует порядок организации и безопасного выполнения работ, требования к оформлению нарядов-допусков, распоряжений, а также квалификационные группы по электробезопасности."
+    ],
+    tableData: {
+      headers: ["Группа", "Требования", "Кто получает"],
+      rows: [
+        ["I", "Инструктаж", "Неэлектротехнический персонал (офис-менеджеры, уборщики)."],
+        ["II", "Базовые знания, 72ч обучения", "Электросварщики, машинисты (работающие с электроинструментом)."],
+        ["III", "Право самостоятельной работы", "Электромонтеры до 1000В. Могут единолично осматривать установки."],
+        ["IV", "Опыт работы, знание схем", "Мастера, производители работ, ответственные за электрохозяйство до 1000В."],
+        ["V", "Знание схем любой сложности", "Инженеры и мастера в установках выше 1000В (подстанции, ЛЭП)."]
+      ]
+    }
   },
   {
     id: "cable-joints",
@@ -223,10 +274,8 @@ const KNOWLEDGE_CATEGORIES = ["Все", "ПУЭ", "ГОСТ", "СНиП", "Ка�
 function KnowledgePage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState("Все")
-  // Состояние для открытого документа
   const [selectedDoc, setSelectedDoc] = useState<DocItem | null>(null)
 
-  // Фильтрация
   const filteredDocs = KNOWLEDGE_DOCS.filter(doc => {
     const matchesSearch = doc.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           doc.subtitle.toLowerCase().includes(searchQuery.toLowerCase())
@@ -234,8 +283,8 @@ function KnowledgePage() {
     return matchesSearch && matchesCategory
   })
 
-  // Блокируем скролл фона, если модалка открыта
-  React.useEffect(() => {
+  // Блокировка скролла фона
+  useEffect(() => {
     if (selectedDoc) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -263,8 +312,6 @@ function KnowledgePage() {
 
       {/* Поиск и фильтры */}
       <div className="space-y-4 mb-8 sticky top-0 z-10 bg-background/80 backdrop-blur-xl py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
-        
-        {/* Поисковая строка */}
         <div className="relative group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <input
@@ -276,7 +323,6 @@ function KnowledgePage() {
           />
         </div>
 
-        {/* Категории (скролл на мобилках) */}
         <div className="flex gap-2 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden w-full">
           {KNOWLEDGE_CATEGORIES.map(category => (
             <button
@@ -303,7 +349,6 @@ function KnowledgePage() {
               className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md hover:border-primary/50 transition-all flex flex-col h-full group"
               style={{ animationDelay: `${idx * 50}ms` }}
             >
-              {/* Шапка карточки */}
               <div className="flex items-start justify-between mb-4 gap-4">
                 <div className="flex flex-wrap gap-2">
                   <span className="bg-primary/10 text-primary text-[10px] sm:text-xs font-black uppercase tracking-wider px-2 py-1 rounded-md">
@@ -317,7 +362,6 @@ function KnowledgePage() {
                 </div>
               </div>
 
-              {/* Название и суть */}
               <h3 className="text-lg sm:text-xl font-black text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
                 {doc.title}
               </h3>
@@ -325,7 +369,6 @@ function KnowledgePage() {
                 {doc.subtitle}
               </p>
 
-              {/* Кнопка "Читать" теперь открывает модалку */}
               <button 
                 onClick={() => setSelectedDoc(doc)}
                 className="mt-auto flex items-center justify-between w-full bg-background border border-border rounded-xl p-3 sm:p-4 text-sm font-bold text-foreground hover:bg-primary/5 hover:border-primary/50 transition-colors group/btn"
@@ -337,7 +380,6 @@ function KnowledgePage() {
           ))}
         </div>
       ) : (
-        /* Состояние: Ничего не найдено */
         <div className="bg-card border border-border rounded-2xl p-12 flex flex-col items-center text-center shadow-sm">
           <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
             <Search className="w-8 h-8 text-muted-foreground" />
@@ -355,18 +397,18 @@ function KnowledgePage() {
         </div>
       )}
 
-      {/* МОДАЛЬНОЕ ОКНО ДЛЯ ЧТЕНИЯ ДОКУМЕНТА */}
+      {/* МОДАЛЬНОЕ ОКНО */}
       {selectedDoc && (
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in"
-          onClick={() => setSelectedDoc(null)} // Закрытие при клике на фон
+          onClick={() => setSelectedDoc(null)}
         >
           <div 
             className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95"
-            onClick={(e) => e.stopPropagation()} // Чтобы окно не закрывалось при клике внутри него
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Шапка модалки */}
-            <div className="flex items-start justify-between p-5 sm:p-6 border-b border-border bg-muted/20">
+            <div className="flex items-start justify-between p-5 sm:p-6 border-b border-border bg-muted/20 shrink-0">
               <div className="pr-4">
                 <span className="bg-primary/10 text-primary text-[10px] sm:text-xs font-black uppercase tracking-wider px-2 py-1 rounded-md mb-3 inline-block">
                   {selectedDoc.category}
@@ -389,7 +431,7 @@ function KnowledgePage() {
                 {selectedDoc.subtitle}
               </p>
               
-              <div className="space-y-4">
+              <div className="space-y-4 mb-6">
                 {selectedDoc.content.map((paragraph, index) => (
                   <p key={index} className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                     {paragraph}
@@ -397,12 +439,34 @@ function KnowledgePage() {
                 ))}
               </div>
 
-              {selectedDoc.hasTable && (
-                <div className="mt-6 p-4 bg-blue-500/5 border border-blue-500/20 rounded-xl flex items-start gap-3">
-                  <FileText className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
-                  <p className="text-sm text-blue-500/80">
-                    К этому нормативу привязана таблица. В текущей MVP версии графики и таблицы находятся в процессе интеграции.
-                  </p>
+              {/* РЕАЛЬНАЯ ТАБЛИЦА */}
+              {selectedDoc.tableData && (
+                <div className="mt-6 border border-border rounded-xl overflow-hidden bg-background">
+                  {/* Горизонтальный скролл для мобилок */}
+                  <div className="overflow-x-auto [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full">
+                    <table className="w-full text-left border-collapse min-w-[500px]">
+                      <thead>
+                        <tr className="bg-primary/10">
+                          {selectedDoc.tableData.headers.map((header, idx) => (
+                            <th key={idx} className="p-3 text-xs sm:text-sm font-black text-primary border-b border-border/50 uppercase tracking-wider whitespace-nowrap">
+                              {header}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedDoc.tableData.rows.map((row, rowIdx) => (
+                          <tr key={rowIdx} className="hover:bg-muted/30 transition-colors border-b border-border/50 last:border-0">
+                            {row.map((cell, cellIdx) => (
+                              <td key={cellIdx} className={`p-3 text-sm sm:text-base ${cellIdx === 0 ? 'font-bold text-foreground' : 'text-muted-foreground'}`}>
+                                {cell}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </div>
