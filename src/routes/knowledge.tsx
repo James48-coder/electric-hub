@@ -513,7 +513,6 @@ function KnowledgePage() {
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in"
           onClick={() => setSelectedDoc(null)}
         >
-          {/* ЗДЕСЬ УВЕЛИЧЕНА ШИРИНА ОКНА ДЛЯ ДЕСКТОПА: lg:max-w-5xl md:max-w-4xl */}
           <div 
             className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-2xl md:max-w-4xl lg:max-w-5xl max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95"
             onClick={(e) => e.stopPropagation()}
@@ -591,7 +590,6 @@ function KnowledgePage() {
                         {selectedDoc.tableData.rows.map((row, rowIdx) => (
                           <tr key={rowIdx} className="hover:bg-muted/30 transition-colors border-b border-border/50 last:border-0">
                             {row.map((cell, cellIdx) => (
-                              {/* ДОБАВЛЕНО ВЫРАВНИВАНИЕ ПО ВЕРХУ align-top */}
                               <td key={cellIdx} className={`p-4 text-sm align-top ${cellIdx === 0 ? 'font-bold text-foreground' : 'text-muted-foreground'}`}>
                                 {cell}
                               </td>
