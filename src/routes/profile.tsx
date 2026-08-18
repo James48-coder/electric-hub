@@ -10,7 +10,6 @@ export const Route = createFileRoute('/profile')({
 type TariffType = 'free' | 'master' | 'pro'
 
 function ProfilePage() {
-  // Для тестирования интерфейса делаем переключатель тарифов
   const [currentTariff, setCurrentTariff] = useState<TariffType>('pro')
 
   // Моковые данные пользователя
@@ -109,7 +108,6 @@ function ProfilePage() {
           {/* Главная карточка тарифа */}
           <div className={`border rounded-2xl p-6 sm:p-8 shadow-sm relative overflow-hidden transition-colors ${
             currentTariff === 'pro' ? 'bg-primary/5 border-primary/30' : 
-            currentTariff === 'master' ? 'bg-card border-border' : 
             'bg-card border-border'
           }`}>
             
@@ -151,27 +149,32 @@ function ProfilePage() {
               </div>
             )}
 
-            {/* Список фич */}
+            {/* НАКОПИТЕЛЬНЫЙ СПИСОК ФИЧ */}
             <div className="space-y-3 mb-8">
               {currentTariff === 'free' && (
                 <>
                   <FeatureItem text="Все инженерные калькуляторы и схемы" active={true} />
                   <FeatureItem text="Доступ к актуальной Базе знаний" active={true} />
-                  <FeatureItem text="ИИ-сметчик (составление смет по ПУЭ)" active={false} />
-                  <FeatureItem text="Экспорт смет в PDF и сохранение истории" active={false} />
-                </>
-              )}
-              {currentTariff === 'master' && (
-                <>
-                  <FeatureItem text="20 генераций смет через ИИ в месяц" active={true} />
-                  <FeatureItem text="Все инженерные калькуляторы и схемы" active={true} />
+                  <FeatureItem text="Составление смет через ИИ-сметчик" active={false} />
                   <FeatureItem text="Экспорт смет в PDF и история объектов" active={false} />
                 </>
               )}
+              
+              {currentTariff === 'master' && (
+                <>
+                  <FeatureItem text="Все инженерные калькуляторы и База знаний" active={true} />
+                  <FeatureItem text="20 генераций смет через ИИ в месяц" active={true} highlight={true} />
+                  <FeatureItem text="Сохранение черновиков смет в браузере" active={true} />
+                  <FeatureItem text="Экспорт профессиональных смет в PDF" active={false} />
+                  <FeatureItem text="История объектов и облачное сохранение" active={false} />
+                </>
+              )}
+              
               {currentTariff === 'pro' && (
                 <>
+                  <FeatureItem text="Все базовые функции, калькуляторы и База знаний" active={true} />
                   <FeatureItem text="Безлимитный доступ к ИИ-сметчику" active={true} highlight={true} />
-                  <FeatureItem text="Экспорт профессиональных смет в PDF" active={true} />
+                  <FeatureItem text="Экспорт профессиональных смет в PDF" active={true} highlight={true} />
                   <FeatureItem text="История объектов и облачное сохранение" active={true} />
                   <FeatureItem text="Приоритетная поддержка" active={true} />
                 </>
@@ -182,7 +185,7 @@ function ProfilePage() {
             <div className="flex flex-col sm:flex-row gap-3">
               {currentTariff === 'free' && (
                 <button className="flex-1 bg-primary text-primary-foreground px-6 py-3.5 rounded-xl text-sm font-bold shadow-sm hover:opacity-90 transition-opacity">
-                  Выбрать тариф
+                  Улучшить тариф
                 </button>
               )}
               {currentTariff === 'master' && (
@@ -236,7 +239,6 @@ function ProfilePage() {
   )
 }
 
-// Компонент для списка фич
 function FeatureItem({ text, active, highlight = false }: { text: string, active: boolean, highlight?: boolean }) {
   return (
     <div className={`flex items-center gap-3 ${active ? 'opacity-100' : 'opacity-40 grayscale'}`}>
