@@ -1,129 +1,130 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Zap, Shield, Clock, Calculator, Network, MessageSquare, ArrowRight } from "lucide-react";
-import { SpotlightCard } from "@/components/spotlight-card";
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { Zap, ShieldCheck, Timer, Calculator, Waypoints, MessageSquare, ArrowRight, Bot } from 'lucide-react'
+import React from 'react'
 
-export const Route = createFileRoute("/")({
-  component: HomePage,
-});
+export const Route = createFileRoute('/')({
+  component: IndexPage,
+})
 
-export function HomePage() {
+function IndexPage() {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8 text-foreground">
+    <div className="animate-in fade-in duration-500 pb-24">
       
-      {/* Верхний блок статистики (Обернут в Spotlight) */}
-      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
-        <SpotlightCard className="p-4 sm:p-6">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-xl bg-primary/10 text-primary shrink-0">
-              <Zap className="h-5 w-5 sm:h-6 sm:w-6" />
-            </div>
-            <div>
-              <div className="text-xl sm:text-2xl font-bold">1240+</div>
-              <div className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">расчётов в день</div>
-            </div>
-          </div>
-        </SpotlightCard>
-
-        <SpotlightCard className="p-4 sm:p-6">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-xl bg-primary/10 text-primary shrink-0">
-              <Shield className="h-5 w-5 sm:h-6 sm:w-6" />
-            </div>
-            <div>
-              <div className="text-xl sm:text-2xl font-bold">100%</div>
-              <div className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">соответствие ПУЭ</div>
-            </div>
-          </div>
-        </SpotlightCard>
-
-        <SpotlightCard className="p-4 sm:p-6">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-xl bg-primary/10 text-primary shrink-0">
-              <Clock className="h-5 w-5 sm:h-6 sm:w-6" />
-            </div>
-            <div>
-              <div className="text-xl sm:text-2xl font-bold">&lt; 8 сек</div>
-              <div className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">среднее время</div>
-            </div>
-          </div>
-        </SpotlightCard>
-      </div>
-
-      <header className="space-y-1 sm:space-y-2 pt-2 sm:pt-4">
-        <h2 className="text-xl sm:text-2xl font-bold tracking-tight">Быстрые инструменты</h2>
-        <p className="text-xs sm:text-sm text-muted-foreground">Открывайте нужное в один клик.</p>
-      </header>
-
-      {/* Карточки быстрых инструментов (Обернуты в Spotlight) */}
-      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      {/* HERO SECTION С НЕОНОВОЙ ПОДСВЕТКОЙ (Вариант 2) */}
+      <div className="relative overflow-hidden rounded-3xl bg-card border border-border p-6 sm:p-10 md:p-12 mb-8 sm:mb-12 flex flex-col md:flex-row items-center gap-8 shadow-sm">
         
-        <SpotlightCard>
-          <Link
-            to="/calculators"
-            className="group flex h-full flex-col justify-between p-4 sm:p-6 outline-none"
-          >
-            <div className="space-y-3 sm:space-y-4">
-              <div className="grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/20 shrink-0">
-                <Calculator className="h-5 w-5 sm:h-6 sm:w-6" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-base sm:text-lg font-bold text-foreground">Калькуляторы</h3>
-                <p className="text-[10px] sm:text-xs leading-relaxed text-muted-foreground">
-                  Сечение кабеля, падение напряжения, защита, заземление.
-                </p>
-              </div>
-            </div>
-            <div className="mt-4 sm:mt-6 flex items-center border-t border-border pt-3 sm:pt-4 text-xs sm:text-sm font-semibold text-primary transition-transform group-hover:translate-x-1">
-              Открыть <ArrowRight className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
-            </div>
-          </Link>
-        </SpotlightCard>
+        {/* Неоновые эффекты на фоне (CSS-blur) */}
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/30 blur-[100px] rounded-full pointer-events-none"></div>
+        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-emerald-500/10 blur-[80px] rounded-full pointer-events-none"></div>
 
-        <SpotlightCard>
-          <Link
-            to="/schemes"
-            className="group flex h-full flex-col justify-between p-4 sm:p-6 outline-none"
-          >
-            <div className="space-y-3 sm:space-y-4">
-              <div className="grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/20 shrink-0">
-                <Network className="h-5 w-5 sm:h-6 sm:w-6" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-base sm:text-lg font-bold text-foreground">Описание схем</h3>
-                <p className="text-[10px] sm:text-xs leading-relaxed text-muted-foreground">
-                  Практические руководства и правила электромонтажа.
-                </p>
-              </div>
-            </div>
-            <div className="mt-4 sm:mt-6 flex items-center border-t border-border pt-3 sm:pt-4 text-xs sm:text-sm font-semibold text-primary transition-transform group-hover:translate-x-1">
-              Открыть <ArrowRight className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
-            </div>
-          </Link>
-        </SpotlightCard>
+        {/* Текстовая часть */}
+        <div className="relative z-10 flex-1 space-y-4 sm:space-y-6 text-center md:text-left">
+          <div className="inline-flex items-center justify-center md:justify-start gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest border border-primary/20 mx-auto md:mx-0 w-max">
+            <Zap className="w-3.5 h-3.5" /> ВольтПро 3.1
+          </div>
+          
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-foreground tracking-tight leading-[1.1]">
+            Электромонтаж <br className="hidden lg:block"/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">нового уровня</span>
+          </h1>
+          
+          <p className="text-sm sm:text-lg text-muted-foreground max-w-xl mx-auto md:mx-0 leading-relaxed">
+            Забудь про рутину. ИИ-сметчик, точные калькуляторы и профессиональная база знаний в твоем кармане.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-3 sm:gap-4 pt-2">
+            <Link to="/estimator" className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-primary text-primary-foreground font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/25 text-sm">
+              <Bot className="w-5 h-5" /> ИИ-сметчик
+            </Link>
+            <Link to="/calculators" className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-background border border-border text-foreground hover:bg-muted transition-colors font-bold text-sm shadow-sm">
+              <Calculator className="w-5 h-5" /> Калькуляторы
+            </Link>
+          </div>
+        </div>
 
-        <SpotlightCard>
-          <Link
-            to="/chat"
-            className="group flex h-full flex-col justify-between p-4 sm:p-6 outline-none"
-          >
-            <div className="space-y-3 sm:space-y-4">
-              <div className="grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/20 shrink-0">
-                <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-base sm:text-lg font-bold text-foreground">Чат с ИИ</h3>
-                <p className="text-[10px] sm:text-xs leading-relaxed text-muted-foreground">
-                  Подскажет по ПУЭ, ГОСТ и поможет с расчётом на объекте.
-                </p>
-              </div>
-            </div>
-            <div className="mt-4 sm:mt-6 flex items-center border-t border-border pt-3 sm:pt-4 text-xs sm:text-sm font-semibold text-primary transition-transform group-hover:translate-x-1">
-              Открыть <ArrowRight className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
-            </div>
-          </Link>
-        </SpotlightCard>
-
+        {/* Визуальная часть (Светящаяся абстракция) */}
+        <div className="hidden md:flex relative z-10 w-64 h-64 items-center justify-center shrink-0">
+          <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 to-transparent rounded-full animate-[spin_10s_linear_infinite]"></div>
+          <div className="absolute inset-2 bg-card rounded-full flex items-center justify-center border border-primary/30 backdrop-blur-md shadow-[0_0_50px_rgba(var(--primary),0.2)]">
+             <Zap className="w-24 h-24 text-primary drop-shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+          </div>
+        </div>
       </div>
+
+      {/* КАРТОЧКИ СО СТАТИСТИКОЙ */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-10 sm:mb-12">
+        <div className="bg-card border border-border p-5 sm:p-6 rounded-2xl flex items-center gap-4 shadow-sm hover:border-primary/50 transition-colors">
+          <div className="bg-primary/10 p-3 rounded-xl shrink-0">
+            <Zap className="w-6 h-6 sm:w-7 sm:h-7 text-primary" />
+          </div>
+          <div>
+            <p className="text-xl sm:text-2xl font-black text-foreground">1240+</p>
+            <p className="text-[10px] sm:text-xs font-bold text-muted-foreground uppercase tracking-wider">Расчётов в день</p>
+          </div>
+        </div>
+        
+        <div className="bg-card border border-border p-5 sm:p-6 rounded-2xl flex items-center gap-4 shadow-sm hover:border-primary/50 transition-colors">
+          <div className="bg-primary/10 p-3 rounded-xl shrink-0">
+            <ShieldCheck className="w-6 h-6 sm:w-7 sm:h-7 text-primary" />
+          </div>
+          <div>
+            <p className="text-xl sm:text-2xl font-black text-foreground">100%</p>
+            <p className="text-[10px] sm:text-xs font-bold text-muted-foreground uppercase tracking-wider">Соответствие ПУЭ</p>
+          </div>
+        </div>
+
+        <div className="bg-card border border-border p-5 sm:p-6 rounded-2xl flex items-center gap-4 shadow-sm hover:border-primary/50 transition-colors">
+          <div className="bg-primary/10 p-3 rounded-xl shrink-0">
+            <Timer className="w-6 h-6 sm:w-7 sm:h-7 text-primary" />
+          </div>
+          <div>
+            <p className="text-xl sm:text-2xl font-black text-foreground">&lt; 8 сек</p>
+            <p className="text-[10px] sm:text-xs font-bold text-muted-foreground uppercase tracking-wider">Среднее время</p>
+          </div>
+        </div>
+      </div>
+
+      {/* БЫСТРЫЕ ИНСТРУМЕНТЫ */}
+      <div className="mb-6 sm:mb-8">
+        <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-1">Быстрые инструменты</h2>
+        <p className="text-sm text-muted-foreground">Открывайте нужное в один клик.</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+        {/* Карточка 1 */}
+        <Link to="/calculators" className="group bg-card border border-border p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md hover:border-primary/50 transition-all flex flex-col h-full relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full transition-transform group-hover:scale-110"></div>
+          <Calculator className="w-8 h-8 sm:w-10 sm:h-10 text-primary mb-4 sm:mb-6" />
+          <h3 className="text-lg sm:text-xl font-bold text-foreground mb-2">Калькуляторы</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed flex-1">Сечение кабеля, падение напряжения, защита, заземление.</p>
+          <div className="mt-6 flex items-center gap-2 text-sm font-bold text-primary">
+            Открыть <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </Link>
+
+        {/* Карточка 2 */}
+        <Link to="/schemes" className="group bg-card border border-border p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md hover:border-primary/50 transition-all flex flex-col h-full relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full transition-transform group-hover:scale-110"></div>
+          <Waypoints className="w-8 h-8 sm:w-10 sm:h-10 text-primary mb-4 sm:mb-6" />
+          <h3 className="text-lg sm:text-xl font-bold text-foreground mb-2">Описание схем</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed flex-1">Практические руководства и правила электромонтажа.</p>
+          <div className="mt-6 flex items-center gap-2 text-sm font-bold text-primary">
+            Открыть <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </Link>
+
+        {/* Карточка 3 */}
+        <Link to="/chat" className="group bg-card border border-border p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md hover:border-primary/50 transition-all flex flex-col h-full relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full transition-transform group-hover:scale-110"></div>
+          <MessageSquare className="w-8 h-8 sm:w-10 sm:h-10 text-primary mb-4 sm:mb-6" />
+          <h3 className="text-lg sm:text-xl font-bold text-foreground mb-2">Чат с ИИ</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed flex-1">Подскажет по ПУЭ, ГОСТ и поможет с расчётом на объекте.</p>
+          <div className="mt-6 flex items-center gap-2 text-sm font-bold text-primary">
+            Открыть <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </Link>
+      </div>
+
     </div>
-  );
+  )
 }
