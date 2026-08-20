@@ -14,6 +14,11 @@ export const Route = createRootRoute({
 function RootComponent() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // ВРЕМЕННЫЙ РУБИЛЬНИК АВТОРИЗАЦИИ (теперь и для мобилок!)
+  // false = не авторизован (ведет на /login)
+  // true  = авторизован (ведет на /profile)
+  const isAuthenticated = false;
+
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -56,9 +61,15 @@ function RootComponent() {
               
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-4 mb-1 ml-3">Сообщество и аккаунт</p>
               <MobileNavLink to="/masters-chat" icon={<Users className="w-5 h-5"/>} label="Чат мастеров" onClick={() => setIsMobileMenuOpen(false)} />
-              <MobileNavLink to="/profile" icon={<User className="w-5 h-5"/>} label="Профиль" onClick={() => setIsMobileMenuOpen(false)} />
               
-              {/* НОВАЯ ССЫЛКА НА FAQ В МОБИЛКЕ */}
+              {/* === УМНАЯ ССЫЛКА НА ПРОФИЛЬ ДЛЯ ТЕЛЕФОНОВ === */}
+              <MobileNavLink 
+                to={isAuthenticated ? "/profile" : "/login"} 
+                icon={<User className="w-5 h-5"/>} 
+                label="Профиль" 
+                onClick={() => setIsMobileMenuOpen(false)} 
+              />
+              
               <MobileNavLink to="/faq" icon={<HelpCircle className="w-5 h-5"/>} label="Частые вопросы" onClick={() => setIsMobileMenuOpen(false)} />
             </div>
           </div>
