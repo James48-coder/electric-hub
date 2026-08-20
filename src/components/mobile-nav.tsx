@@ -21,14 +21,18 @@ const PRIMARY: Item[] = [
   { to: "/knowledge", label: "База", icon: BookOpen },
 ];
 
-const MORE: Item[] = [
-  { to: "/profile", label: "Личный кабинет", icon: User },
-  { to: "/schemes", label: "Схемы", icon: Network },
-];
-
 export function MobileNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
+
+  // ВРЕМЕННЫЙ РУБИЛЬНИК АВТОРИЗАЦИИ (как и в боковом меню на ПК)
+  const isAuthenticated = false;
+
+  // Перенесли MORE внутрь, чтобы ссылка динамически менялась
+  const MORE: Item[] = [
+    { to: isAuthenticated ? "/profile" : "/login", label: "Личный кабинет", icon: User },
+    { to: "/schemes", label: "Схемы", icon: Network },
+  ];
 
   const isActive = (to: string) => (to === "/" ? pathname === "/" : pathname.startsWith(to));
   const moreActive = MORE.some((m) => isActive(m.to));
