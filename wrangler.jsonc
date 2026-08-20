@@ -5,5 +5,12 @@
   "assets": {
     "directory": "./dist",
     "not_found_handling": "single-page-application"
-  }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "voltprofi",
+      "database_id": "47ab98c5-b161-497f-a2db-ebba2b1a2b5d"
+    }
+  ]
 }
