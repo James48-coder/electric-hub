@@ -23,7 +23,7 @@ function ProfilePage() {
   return (
     <div className="container mx-auto max-w-7xl animate-in fade-in duration-500 pb-24 relative px-4 sm:px-6">
       
-      {/* 🛠 ДЕБАГ-ПАНЕЛЬ (ТОЛЬКО ДЛЯ РАЗРАБОТКИ) - СУПЕР ЗАМЕТНЫЕ КНОПКИ */}
+      {/* 🛠 ДЕБАГ-ПАНЕЛЬ */}
       <div className="mb-8 p-4 bg-muted/30 border-2 border-border rounded-2xl flex flex-wrap items-center gap-4">
         <span className="text-xs font-black text-muted-foreground uppercase tracking-widest w-full sm:w-auto mb-1 sm:mb-0 text-center sm:text-left flex items-center justify-center sm:justify-start gap-2">
           <Settings className="w-4 h-4" /> Тест тарифов:
@@ -68,8 +68,8 @@ function ProfilePage() {
         <p className="text-sm sm:text-base text-muted-foreground">Управление аккаунтом и подпиской</p>
       </div>
 
-      {/* ВЕРХНЯЯ ПАНЕЛЬ: ИНФО ПОЛЬЗОВАТЕЛЯ И СПОСОБ ОПЛАТЫ */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+      {/* ВЕРХНЯЯ ПАНЕЛЬ: 2 КОЛОНКИ НА КОМПЕ (Пользователь и Помощь) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
         
         {/* Карточка пользователя */}
         <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex items-center gap-6 relative overflow-hidden">
@@ -83,9 +83,10 @@ function ProfilePage() {
               </div>
             )}
           </div>
-          <div className="flex-1">
-            <h2 className="text-lg sm:text-xl font-black text-foreground mb-1">{user.name}</h2>
-            <p className="text-xs sm:text-sm text-muted-foreground mb-4 truncate">{user.email}</p>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg sm:text-xl font-black text-foreground mb-1 truncate">{user.name}</h2>
+            {/* Убрали truncate, чтобы почта умещалась полностью */}
+            <p className="text-xs sm:text-sm text-muted-foreground mb-4">{user.email}</p>
             <div className="flex gap-2">
               <button className="flex-1 bg-background border border-border py-2 rounded-lg text-xs font-bold text-foreground hover:border-primary/50 hover:text-primary transition-colors">
                 Настройки
@@ -96,55 +97,6 @@ function ProfilePage() {
             </div>
           </div>
         </div>
-
-        {/* Блок лимитов (показываем только для Master) */}
-        {currentTariff === 'master' ? (
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-center">
-            <div className="flex justify-between text-sm font-bold mb-3">
-              <span className="text-foreground">Остаток ИИ-смет</span>
-              <span className="text-primary">{user.estimatesLimit - user.estimatesUsed} из {user.estimatesLimit}</span>
-            </div>
-            <div className="h-2 w-full bg-muted rounded-full overflow-hidden flex justify-end mb-2">
-              <div 
-                className="h-full bg-primary rounded-full transition-all duration-500"
-                style={{ width: `${((user.estimatesLimit - user.estimatesUsed) / user.estimatesLimit) * 100}%` }}
-              ></div>
-            </div>
-            <p className="text-xs text-muted-foreground">Лимит обновится 17 сентября.</p>
-          </div>
-        ) : (
-          /* Донат (показываем для Free) или Способ оплаты (показываем для PRO) */
-          currentTariff === 'free' ? (
-            <div className="bg-gradient-to-br from-orange-500/10 to-amber-500/5 border border-orange-500/20 rounded-2xl p-6 shadow-sm flex flex-col justify-center">
-              <div className="flex items-center gap-3 mb-2">
-                <Coffee className="w-5 h-5 text-orange-500 shrink-0" />
-                <h3 className="font-bold text-foreground">Поддержать проект</h3>
-              </div>
-              <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
-                Сервис сэкономил время? Вы можете поддержать сервера.
-              </p>
-              <button className="w-full bg-orange-500/10 text-orange-600 border border-orange-500/20 hover:bg-orange-500 hover:text-white py-2 rounded-lg text-xs font-bold transition-all">
-                Угостить кофе
-              </button>
-            </div>
-          ) : (
-            <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-center">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-foreground flex items-center gap-2">
-                  <CreditCard className="w-4 h-4 text-muted-foreground" /> Оплата
-                </h3>
-                <span className="text-xs font-bold text-muted-foreground">До 17 сен 2026</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-background border border-border rounded-xl">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-5 bg-emerald-900/20 border border-emerald-500/20 rounded flex items-center justify-center text-[8px] font-black text-emerald-500 shrink-0">МИР</div>
-                  <span className="font-bold text-sm">•••• 2026</span>
-                </div>
-                <button className="text-red-500 hover:text-red-400 p-1 transition-colors"><Trash2 className="w-4 h-4" /></button>
-              </div>
-            </div>
-          )
-        )}
 
         {/* Поддержка */}
         <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-center">
@@ -162,7 +114,7 @@ function ProfilePage() {
 
       </div>
 
-      {/* НИЖНЯЯ ПАНЕЛЬ: ВИТРИНА ТАРИФОВ (ВСЕГДА НА ЭКРАНЕ) */}
+      {/* НИЖНЯЯ ПАНЕЛЬ: ВИТРИНА ТАРИФОВ */}
       <div className="mb-10 text-center">
         <h2 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight mb-3">
           Инвестируйте в свое время
@@ -172,8 +124,8 @@ function ProfilePage() {
         </p>
       </div>
 
-      {/* СЕТКА ТАРИФОВ: 1 КОЛОНКА НА МОБИЛКЕ, 3 НА ДЕСКТОПЕ */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+      {/* СЕТКА ТАРИФОВ */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-10">
         
         {/* === ТАРИФ FREE === */}
         <div className={`bg-card border-2 rounded-3xl p-6 sm:p-8 flex flex-col relative transition-all ${currentTariff === 'free' ? 'border-primary shadow-md' : 'border-border shadow-sm'}`}>
@@ -277,6 +229,57 @@ function ProfilePage() {
         </div>
 
       </div>
+
+      {/* ОПУЩЕННЫЙ ВНИЗ БЛОК (ОПЛАТА / ДОНАТ / ЛИМИТЫ) */}
+      <div className="max-w-md mx-auto w-full">
+        {currentTariff === 'master' ? (
+          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-center">
+            <div className="flex justify-between text-sm font-bold mb-3">
+              <span className="text-foreground">Остаток ИИ-смет</span>
+              <span className="text-primary">{user.estimatesLimit - user.estimatesUsed} из {user.estimatesLimit}</span>
+            </div>
+            <div className="h-2 w-full bg-muted rounded-full overflow-hidden flex justify-end mb-2">
+              <div 
+                className="h-full bg-primary rounded-full transition-all duration-500"
+                style={{ width: `${((user.estimatesLimit - user.estimatesUsed) / user.estimatesLimit) * 100}%` }}
+              ></div>
+            </div>
+            <p className="text-xs text-muted-foreground text-center mt-2">Лимит обновится 17 сентября.</p>
+          </div>
+        ) : (
+          currentTariff === 'free' ? (
+            <div className="bg-gradient-to-br from-orange-500/10 to-amber-500/5 border border-orange-500/20 rounded-2xl p-6 shadow-sm flex flex-col justify-center items-center text-center">
+              <div className="flex items-center gap-3 mb-2">
+                <Coffee className="w-5 h-5 text-orange-500 shrink-0" />
+                <h3 className="font-bold text-foreground">Поддержать проект</h3>
+              </div>
+              <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+                Сервис сэкономил время? Вы можете поддержать сервера.
+              </p>
+              <button className="w-full bg-orange-500/10 text-orange-600 border border-orange-500/20 hover:bg-orange-500 hover:text-white py-3 rounded-xl text-sm font-bold transition-all">
+                Угостить кофе
+              </button>
+            </div>
+          ) : (
+            <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-center">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-bold text-foreground flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-muted-foreground" /> Оплата
+                </h3>
+                <span className="text-xs font-bold text-muted-foreground">До 17 сен 2026</span>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-background border border-border rounded-xl">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-6 bg-emerald-900/20 border border-emerald-500/20 rounded flex items-center justify-center text-[10px] font-black text-emerald-500 shrink-0">МИР</div>
+                  <span className="font-bold text-sm">•••• 2026</span>
+                </div>
+                <button className="text-red-500 hover:text-red-400 p-2 transition-colors bg-red-500/10 rounded-lg"><Trash2 className="w-4 h-4" /></button>
+              </div>
+            </div>
+          )
+        )}
+      </div>
+
     </div>
   )
 }
