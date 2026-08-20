@@ -23,12 +23,44 @@ function ProfilePage() {
   return (
     <div className="container mx-auto max-w-7xl animate-in fade-in duration-500 pb-24 relative px-4 sm:px-6">
       
-      {/* 🛠 ДЕБАГ-ПАНЕЛЬ (ТОЛЬКО ДЛЯ РАЗРАБОТКИ) - ИСПРАВЛЕННАЯ ДЛЯ МОБИЛОК */}
-      <div className="mb-8 p-4 bg-muted/50 border border-border rounded-xl flex flex-wrap items-center gap-3">
-        <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider w-full sm:w-auto mb-1 sm:mb-0 text-center sm:text-left">Тест интерфейса:</span>
-        <button onClick={() => setCurrentTariff('free')} className={`flex-1 sm:flex-none px-3 py-2 sm:py-1.5 text-xs font-bold rounded-lg transition-colors ${currentTariff === 'free' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-card border border-border text-foreground hover:bg-muted'}`}>Free</button>
-        <button onClick={() => setCurrentTariff('master')} className={`flex-1 sm:flex-none px-3 py-2 sm:py-1.5 text-xs font-bold rounded-lg transition-colors ${currentTariff === 'master' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-card border border-border text-foreground hover:bg-muted'}`}>Master</button>
-        <button onClick={() => setCurrentTariff('pro')} className={`flex-1 sm:flex-none px-3 py-2 sm:py-1.5 text-xs font-bold rounded-lg transition-colors ${currentTariff === 'pro' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-card border border-border text-foreground hover:bg-muted'}`}>PRO</button>
+      {/* 🛠 ДЕБАГ-ПАНЕЛЬ (ТОЛЬКО ДЛЯ РАЗРАБОТКИ) - СУПЕР ЗАМЕТНЫЕ КНОПКИ */}
+      <div className="mb-8 p-4 bg-muted/30 border-2 border-border rounded-2xl flex flex-wrap items-center gap-4">
+        <span className="text-xs font-black text-muted-foreground uppercase tracking-widest w-full sm:w-auto mb-1 sm:mb-0 text-center sm:text-left flex items-center justify-center sm:justify-start gap-2">
+          <Settings className="w-4 h-4" /> Тест тарифов:
+        </span>
+        
+        <button 
+          onClick={() => setCurrentTariff('free')} 
+          className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${
+            currentTariff === 'free' 
+            ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' 
+            : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'
+          }`}
+        >
+          Free
+        </button>
+        
+        <button 
+          onClick={() => setCurrentTariff('master')} 
+          className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${
+            currentTariff === 'master' 
+            ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' 
+            : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'
+          }`}
+        >
+          Master
+        </button>
+        
+        <button 
+          onClick={() => setCurrentTariff('pro')} 
+          className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${
+            currentTariff === 'pro' 
+            ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' 
+            : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'
+          }`}
+        >
+          PRO
+        </button>
       </div>
 
       <div className="mb-8 text-center sm:text-left">
