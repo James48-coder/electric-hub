@@ -3,6 +3,11 @@ import { Zap, Home, BookOpen, FileText, Calculator, Waypoints, Bot, MessageSquar
 import React from 'react'
 
 export function AppSidebar() {
+  // ВРЕМЕННЫЙ РУБИЛЬНИК АВТОРИЗАЦИИ
+  // false = не авторизован (ведет на /login)
+  // true  = авторизован (ведет на /profile)
+  const isAuthenticated = false 
+
   return (
     <aside className="w-64 h-full flex flex-col bg-card overflow-y-auto">
       {/* Логотип из скриншота */}
@@ -35,7 +40,13 @@ export function AppSidebar() {
         <div className="my-2 border-t border-border/50"></div>
         
         <SidebarLink to="/masters-chat" icon={<Users className="w-5 h-5" />} label="Чат мастеров" />
-        <SidebarLink to="/profile" icon={<User className="w-5 h-5" />} label="Профиль" />
+        
+        {/* УМНАЯ ССЫЛКА НА ПРОФИЛЬ */}
+        <SidebarLink 
+          to={isAuthenticated ? "/profile" : "/login"} 
+          icon={<User className="w-5 h-5" />} 
+          label="Профиль" 
+        />
         
         <SidebarLink to="/faq" icon={<HelpCircle className="w-5 h-5" />} label="Частые вопросы" />
       </nav>
