@@ -21,29 +21,21 @@ function LoginRoute() {
     setMessage('')
 
     try {
-      // Отправляем данные на наш будущий серверный API
-      const response = await fetch('/api/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: isLogin ? 'login' : 'register',
-          email,
-          password,
-          name: isLogin ? undefined : name
-        })
-      })
+      // Имитируем работу сервера (задержка 1 секунда для показа спиннера)
+      await new Promise(resolve => setTimeout(resolve, 1000))
 
-      const data = await response.json()
-
-      if (data.success) {
-        setMessage(data.message)
-        // Имитация задержки перед переходом в личный кабинет
-        setTimeout(() => {
-          navigate({ to: '/profile' })
-        }, 1500)
+      // Выдаем успешное сообщение в зависимости от того, вход это или регистрация
+      if (isLogin) {
+        setMessage(`С возвращением! Заходим в аккаунт...`)
       } else {
-        setMessage(data.message || 'Произошла ошибка')
+        setMessage(`Супер! Аккаунт для ${email} успешно создан.`)
       }
+
+      // Перекидываем пользователя в Личный кабинет через 1.5 секунды
+      setTimeout(() => {
+        navigate({ to: '/profile' })
+      }, 1500)
+      
     } catch (err) {
       setMessage('Ошибка соединения с сервером. Проверьте интернет.')
     } finally {
@@ -65,7 +57,7 @@ function LoginRoute() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md shrink-0">
         <div className="bg-white py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-slate-100">
 
-          {/* Блок вывода сообщений сервера */}
+          {/* Блок вывода сообщений */}
           {message && (
             <div className={`mb-4 p-3 rounded-xl text-sm text-center font-medium ${message.includes('успешн') || message.includes('возвращением') ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>
               {message}
@@ -85,7 +77,7 @@ function LoginRoute() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required={!isLogin}
-                    className="appearance-none block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
+                    className="appearance-none block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl text-slate-900 bg-white placeholder:text-slate-400 focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
                     placeholder="Иван Иванов"
                   />
                 </div>
@@ -103,7 +95,7 @@ function LoginRoute() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="appearance-none block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
+                  className="appearance-none block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl text-slate-900 bg-white placeholder:text-slate-400 focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
                   placeholder="mail@example.com"
                 />
               </div>
@@ -120,7 +112,7 @@ function LoginRoute() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="appearance-none block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
+                  className="appearance-none block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl text-slate-900 bg-white placeholder:text-slate-400 focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
                   placeholder="••••••••"
                 />
               </div>
