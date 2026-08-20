@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { Calculator, Zap, Activity, Shield, TrendingDown, Anchor, AlertTriangle, Lightbulb, Lock, ChevronRight, Ruler, Network, Palette, CheckSquare, Layers } from 'lucide-react'
 import React, { useState } from 'react'
 
@@ -16,7 +16,7 @@ type CalcItem = {
   isPremium: boolean;
 }
 
-// Полный список всех 12 калькуляторов из файловой системы
+// Полный список всех 12 калькуляторов
 const CALCULATORS: CalcItem[] = [
   // === БЕСПЛАТНЫЕ ИНСТРУМЕНТЫ (FREE) ===
   {
@@ -144,8 +144,8 @@ function CalculatorsPage() {
               key={calc.id} 
               className={`bg-card border rounded-3xl p-6 sm:p-8 flex flex-col relative transition-all duration-300
                 ${isLocked 
-                  ? 'border-border opacity-75 grayscale-[0.3] hover:grayscale-0 shadow-sm' 
-                  : 'border-border hover:border-primary/50 shadow-sm hover:shadow-md cursor-pointer group'}
+                  ? 'border-border opacity-75 grayscale-[0.3] shadow-sm' 
+                  : 'border-border hover:border-primary/50 shadow-sm hover:shadow-md group'}
               `}
               style={{ animationDelay: `${idx * 50}ms` }}
             >
@@ -177,17 +177,20 @@ function CalculatorsPage() {
                 {calc.description}
               </p>
 
-              {/* Кнопка действия */}
+              {/* Кнопка действия (Заменили button на Link для разблокированных) */}
               {isLocked ? (
-                <button className="w-full bg-orange-500/10 text-orange-600 border border-orange-500/20 px-4 py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-orange-500 hover:text-white transition-colors">
+                <button className="w-full bg-orange-500/10 text-orange-600 border border-orange-500/20 px-4 py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 cursor-not-allowed">
                   <Lock className="w-4 h-4 shrink-0" />
                   С тарифа Master
                 </button>
               ) : (
-                <button className="w-full bg-background border border-border text-foreground group-hover:border-primary group-hover:text-primary px-4 py-3.5 rounded-xl text-sm font-bold flex items-center justify-between transition-colors">
+                <Link 
+                  to={`/calculators/${calc.id}`} 
+                  className="w-full bg-background border border-border text-foreground group-hover:border-primary group-hover:text-primary px-4 py-3.5 rounded-xl text-sm font-bold flex items-center justify-between transition-colors cursor-pointer"
+                >
                   <span>Открыть расчет</span>
                   <ChevronRight className="w-4 h-4 shrink-0" />
-                </button>
+                </Link>
               )}
             </div>
           )
