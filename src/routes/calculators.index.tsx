@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Calculator, Zap, Activity, Shield, TrendingDown, Anchor, AlertTriangle, Lightbulb, Lock, ChevronRight, Ruler } from 'lucide-react'
+import { Calculator, Zap, Activity, Shield, TrendingDown, Anchor, AlertTriangle, Lightbulb, Lock, ChevronRight, Ruler, Network, Palette, CheckSquare, Layers } from 'lucide-react'
 import React, { useState } from 'react'
 
 export const Route = createFileRoute('/calculators/')({
@@ -16,63 +16,94 @@ type CalcItem = {
   isPremium: boolean;
 }
 
-// Список всех калькуляторов с флагом премиума
+// Полный список всех 12 калькуляторов из файловой системы
 const CALCULATORS: CalcItem[] = [
+  // === БЕСПЛАТНЫЕ ИНСТРУМЕНТЫ (FREE) ===
   {
-    id: 'power',
-    title: 'Закон Ома (Ток и Мощность)',
+    id: 'load',
+    title: 'Закон Ома и Нагрузки',
     description: 'Базовый расчет силы тока, напряжения и мощности для однофазных и трехфазных сетей.',
     icon: Zap,
     isPremium: false
   },
   {
     id: 'cable',
-    title: 'Сечение кабеля по мощности',
+    title: 'Сечение кабеля',
     description: 'Подбор сечения медного и алюминиевого кабеля по ГОСТ в зависимости от нагрузки и типа прокладки.',
     icon: Activity,
     isPremium: false
   },
   {
-    id: 'breaker',
+    id: 'rcd',
     title: 'Номинал автомата и УЗО',
     description: 'Расчет защитной автоматики, токов утечки и выбор кривой отключения (B, C, D).',
     icon: Shield,
     isPremium: false
   },
   {
-    id: 'voltage-drop',
+    id: 'colors',
+    title: 'Цвета жил и маркировка',
+    description: 'Справочник по цветовой и буквенно-цифровой идентификации проводников по ГОСТ Р 50462.',
+    icon: Palette,
+    isPremium: false
+  },
+  {
+    id: 'gofra',
+    title: 'Подбор гофры и труб',
+    description: 'Расчет диаметра гофротрубы или ПНД трубы в зависимости от количества и сечения прокладываемых кабелей.',
+    icon: CheckSquare,
+    isPremium: false
+  },
+  {
+    id: 'joints',
+    title: 'Муфты и соединения',
+    description: 'Подбор кабельных гильз, наконечников и термоусадочных муфт по сечению жилы.',
+    icon: Layers,
+    isPremium: false
+  },
+  {
+    id: 'rj45',
+    title: 'Распиновка RJ-45',
+    description: 'Схемы обжима витой пары (прямой и перекрестный кабель) по стандартам T568A и T568B.',
+    icon: Network,
+    isPremium: false
+  },
+
+  // === ПЛАТНЫЕ ИНСТРУМЕНТЫ (MASTER / PRO) ===
+  {
+    id: 'voltage',
     title: 'Потери напряжения',
     description: 'Точный расчет падения напряжения на длинных кабельных трассах с учетом косинуса Фи.',
     icon: TrendingDown,
-    isPremium: true // ПЛАТНЫЙ
+    isPremium: true
   },
   {
     id: 'grounding',
     title: 'Расчет контура заземления',
     description: 'Проектирование заземляющего устройства (модульно-штыревое, треугольник) по сопротивлению грунта.',
     icon: Anchor,
-    isPremium: true // ПЛАТНЫЙ
+    isPremium: true
   },
   {
-    id: 'short-circuit',
-    title: 'Токи короткого замыкания (ТКЗ)',
-    description: 'Расчет однофазного и трехфазного КЗ для проверки срабатывания электромагнитного расцепителя.',
+    id: 'dsup',
+    title: 'Расчет ОСУП и ДСУП',
+    description: 'Выбор сечения проводников для основной и дополнительной систем уравнивания потенциалов.',
     icon: AlertTriangle,
-    isPremium: true // ПЛАТНЫЙ
+    isPremium: true
   },
   {
-    id: 'lighting',
+    id: 'light',
     title: 'Расчет освещенности',
     description: 'Подбор количества светильников по нормам СНиП в зависимости от площади и типа помещения.',
     icon: Lightbulb,
-    isPremium: true // ПЛАТНЫЙ
+    isPremium: true
   },
   {
-    id: 'layout',
-    title: 'Расход кабеля на квартиру',
-    description: 'Черновой просчет метража розеточных и осветительных групп по площади помещения.',
+    id: 'capacitor',
+    title: 'Расчет конденсаторов',
+    description: 'Подбор рабочей и пусковой емкости для подключения трехфазного двигателя в однофазную сеть.',
     icon: Ruler,
-    isPremium: false
+    isPremium: true
   }
 ]
 
@@ -80,9 +111,9 @@ function CalculatorsPage() {
   const [tariff, setTariff] = useState<Tariff>('free')
 
   return (
-    <div className="container mx-auto max-w-6xl animate-in fade-in duration-500 pb-24 relative">
+    <div className="container mx-auto max-w-7xl animate-in fade-in duration-500 pb-24 relative">
       
-      {/* 🛠 ПАНЕЛЬ ТЕСТИРОВАНИЯ ТАРИФОВ */}
+      {/* ПАНЕЛЬ ТЕСТИРОВАНИЯ ТАРИФОВ */}
       <div className="mb-8 p-4 bg-muted/50 border border-border rounded-xl flex items-center gap-4 overflow-x-auto">
         <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Тест интерфейса:</span>
         <button onClick={() => setTariff('free')} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${tariff === 'free' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground hover:bg-muted'}`}>Free (Базовый)</button>
@@ -93,7 +124,7 @@ function CalculatorsPage() {
       {/* Шапка */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary shrink-0">
             <Calculator className="w-6 h-6" />
           </div>
           <h1 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight">Калькуляторы</h1>
@@ -134,7 +165,7 @@ function CalculatorsPage() {
                 </div>
               )}
 
-              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-colors ${isLocked ? 'bg-muted text-muted-foreground' : 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground'}`}>
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shrink-0 transition-colors ${isLocked ? 'bg-muted text-muted-foreground' : 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground'}`}>
                 <calc.icon className="w-7 h-7" />
               </div>
               
@@ -155,7 +186,7 @@ function CalculatorsPage() {
               ) : (
                 <button className="w-full bg-background border border-border text-foreground group-hover:border-primary group-hover:text-primary px-4 py-3.5 rounded-xl text-sm font-bold flex items-center justify-between transition-colors">
                   <span>Открыть расчет</span>
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-4 h-4 shrink-0" />
                 </button>
               )}
             </div>
