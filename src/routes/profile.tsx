@@ -21,17 +21,17 @@ function ProfilePage() {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl animate-in fade-in duration-500 pb-24 relative">
+    <div className="container mx-auto max-w-7xl animate-in fade-in duration-500 pb-24 relative px-4 sm:px-6">
       
-      {/* 🛠 ДЕБАГ-ПАНЕЛЬ (ТОЛЬКО ДЛЯ РАЗРАБОТКИ) */}
-      <div className="mb-8 p-4 bg-muted/50 border border-border rounded-xl flex items-center gap-4 overflow-x-auto">
-        <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Тест интерфейса:</span>
-        <button onClick={() => setCurrentTariff('free')} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${currentTariff === 'free' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground hover:bg-muted'}`}>Free</button>
-        <button onClick={() => setCurrentTariff('master')} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${currentTariff === 'master' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground hover:bg-muted'}`}>Master</button>
-        <button onClick={() => setCurrentTariff('pro')} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${currentTariff === 'pro' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground hover:bg-muted'}`}>PRO</button>
+      {/* 🛠 ДЕБАГ-ПАНЕЛЬ (ТОЛЬКО ДЛЯ РАЗРАБОТКИ) - ИСПРАВЛЕННАЯ ДЛЯ МОБИЛОК */}
+      <div className="mb-8 p-4 bg-muted/50 border border-border rounded-xl flex flex-wrap items-center gap-3">
+        <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider w-full sm:w-auto mb-1 sm:mb-0 text-center sm:text-left">Тест интерфейса:</span>
+        <button onClick={() => setCurrentTariff('free')} className={`flex-1 sm:flex-none px-3 py-2 sm:py-1.5 text-xs font-bold rounded-lg transition-colors ${currentTariff === 'free' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-card border border-border text-foreground hover:bg-muted'}`}>Free</button>
+        <button onClick={() => setCurrentTariff('master')} className={`flex-1 sm:flex-none px-3 py-2 sm:py-1.5 text-xs font-bold rounded-lg transition-colors ${currentTariff === 'master' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-card border border-border text-foreground hover:bg-muted'}`}>Master</button>
+        <button onClick={() => setCurrentTariff('pro')} className={`flex-1 sm:flex-none px-3 py-2 sm:py-1.5 text-xs font-bold rounded-lg transition-colors ${currentTariff === 'pro' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-card border border-border text-foreground hover:bg-muted'}`}>PRO</button>
       </div>
 
-      <div className="mb-8">
+      <div className="mb-8 text-center sm:text-left">
         <h1 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight mb-2">Личный кабинет</h1>
         <p className="text-sm sm:text-base text-muted-foreground">Управление аккаунтом и подпиской</p>
       </div>
@@ -41,19 +41,19 @@ function ProfilePage() {
         
         {/* Карточка пользователя */}
         <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex items-center gap-6 relative overflow-hidden">
-          <div className="w-20 h-20 shrink-0 bg-primary/10 rounded-full flex items-center justify-center text-3xl font-black text-primary relative z-10 border-4 border-background shadow-sm">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 bg-primary/10 rounded-full flex items-center justify-center text-2xl sm:text-3xl font-black text-primary relative z-10 border-4 border-background shadow-sm">
             {user.avatar}
             {currentTariff === 'pro' && (
               <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1">
-                <div className="bg-primary text-primary-foreground w-5 h-5 rounded-full flex items-center justify-center">
-                  <Shield className="w-3 h-3" />
+                <div className="bg-primary text-primary-foreground w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center">
+                  <Shield className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                 </div>
               </div>
             )}
           </div>
           <div className="flex-1">
-            <h2 className="text-xl font-black text-foreground mb-1">{user.name}</h2>
-            <p className="text-sm text-muted-foreground mb-4">{user.email}</p>
+            <h2 className="text-lg sm:text-xl font-black text-foreground mb-1">{user.name}</h2>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-4 truncate">{user.email}</p>
             <div className="flex gap-2">
               <button className="flex-1 bg-background border border-border py-2 rounded-lg text-xs font-bold text-foreground hover:border-primary/50 hover:text-primary transition-colors">
                 Настройки
@@ -85,7 +85,7 @@ function ProfilePage() {
           currentTariff === 'free' ? (
             <div className="bg-gradient-to-br from-orange-500/10 to-amber-500/5 border border-orange-500/20 rounded-2xl p-6 shadow-sm flex flex-col justify-center">
               <div className="flex items-center gap-3 mb-2">
-                <Coffee className="w-5 h-5 text-orange-500" />
+                <Coffee className="w-5 h-5 text-orange-500 shrink-0" />
                 <h3 className="font-bold text-foreground">Поддержать проект</h3>
               </div>
               <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
@@ -105,7 +105,7 @@ function ProfilePage() {
               </div>
               <div className="flex items-center justify-between p-3 bg-background border border-border rounded-xl">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-5 bg-emerald-900/20 border border-emerald-500/20 rounded flex items-center justify-center text-[8px] font-black text-emerald-500">МИР</div>
+                  <div className="w-8 h-5 bg-emerald-900/20 border border-emerald-500/20 rounded flex items-center justify-center text-[8px] font-black text-emerald-500 shrink-0">МИР</div>
                   <span className="font-bold text-sm">•••• 2026</span>
                 </div>
                 <button className="text-red-500 hover:text-red-400 p-1 transition-colors"><Trash2 className="w-4 h-4" /></button>
@@ -117,7 +117,7 @@ function ProfilePage() {
         {/* Поддержка */}
         <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-center">
           <div className="flex items-center gap-3 mb-2">
-            <HelpCircle className="w-5 h-5 text-muted-foreground" />
+            <HelpCircle className="w-5 h-5 text-muted-foreground shrink-0" />
             <h3 className="font-bold text-foreground">Помощь</h3>
           </div>
           <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
@@ -146,7 +146,7 @@ function ProfilePage() {
         {/* === ТАРИФ FREE === */}
         <div className={`bg-card border-2 rounded-3xl p-6 sm:p-8 flex flex-col relative transition-all ${currentTariff === 'free' ? 'border-primary shadow-md' : 'border-border shadow-sm'}`}>
           <h3 className="text-2xl font-black text-foreground mb-2">Free</h3>
-          <p className="text-sm text-muted-foreground mb-6 h-10">
+          <p className="text-sm text-muted-foreground mb-6 sm:h-10">
             Базовый набор для простых задач.
           </p>
           <div className="mb-8">
@@ -177,7 +177,7 @@ function ProfilePage() {
         {/* === ТАРИФ MASTER === */}
         <div className={`bg-card border-2 rounded-3xl p-6 sm:p-8 flex flex-col relative transition-all ${currentTariff === 'master' ? 'border-primary shadow-md' : 'border-border shadow-sm hover:shadow-md'}`}>
           <h3 className="text-2xl font-black text-foreground mb-2">Master</h3>
-          <p className="text-sm text-muted-foreground mb-6 h-10">
+          <p className="text-sm text-muted-foreground mb-6 sm:h-10">
             Экономия времени. Избавьтесь от рутины расчетов.
           </p>
           <div className="mb-8">
@@ -214,7 +214,7 @@ function ProfilePage() {
           <h3 className="text-2xl font-black text-primary mb-2 flex items-center gap-2">
             PRO <Zap className="w-5 h-5" fill="currentColor" />
           </h3>
-          <p className="text-sm text-muted-foreground mb-6 h-10">
+          <p className="text-sm text-muted-foreground mb-6 sm:h-10">
             Сдавайте объекты быстрее конкурентов.
           </p>
           
