@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { Calculator, Zap, Activity, Shield, TrendingDown, Anchor, AlertTriangle, Lightbulb, Lock, ChevronRight, Ruler, Network, Palette, CheckSquare, Layers } from 'lucide-react'
+import { Calculator, Zap, Activity, Shield, TrendingDown, Anchor, AlertTriangle, Lightbulb, Lock, ChevronRight, Ruler, Network, Palette, CheckSquare, Layers, Settings } from 'lucide-react'
 import React, { useState } from 'react'
 
 export const Route = createFileRoute('/calculators/')({
@@ -113,12 +113,44 @@ function CalculatorsPage() {
   return (
     <div className="container mx-auto max-w-7xl animate-in fade-in duration-500 pb-24 relative">
       
-      {/* ПАНЕЛЬ ТЕСТИРОВАНИЯ ТАРИФОВ */}
-      <div className="mb-8 p-4 bg-muted/50 border border-border rounded-xl flex items-center gap-4 overflow-x-auto">
-        <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Тест интерфейса:</span>
-        <button onClick={() => setTariff('free')} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${tariff === 'free' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground hover:bg-muted'}`}>Free (Базовый)</button>
-        <button onClick={() => setTariff('master')} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${tariff === 'master' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground hover:bg-muted'}`}>Master</button>
-        <button onClick={() => setTariff('pro')} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${tariff === 'pro' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground hover:bg-muted'}`}>PRO</button>
+      {/* ПАНЕЛЬ ТЕСТИРОВАНИЯ ТАРИФОВ (ОБНОВЛЕННЫЙ ДИЗАЙН) */}
+      <div className="mb-8 p-4 bg-muted/30 border-2 border-border rounded-2xl flex flex-wrap items-center gap-4">
+        <span className="text-xs font-black text-muted-foreground uppercase tracking-widest w-full sm:w-auto mb-1 sm:mb-0 text-center sm:text-left flex items-center justify-center sm:justify-start gap-2">
+          <Settings className="w-4 h-4" /> Тест интерфейса:
+        </span>
+        
+        <button 
+          onClick={() => setTariff('free')} 
+          className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${
+            tariff === 'free' 
+            ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' 
+            : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'
+          }`}
+        >
+          Free (Базовый)
+        </button>
+        
+        <button 
+          onClick={() => setTariff('master')} 
+          className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${
+            tariff === 'master' 
+            ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' 
+            : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'
+          }`}
+        >
+          Master
+        </button>
+        
+        <button 
+          onClick={() => setTariff('pro')} 
+          className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${
+            tariff === 'pro' 
+            ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' 
+            : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'
+          }`}
+        >
+          PRO
+        </button>
       </div>
 
       {/* Шапка */}
@@ -177,7 +209,7 @@ function CalculatorsPage() {
                 {calc.description}
               </p>
 
-              {/* Кнопка действия (Заменили button на Link для разблокированных) */}
+              {/* Кнопка действия */}
               {isLocked ? (
                 <button className="w-full bg-orange-500/10 text-orange-600 border border-orange-500/20 px-4 py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 cursor-not-allowed">
                   <Lock className="w-4 h-4 shrink-0" />
