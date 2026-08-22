@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Bot, MapPin, Home as HomeIcon, Ruler, Settings, Lock, Sparkles, Loader2, FileText, Download, CheckCircle2, ChevronDown } from 'lucide-react'
+import { Bot, MapPin, Home as HomeIcon, Ruler, Settings, Lock, Sparkles, Loader2, FileText, Download, CheckCircle2, ChevronDown, AlertTriangle } from 'lucide-react'
 import React, { useState } from 'react'
 
 export const Route = createFileRoute('/estimator')({
@@ -119,11 +119,13 @@ function EstimatorPage() {
                       <MapPin className="h-5 w-5 text-muted-foreground" />
                     </div>
                     <input type="text" required placeholder="Например: Новосибирск" 
+                      onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Пожалуйста, укажите регион')}
+                      onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
                       className="w-full pl-12 pr-4 py-3.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" />
                   </div>
                 </div>
 
-                {/* Тип помещения (ИСПРАВЛЕНО НА ВЫПАДАЮЩИЙ СПИСОК) */}
+                {/* Тип помещения */}
                 <div>
                   <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Тип помещения</label>
                   <div className="relative">
@@ -131,6 +133,8 @@ function EstimatorPage() {
                       <HomeIcon className="h-5 w-5 text-muted-foreground" />
                     </div>
                     <select required defaultValue="Коммерческое помещение"
+                      onInvalid={(e) => (e.target as HTMLSelectElement).setCustomValidity('Пожалуйста, выберите тип помещения')}
+                      onInput={(e) => (e.target as HTMLSelectElement).setCustomValidity('')}
                       className="w-full pl-12 pr-10 py-3.5 bg-background border border-border rounded-xl text-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none appearance-none cursor-pointer">
                       <option value="Квартира (Новостройка)">Квартира (Новостройка)</option>
                       <option value="Квартира (Вторичка)">Квартира (Вторичка)</option>
@@ -153,11 +157,13 @@ function EstimatorPage() {
                       <Ruler className="h-5 w-5 text-muted-foreground" />
                     </div>
                     <input type="number" required min="1" placeholder="0" defaultValue="24"
+                      onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Пожалуйста, укажите площадь')}
+                      onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
                       className="w-full pl-12 pr-4 py-3.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" />
                   </div>
                 </div>
 
-                {/* Использовать мои цены (ИСПРАВЛЕНО ДЛЯ МОБИЛОК) */}
+                {/* Использовать мои цены */}
                 <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl border border-border mt-auto gap-4">
                   <div className="flex-1">
                     <p className="font-bold text-sm text-foreground mb-1 leading-tight">Использовать мои цены</p>
@@ -201,7 +207,7 @@ function EstimatorPage() {
             <div className="bg-card border-2 border-primary/30 rounded-3xl p-6 sm:p-8 shadow-xl animate-in slide-in-from-bottom-8 duration-500 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50"></div>
               
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                 <div>
                   <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">Готово</p>
                   <h3 className="text-xl sm:text-2xl font-black text-foreground flex items-center gap-2">
@@ -211,6 +217,14 @@ function EstimatorPage() {
                 <button className="flex items-center justify-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 text-foreground font-bold rounded-lg text-sm transition-colors border border-border">
                   <Download className="w-4 h-4" /> Экспорт в PDF
                 </button>
+              </div>
+
+              {/* ДИСКЛЕЙМЕР */}
+              <div className="mb-6 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                <p className="text-xs sm:text-sm text-amber-600 dark:text-amber-500 leading-relaxed font-medium">
+                  Расчёт приблизительный, не является офертой. Перед работой проконсультируйтесь со специалистом!
+                </p>
               </div>
 
               {/* Список материалов */}
