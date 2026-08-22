@@ -13,19 +13,31 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // ВРЕМЕННЫЙ РУБИЛЬНИК АВТОРИЗАЦИИ (теперь и для мобилок!)
-  // false = не авторизован (ведет на /login)
-  // true  = авторизован (ведет на /profile)
-  const isAuthenticated = false;
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
+    // Функция проверки метки в памяти браузера
+    const checkAuth = () => {
+      setIsAuthenticated(localStorage.getItem('voltpro_auth') === 'true');
+    };
+    
+    checkAuth(); // Проверяем при загрузке
+
+    // Слушаем изменения авторизации в реальном времени
+    window.addEventListener('storage', checkAuth);
+    window.addEventListener('auth-change', checkAuth);
+
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
     }
-    return () => { document.body.style.overflow = 'unset'; }
+
+    return () => { 
+      document.body.style.overflow = 'unset';
+      window.removeEventListener('storage', checkAuth);
+      window.removeEventListener('auth-change', checkAuth);
+    }
   }, [isMobileMenuOpen]);
 
   return (
@@ -62,7 +74,7 @@ function RootComponent() {
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-4 mb-1 ml-3">Сообщество и аккаунт</p>
               <MobileNavLink to="/masters-chat" icon={<Users className="w-5 h-5"/>} label="Чат мастеров" onClick={() => setIsMobileMenuOpen(false)} />
               
-              {/* === УМНАЯ ССЫЛКА НА ПРОФИЛЬ ДЛЯ ТЕЛЕФОНОВ === */}
+              {/* === УМНАЯ ССЫЛКА (Теперь работает из памяти!) === */}
               <MobileNavLink 
                 to={isAuthenticated ? "/profile" : "/login"} 
                 icon={<User className="w-5 h-5"/>} 
