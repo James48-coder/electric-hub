@@ -31,6 +31,11 @@ function LoginRoute() {
         setMessage(`Супер! Аккаунт для ${email} успешно создан.`)
       }
 
+      // === ЗАПИСЫВАЕМ ПАМЯТЬ ОБ АВТОРИЗАЦИИ ===
+      localStorage.setItem('voltpro_auth', 'true')
+      // ОТПРАВЛЯЕМ СИГНАЛ ВСЕМ МЕНЮ, ЧТО МЫ ВОШЛИ
+      window.dispatchEvent(new Event('auth-change'))
+
       // Перекидываем пользователя в Личный кабинет через 1.5 секунды
       setTimeout(() => {
         navigate({ to: '/profile' })
