@@ -17,7 +17,8 @@ function EstimatorPage() {
   const [region, setRegion] = useState('')
   const [roomType, setRoomType] = useState('Коммерческое помещение')
   const [area, setArea] = useState<number>(24)
-  const [useMyPrices, setUseMyPrices] = useState(true)
+  // ПОЛЗУНОК ВЫКЛЮЧЕН ПО УМОЛЧАНИЮ
+  const [useMyPrices, setUseMyPrices] = useState(false)
   const [description, setDescription] = useState('Гараж, 1 выключатель, 2 розетки, 4 светильника')
 
   // === КОЛИЧЕСТВО МАТЕРИАЛОВ (Считает ИИ) ===
@@ -332,10 +333,12 @@ function EstimatorPage() {
                 />
                 
                 {/* ИТОГОВАЯ СУММА */}
-                <div className="p-5 mt-4 bg-primary/10 border border-primary/20 rounded-xl flex justify-between items-center">
-                  <span className="font-bold text-foreground">Итого по материалам:</span>
-                  <span className="text-xl font-black text-primary">{totalSum.toLocaleString('ru-RU')} ₽</span>
-                </div>
+                {useMyPrices && (
+                  <div className="p-5 mt-4 bg-primary/10 border border-primary/20 rounded-xl flex justify-between items-center">
+                    <span className="font-bold text-foreground">Итого по материалам:</span>
+                    <span className="text-xl font-black text-primary">{totalSum.toLocaleString('ru-RU')} ₽</span>
+                  </div>
+                )}
 
                 <div className="p-4 bg-muted/30 border border-border border-dashed rounded-xl text-center mt-4">
                   <p className="text-sm font-medium text-muted-foreground italic">+ гофра, коробки и еще 14 позиций</p>
@@ -384,7 +387,7 @@ function ResultItem({ title, unit, qty, price, isEditable, onChange }: { title: 
               <span className="absolute right-2 top-1.5 text-xs text-muted-foreground">₽</span>
             </div>
           ) : (
-            <span className="font-bold text-sm mt-1 md:mt-0">{price.toLocaleString('ru-RU')} ₽</span>
+            <span className="font-bold text-sm mt-1 md:mt-0">{isEditable ? '' : '-'}</span>
           )}
         </div>
 
@@ -397,7 +400,7 @@ function ResultItem({ title, unit, qty, price, isEditable, onChange }: { title: 
         {/* 4. Итоговая сумма */}
         <div className="md:col-span-2 flex flex-col w-1/3 md:w-auto text-right">
           <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1">Итого</span>
-          <span className="font-black text-primary text-sm whitespace-nowrap mt-1 md:mt-0">{total.toLocaleString('ru-RU')} ₽</span>
+          <span className="font-black text-primary text-sm whitespace-nowrap mt-1 md:mt-0">{isEditable ? `${total.toLocaleString('ru-RU')} ₽` : '-'}</span>
         </div>
       </div>
     </div>
