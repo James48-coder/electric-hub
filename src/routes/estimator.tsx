@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Bot, MapPin, Home as HomeIcon, Ruler, Settings, Lock, Sparkles, Loader2, FileText, Download, CheckCircle2 } from 'lucide-react'
+import { Bot, MapPin, Home as HomeIcon, Ruler, Settings, Lock, Sparkles, Loader2, FileText, Download, CheckCircle2, ChevronDown } from 'lucide-react'
 import React, { useState } from 'react'
 
 export const Route = createFileRoute('/estimator')({
@@ -29,7 +29,7 @@ function EstimatorPage() {
   return (
     <div className="container mx-auto max-w-4xl animate-in fade-in duration-500 pb-24 relative px-4 sm:px-6">
       
-      {/* 🛠 ПАНЕЛЬ ТЕСТИРОВАНИЯ ТАРИФОВ (Единый стиль с другими страницами) */}
+      {/* 🛠 ПАНЕЛЬ ТЕСТИРОВАНИЯ ТАРИФОВ */}
       <div className="mb-8 p-4 bg-muted/30 border-2 border-border rounded-2xl flex flex-wrap items-center gap-4">
         <span className="text-xs font-black text-muted-foreground uppercase tracking-widest w-full sm:w-auto mb-1 sm:mb-0 text-center sm:text-left flex items-center justify-center sm:justify-start gap-2">
           <Settings className="w-4 h-4" /> Тест тарифов:
@@ -123,15 +123,25 @@ function EstimatorPage() {
                   </div>
                 </div>
 
-                {/* Тип помещения */}
+                {/* Тип помещения (ИСПРАВЛЕНО НА ВЫПАДАЮЩИЙ СПИСОК) */}
                 <div>
                   <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Тип помещения</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <HomeIcon className="h-5 w-5 text-muted-foreground" />
                     </div>
-                    <input type="text" required placeholder="Квартира, Офис, Дом..." defaultValue="Коммерческое помещение"
-                      className="w-full pl-12 pr-4 py-3.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" />
+                    <select required defaultValue="Коммерческое помещение"
+                      className="w-full pl-12 pr-10 py-3.5 bg-background border border-border rounded-xl text-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none appearance-none cursor-pointer">
+                      <option value="Квартира (Новостройка)">Квартира (Новостройка)</option>
+                      <option value="Квартира (Вторичка)">Квартира (Вторичка)</option>
+                      <option value="Дом / Коттедж">Дом / Коттедж</option>
+                      <option value="Коммерческое помещение">Коммерческое помещение</option>
+                      <option value="Офис">Офис</option>
+                      <option value="Гараж / Подсобное">Гараж / Подсобное</option>
+                    </select>
+                    <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                      <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                    </div>
                   </div>
                 </div>
 
@@ -147,11 +157,11 @@ function EstimatorPage() {
                   </div>
                 </div>
 
-                {/* Использовать мои цены */}
-                <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl border border-border mt-auto">
-                  <div>
-                    <p className="font-bold text-sm text-foreground mb-1">Использовать мои цены</p>
-                    <p className="text-xs text-muted-foreground">Алгоритм подставит ваши сохраненные прайсы</p>
+                {/* Использовать мои цены (ИСПРАВЛЕНО ДЛЯ МОБИЛОК) */}
+                <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl border border-border mt-auto gap-4">
+                  <div className="flex-1">
+                    <p className="font-bold text-sm text-foreground mb-1 leading-tight">Использовать мои цены</p>
+                    <p className="text-xs text-muted-foreground leading-snug">Алгоритм подставит ваши прайсы</p>
                   </div>
                   {/* Простой переключатель (Toggle) */}
                   <label className="relative inline-flex items-center cursor-pointer shrink-0">
@@ -175,7 +185,7 @@ function EstimatorPage() {
               <button 
                 type="submit" 
                 disabled={isGenerating}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black py-4 px-6 rounded-xl transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-3 disabled:opacity-80"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black py-4 px-6 rounded-xl transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-3 disabled:opacity-80 cursor-pointer"
               >
                 {isGenerating ? (
                   <><Loader2 className="w-6 h-6 animate-spin" /> Анализ нормативов ПУЭ...</>
@@ -186,7 +196,7 @@ function EstimatorPage() {
             </form>
           </div>
 
-          {/* ВЫДАЧА РЕЗУЛЬТАТА (Показывается только после загрузки) */}
+          {/* ВЫДАЧА РЕЗУЛЬТАТА */}
           {showResult && (
             <div className="bg-card border-2 border-primary/30 rounded-3xl p-6 sm:p-8 shadow-xl animate-in slide-in-from-bottom-8 duration-500 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50"></div>
@@ -227,7 +237,6 @@ function EstimatorPage() {
   )
 }
 
-// Вспомогательный компонент для строки сметы
 function ResultItem({ title, value }: { title: string, value: string }) {
   return (
     <div className="flex items-center justify-between p-4 bg-background border border-border rounded-xl">
