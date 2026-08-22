@@ -17,38 +17,64 @@ function EstimatorPage() {
   const [roomType, setRoomType] = useState('Коммерческое помещение')
   const [area, setArea] = useState<number>(24)
   const [useMyPrices, setUseMyPrices] = useState(true)
+  const [description, setDescription] = useState('Гараж, 1 выключатель, 2 розетки, 4 светильника')
 
   // === ДАННЫЕ СГЕНЕРИРОВАННОЙ СМЕТЫ ===
   const [estimatedData, setEstimatedData] = useState({
-    cableQty: 0,
+    cable3x25: 0,
+    cable3x15: 0,
     rcdQty: 0,
-    breakerQty: 0,
+    breaker16AQty: 0,
+    breaker10AQty: 0,
     totalPrice: 0
   })
 
-  // Имитация работы нейросети с привязкой к площади
+  // === ИМИТАЦИЯ ИИ (ПАРСИНГ ТЕКСТА И ЛОГИКА ТРАССИРОВКИ) ===
   const handleGenerate = (e: React.FormEvent) => {
     e.preventDefault()
     setIsGenerating(true)
     setShowResult(false)
 
-    // Простая имитация расчета на основе площади
-    const calcCable = Math.round(area * 5.5) // ~5.5 метров кабеля на квадрат
-    const calcRcd = Math.max(1, Math.ceil(area / 20)) // 1 УЗО на 20 квадратов
-    const calcBreaker = Math.max(2, Math.ceil(area / 5)) // 1 Автомат на 5 квадратов
-    
-    // Условные прайсы
-    const priceCable = 85
+    // ИИ "читает" текст задачи
+    const text = description.toLowerCase()
+    const socketsMatch = text.match(/(\d+)\s*розет/)
+    const switchesMatch = text.match(/(\d+)\s*выключат/)
+    const lightsMatch = text.match(/(\d+)\s*светил/)
+
+    // Если цифры есть в тексте - берем их, если нет - считаем по норме на м2
+    const socketsCount = socketsMatch ? parseInt(socketsMatch[1], 10) : Math.max(1, Math.ceil(area / 6))
+    const switchesCount = switchesMatch ? parseInt(switchesMatch[1], 10) : 1
+    const lightsCount = lightsMatch ? parseInt(lightsMatch[1], 10) : Math.max(1, Math.ceil(area / 5))
+
+    // Логика расчета кабеля (Щит -> Коробка + Опуски + Запас)
+    const calcCable3x25 = Math.round(10 + (socketsCount * 3) + (area * 0.1)) 
+    const calcCable3x15 = Math.round(10 + (switchesCount * 3) + (lightsCount * 2) + (area * 0.1))
+
+    // Логика автоматики
+    const calcAutomat16A = Math.max(1, Math.ceil(socketsCount / 4)) // Грубо: 1 автомат на группу из 4 розеток
+    const calcAutomat10A = Math.max(1, Math.ceil(lightsCount / 10)) // 1 автомат на 10 светильников
+    const calcRcd = 1 // Минимум 1 вводное УЗО или дифавтомат
+
+    // Моковые цены из базы мастера
+    const priceCable3x25 = 85
+    const priceCable3x15 = 65
+    const priceAutomat = 350
     const priceRcd = 2500
-    const priceBreaker = 350
-    const total = (calcCable * priceCable) + (calcRcd * priceRcd) + (calcBreaker * priceBreaker)
+
+    const total = (calcCable3x25 * priceCable3x25) + 
+                  (calcCable3x15 * priceCable3x15) + 
+                  (calcAutomat16A * priceAutomat) + 
+                  (calcAutomat10A * priceAutomat) + 
+                  (calcRcd * priceRcd)
 
     // Имитируем задержку ИИ в 2.5 секунды
     setTimeout(() => {
       setEstimatedData({
-        cableQty: calcCable,
+        cable3x25: calcCable3x25,
+        cable3x15: calcCable3x15,
         rcdQty: calcRcd,
-        breakerQty: calcBreaker,
+        breaker16AQty: calcAutomat16A,
+        breaker10AQty: calcAutomat10A,
         totalPrice: total
       })
       setIsGenerating(false)
@@ -199,7 +225,6 @@ function EstimatorPage() {
                     <p className="font-bold text-sm text-foreground mb-1 leading-tight">Использовать мои цены</p>
                     <p className="text-xs text-muted-foreground leading-snug">Алгоритм подставит ваши прайсы</p>
                   </div>
-                  {/* Ползунок привязан к стейту useMyPrices */}
                   <label className="relative inline-flex items-center cursor-pointer shrink-0">
                     <input type="checkbox" className="sr-only peer" checked={useMyPrices} onChange={(e) => setUseMyPrices(e.target.checked)} />
                     <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary border border-border"></div>
@@ -213,7 +238,7 @@ function EstimatorPage() {
                   <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest">Описание задачи для ИИ</label>
                   <span className="text-xs text-muted-foreground">Опционально</span>
                 </div>
-                <textarea rows={3} placeholder="Гараж, 1 выключатель, 2 розетки, 4 светильника" defaultValue="Гараж, 1 выключатель, 2 розетки, 4 светильника"
+                <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Пример: Гараж, 1 выключатель, 2 розетки, 4 светильника"
                   className="w-full p-4 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none resize-none"></textarea>
               </div>
 
@@ -224,7 +249,7 @@ function EstimatorPage() {
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black py-4 px-6 rounded-xl transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-3 disabled:opacity-80 cursor-pointer"
               >
                 {isGenerating ? (
-                  <><Loader2 className="w-6 h-6 animate-spin" /> Анализ нормативов ПУЭ...</>
+                  <><Loader2 className="w-6 h-6 animate-spin" /> Изучаем ПУЭ и считаем трассы...</>
                 ) : (
                   <><Sparkles className="w-6 h-6" /> Сгенерировать смету</>
                 )}
@@ -241,7 +266,6 @@ function EstimatorPage() {
                 <div>
                   <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">Готово</p>
                   <h3 className="text-xl sm:text-2xl font-black text-foreground flex items-center gap-2">
-                    {/* ПОДСТАВЛЯЕМ ВЫБРАННЫЙ ТИП ПОМЕЩЕНИЯ */}
                     <FileText className="w-6 h-6 text-muted-foreground" /> Смета: {roomType}
                   </h3>
                 </div>
@@ -261,9 +285,14 @@ function EstimatorPage() {
               {/* Список материалов (ДИНАМИЧЕСКИЙ) */}
               <div className="space-y-3 mb-6">
                 <ResultItem 
-                  title="Кабель ВВГнг(А)-LS 3x2.5 (м)" 
-                  qty={`${estimatedData.cableQty} м.`} 
-                  price={useMyPrices ? `${(estimatedData.cableQty * 85).toLocaleString('ru-RU')} ₽` : undefined} 
+                  title="Кабель ВВГнг(А)-LS 3x2.5 (Розеточная группа)" 
+                  qty={`${estimatedData.cable3x25} м.`} 
+                  price={useMyPrices ? `${(estimatedData.cable3x25 * 85).toLocaleString('ru-RU')} ₽` : undefined} 
+                />
+                <ResultItem 
+                  title="Кабель ВВГнг(А)-LS 3x1.5 (Освещение)" 
+                  qty={`${estimatedData.cable3x15} м.`} 
+                  price={useMyPrices ? `${(estimatedData.cable3x15 * 65).toLocaleString('ru-RU')} ₽` : undefined} 
                 />
                 <ResultItem 
                   title="УЗО 40А 30мА тип А (шт)" 
@@ -271,9 +300,14 @@ function EstimatorPage() {
                   price={useMyPrices ? `${(estimatedData.rcdQty * 2500).toLocaleString('ru-RU')} ₽` : undefined} 
                 />
                 <ResultItem 
-                  title="Автоматический выключатель 16А (шт)" 
-                  qty={`${estimatedData.breakerQty} шт.`} 
-                  price={useMyPrices ? `${(estimatedData.breakerQty * 350).toLocaleString('ru-RU')} ₽` : undefined} 
+                  title="Автоматический выключатель 16А, х-ка С (шт)" 
+                  qty={`${estimatedData.breaker16AQty} шт.`} 
+                  price={useMyPrices ? `${(estimatedData.breaker16AQty * 350).toLocaleString('ru-RU')} ₽` : undefined} 
+                />
+                <ResultItem 
+                  title="Автоматический выключатель 10А, х-ка С (шт)" 
+                  qty={`${estimatedData.breaker10AQty} шт.`} 
+                  price={useMyPrices ? `${(estimatedData.breaker10AQty * 350).toLocaleString('ru-RU')} ₽` : undefined} 
                 />
                 
                 {/* ИТОГОВАЯ СУММА (Показывается только если включены цены) */}
@@ -285,7 +319,7 @@ function EstimatorPage() {
                 )}
 
                 <div className="p-4 bg-muted/30 border border-border border-dashed rounded-xl text-center mt-4">
-                  <p className="text-sm font-medium text-muted-foreground italic">+ еще 24 позиции согласно ПУЭ</p>
+                  <p className="text-sm font-medium text-muted-foreground italic">+ гофра, распаячные коробки и еще 14 позиций</p>
                 </div>
               </div>
 
@@ -302,15 +336,14 @@ function EstimatorPage() {
   )
 }
 
-// Вспомогательный компонент для строки сметы (добавлена поддержка цены)
 function ResultItem({ title, qty, price }: { title: string, qty: string, price?: string }) {
   return (
     <div className="flex items-center justify-between p-4 bg-background border border-border rounded-xl">
       <div className="flex items-center gap-3">
         <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
-        <span className="font-medium text-sm sm:text-base text-foreground">{title}</span>
+        <span className="font-medium text-sm sm:text-base text-foreground pr-4">{title}</span>
       </div>
-      <div className="text-right ml-4">
+      <div className="text-right ml-auto shrink-0">
         <div className="font-black text-foreground whitespace-nowrap">{qty}</div>
         {price && <div className="text-xs font-bold text-primary mt-1">{price}</div>}
       </div>
