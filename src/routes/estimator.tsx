@@ -13,14 +13,44 @@ function EstimatorPage() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [showResult, setShowResult] = useState(false)
 
-  // Имитация работы нейросети
+  // === ЖИВЫЕ ДАННЫЕ ФОРМЫ ===
+  const [roomType, setRoomType] = useState('Коммерческое помещение')
+  const [area, setArea] = useState<number>(24)
+  const [useMyPrices, setUseMyPrices] = useState(true)
+
+  // === ДАННЫЕ СГЕНЕРИРОВАННОЙ СМЕТЫ ===
+  const [estimatedData, setEstimatedData] = useState({
+    cableQty: 0,
+    rcdQty: 0,
+    breakerQty: 0,
+    totalPrice: 0
+  })
+
+  // Имитация работы нейросети с привязкой к площади
   const handleGenerate = (e: React.FormEvent) => {
     e.preventDefault()
     setIsGenerating(true)
     setShowResult(false)
 
+    // Простая имитация расчета на основе площади
+    const calcCable = Math.round(area * 5.5) // ~5.5 метров кабеля на квадрат
+    const calcRcd = Math.max(1, Math.ceil(area / 20)) // 1 УЗО на 20 квадратов
+    const calcBreaker = Math.max(2, Math.ceil(area / 5)) // 1 Автомат на 5 квадратов
+    
+    // Условные прайсы
+    const priceCable = 85
+    const priceRcd = 2500
+    const priceBreaker = 350
+    const total = (calcCable * priceCable) + (calcRcd * priceRcd) + (calcBreaker * priceBreaker)
+
     // Имитируем задержку ИИ в 2.5 секунды
     setTimeout(() => {
+      setEstimatedData({
+        cableQty: calcCable,
+        rcdQty: calcRcd,
+        breakerQty: calcBreaker,
+        totalPrice: total
+      })
       setIsGenerating(false)
       setShowResult(true)
     }, 2500)
@@ -132,7 +162,7 @@ function EstimatorPage() {
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <HomeIcon className="h-5 w-5 text-muted-foreground" />
                     </div>
-                    <select required defaultValue="Коммерческое помещение"
+                    <select required value={roomType} onChange={(e) => setRoomType(e.target.value)}
                       onInvalid={(e) => (e.target as HTMLSelectElement).setCustomValidity('Пожалуйста, выберите тип помещения')}
                       onInput={(e) => (e.target as HTMLSelectElement).setCustomValidity('')}
                       className="w-full pl-12 pr-10 py-3.5 bg-background border border-border rounded-xl text-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none appearance-none cursor-pointer">
@@ -156,7 +186,7 @@ function EstimatorPage() {
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <Ruler className="h-5 w-5 text-muted-foreground" />
                     </div>
-                    <input type="number" required min="1" placeholder="0" defaultValue="24"
+                    <input type="number" required min="1" value={area || ''} onChange={(e) => setArea(Number(e.target.value))} placeholder="0"
                       onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Пожалуйста, укажите площадь')}
                       onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
                       className="w-full pl-12 pr-4 py-3.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" />
@@ -169,9 +199,9 @@ function EstimatorPage() {
                     <p className="font-bold text-sm text-foreground mb-1 leading-tight">Использовать мои цены</p>
                     <p className="text-xs text-muted-foreground leading-snug">Алгоритм подставит ваши прайсы</p>
                   </div>
-                  {/* Простой переключатель (Toggle) */}
+                  {/* Ползунок привязан к стейту useMyPrices */}
                   <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                    <input type="checkbox" className="sr-only peer" defaultChecked />
+                    <input type="checkbox" className="sr-only peer" checked={useMyPrices} onChange={(e) => setUseMyPrices(e.target.checked)} />
                     <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary border border-border"></div>
                   </label>
                 </div>
@@ -211,7 +241,8 @@ function EstimatorPage() {
                 <div>
                   <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">Готово</p>
                   <h3 className="text-xl sm:text-2xl font-black text-foreground flex items-center gap-2">
-                    <FileText className="w-6 h-6 text-muted-foreground" /> Смета: Коммерческое помещение
+                    {/* ПОДСТАВЛЯЕМ ВЫБРАННЫЙ ТИП ПОМЕЩЕНИЯ */}
+                    <FileText className="w-6 h-6 text-muted-foreground" /> Смета: {roomType}
                   </h3>
                 </div>
                 <button className="flex items-center justify-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 text-foreground font-bold rounded-lg text-sm transition-colors border border-border">
@@ -227,13 +258,33 @@ function EstimatorPage() {
                 </p>
               </div>
 
-              {/* Список материалов */}
+              {/* Список материалов (ДИНАМИЧЕСКИЙ) */}
               <div className="space-y-3 mb-6">
-                <ResultItem title="Кабель ВВГнг(А)-LS 3x2.5 (м)" value="150 м." />
-                <ResultItem title="УЗО 40А 30мА тип А (шт)" value="2 шт." />
-                <ResultItem title="Автоматический выключатель 16А (шт)" value="8 шт." />
+                <ResultItem 
+                  title="Кабель ВВГнг(А)-LS 3x2.5 (м)" 
+                  qty={`${estimatedData.cableQty} м.`} 
+                  price={useMyPrices ? `${(estimatedData.cableQty * 85).toLocaleString('ru-RU')} ₽` : undefined} 
+                />
+                <ResultItem 
+                  title="УЗО 40А 30мА тип А (шт)" 
+                  qty={`${estimatedData.rcdQty} шт.`} 
+                  price={useMyPrices ? `${(estimatedData.rcdQty * 2500).toLocaleString('ru-RU')} ₽` : undefined} 
+                />
+                <ResultItem 
+                  title="Автоматический выключатель 16А (шт)" 
+                  qty={`${estimatedData.breakerQty} шт.`} 
+                  price={useMyPrices ? `${(estimatedData.breakerQty * 350).toLocaleString('ru-RU')} ₽` : undefined} 
+                />
                 
-                <div className="p-4 bg-muted/30 border border-border border-dashed rounded-xl text-center">
+                {/* ИТОГОВАЯ СУММА (Показывается только если включены цены) */}
+                {useMyPrices && (
+                  <div className="p-5 mt-4 bg-primary/10 border border-primary/20 rounded-xl flex justify-between items-center">
+                    <span className="font-bold text-foreground">Итого по материалам:</span>
+                    <span className="text-xl font-black text-primary">{estimatedData.totalPrice.toLocaleString('ru-RU')} ₽</span>
+                  </div>
+                )}
+
+                <div className="p-4 bg-muted/30 border border-border border-dashed rounded-xl text-center mt-4">
                   <p className="text-sm font-medium text-muted-foreground italic">+ еще 24 позиции согласно ПУЭ</p>
                 </div>
               </div>
@@ -251,14 +302,18 @@ function EstimatorPage() {
   )
 }
 
-function ResultItem({ title, value }: { title: string, value: string }) {
+// Вспомогательный компонент для строки сметы (добавлена поддержка цены)
+function ResultItem({ title, qty, price }: { title: string, qty: string, price?: string }) {
   return (
     <div className="flex items-center justify-between p-4 bg-background border border-border rounded-xl">
       <div className="flex items-center gap-3">
         <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
         <span className="font-medium text-sm sm:text-base text-foreground">{title}</span>
       </div>
-      <span className="font-black text-foreground whitespace-nowrap ml-4">{value}</span>
+      <div className="text-right ml-4">
+        <div className="font-black text-foreground whitespace-nowrap">{qty}</div>
+        {price && <div className="text-xs font-bold text-primary mt-1">{price}</div>}
+      </div>
     </div>
   )
 }
