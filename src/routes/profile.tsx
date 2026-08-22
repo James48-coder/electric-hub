@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { User, Settings, LogOut, Zap, Shield, CreditCard, Coffee, HelpCircle, CheckCircle2, ChevronRight, Trash2 } from 'lucide-react'
 import React, { useState } from 'react'
 
@@ -10,6 +10,14 @@ type TariffType = 'free' | 'master' | 'pro'
 
 function ProfilePage() {
   const [currentTariff, setCurrentTariff] = useState<TariffType>('free')
+  const navigate = useNavigate()
+
+  // Логика выхода (удаляем память и переходим на главную)
+  const handleLogout = () => {
+    localStorage.removeItem('voltpro_auth')
+    window.dispatchEvent(new Event('auth-change')) // Оповещаем всё меню
+    navigate({ to: '/' })
+  }
 
   // Моковые данные пользователя
   const user = {
@@ -68,7 +76,7 @@ function ProfilePage() {
         <p className="text-sm sm:text-base text-muted-foreground">Управление аккаунтом и подпиской</p>
       </div>
 
-      {/* ВЕРХНЯЯ ПАНЕЛЬ: 2 КОЛОНКИ НА КОМПЕ (Пользователь и Помощь) */}
+      {/* ВЕРХНЯЯ ПАНЕЛЬ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
         
         {/* Карточка пользователя */}
@@ -85,13 +93,13 @@ function ProfilePage() {
           </div>
           <div className="flex-1 min-w-0">
             <h2 className="text-lg sm:text-xl font-black text-foreground mb-1 truncate">{user.name}</h2>
-            {/* Убрали truncate, чтобы почта умещалась полностью */}
             <p className="text-xs sm:text-sm text-muted-foreground mb-4">{user.email}</p>
             <div className="flex gap-2">
               <button className="flex-1 bg-background border border-border py-2 rounded-lg text-xs font-bold text-foreground hover:border-primary/50 hover:text-primary transition-colors">
                 Настройки
               </button>
-              <button className="px-3 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white py-2 rounded-lg transition-colors">
+              {/* РАБОЧАЯ КНОПКА ВЫХОДА */}
+              <button onClick={handleLogout} className="px-3 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white py-2 rounded-lg transition-colors">
                 <LogOut className="w-4 h-4" />
               </button>
             </div>
