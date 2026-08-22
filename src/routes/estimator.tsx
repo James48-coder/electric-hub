@@ -17,7 +17,6 @@ function EstimatorPage() {
   const [region, setRegion] = useState('')
   const [roomType, setRoomType] = useState('Коммерческое помещение')
   const [area, setArea] = useState<number>(24)
-  // ПОЛЗУНОК ВЫКЛЮЧЕН ПО УМОЛЧАНИЮ
   const [useMyPrices, setUseMyPrices] = useState(false)
   const [description, setDescription] = useState('Гараж, 1 выключатель, 2 розетки, 4 светильника')
 
@@ -333,12 +332,10 @@ function EstimatorPage() {
                 />
                 
                 {/* ИТОГОВАЯ СУММА */}
-                {useMyPrices && (
-                  <div className="p-5 mt-4 bg-primary/10 border border-primary/20 rounded-xl flex justify-between items-center">
-                    <span className="font-bold text-foreground">Итого по материалам:</span>
-                    <span className="text-xl font-black text-primary">{totalSum.toLocaleString('ru-RU')} ₽</span>
-                  </div>
-                )}
+                <div className="p-5 mt-4 bg-primary/10 border border-primary/20 rounded-xl flex justify-between items-center">
+                  <span className="font-bold text-foreground">Итого по материалам:</span>
+                  <span className="text-xl font-black text-primary">{totalSum.toLocaleString('ru-RU')} ₽</span>
+                </div>
 
                 <div className="p-4 bg-muted/30 border border-border border-dashed rounded-xl text-center mt-4">
                   <p className="text-sm font-medium text-muted-foreground italic">+ гофра, коробки и еще 14 позиций</p>
@@ -373,7 +370,7 @@ function ResultItem({ title, unit, qty, price, isEditable, onChange }: { title: 
       {/* Блок метрик (Для мобилок выстраивается в ряд) */}
       <div className="md:col-span-7 flex w-full justify-between md:grid md:grid-cols-7 gap-2 md:gap-4 items-center mt-2 md:mt-0 pt-2 border-t border-border md:border-0 md:pt-0">
         
-        {/* 2. Цена (Редактируемая колонка) */}
+        {/* 2. Цена (Редактируемая колонка или текст) */}
         <div className="md:col-span-3 flex flex-col w-1/3 md:w-auto">
           <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1">Цена</span>
           {isEditable ? (
@@ -387,7 +384,7 @@ function ResultItem({ title, unit, qty, price, isEditable, onChange }: { title: 
               <span className="absolute right-2 top-1.5 text-xs text-muted-foreground">₽</span>
             </div>
           ) : (
-            <span className="font-bold text-sm mt-1 md:mt-0">{isEditable ? '' : '-'}</span>
+            <span className="font-bold text-sm mt-1 md:mt-0">{price.toLocaleString('ru-RU')} ₽</span>
           )}
         </div>
 
@@ -400,7 +397,7 @@ function ResultItem({ title, unit, qty, price, isEditable, onChange }: { title: 
         {/* 4. Итоговая сумма */}
         <div className="md:col-span-2 flex flex-col w-1/3 md:w-auto text-right">
           <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1">Итого</span>
-          <span className="font-black text-primary text-sm whitespace-nowrap mt-1 md:mt-0">{isEditable ? `${total.toLocaleString('ru-RU')} ₽` : '-'}</span>
+          <span className="font-black text-primary text-sm whitespace-nowrap mt-1 md:mt-0">{total.toLocaleString('ru-RU')} ₽</span>
         </div>
       </div>
     </div>
