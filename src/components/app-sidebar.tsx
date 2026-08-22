@@ -1,12 +1,28 @@
 import { Link } from '@tanstack/react-router'
 import { Zap, Home, BookOpen, FileText, Calculator, Waypoints, Bot, MessageSquare, Users, User, HelpCircle, Binary } from 'lucide-react'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
 export function AppSidebar() {
-  // ВРЕМЕННЫЙ РУБИЛЬНИК АВТОРИЗАЦИИ
-  // false = не авторизован (ведет на /login)
-  // true  = авторизован (ведет на /profile)
-  const isAuthenticated = false 
+  // УМНЫЙ РУБИЛЬНИК АВТОРИЗАЦИИ (читает память браузера)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  useEffect(() => {
+    // Функция проверки метки в памяти
+    const checkAuth = () => {
+      setIsAuthenticated(localStorage.getItem('voltpro_auth') === 'true')
+    }
+    
+    checkAuth() // Проверяем при загрузке
+
+    // Слушаем изменения авторизации в реальном времени
+    window.addEventListener('storage', checkAuth)
+    window.addEventListener('auth-change', checkAuth)
+
+    return () => {
+      window.removeEventListener('storage', checkAuth)
+      window.removeEventListener('auth-change', checkAuth)
+    }
+  }, [])
 
   return (
     <aside className="w-64 h-full flex flex-col bg-card overflow-y-auto">
