@@ -14,20 +14,34 @@ function EstimatorPage() {
   const [showResult, setShowResult] = useState(false)
 
   // === ЖИВЫЕ ДАННЫЕ ФОРМЫ ===
+  const [region, setRegion] = useState('')
   const [roomType, setRoomType] = useState('Коммерческое помещение')
   const [area, setArea] = useState<number>(24)
   const [useMyPrices, setUseMyPrices] = useState(true)
   const [description, setDescription] = useState('Гараж, 1 выключатель, 2 розетки, 4 светильника')
 
-  // === ДАННЫЕ СГЕНЕРИРОВАННОЙ СМЕТЫ ===
+  // === КОЛИЧЕСТВО МАТЕРИАЛОВ (Считает ИИ) ===
   const [estimatedData, setEstimatedData] = useState({
     cable3x25: 0,
     cable3x15: 0,
     rcdQty: 0,
     breaker16AQty: 0,
     breaker10AQty: 0,
-    totalPrice: 0
   })
+
+  // === БАЗОВЫЕ ЦЕНЫ (Будут подтягиваться ИИ онлайн по региону, а пока можно менять руками) ===
+  const [prices, setPrices] = useState({
+    cable3x25: 85,
+    cable3x15: 65,
+    rcd: 2500,
+    breaker16A: 350,
+    breaker10A: 350,
+  })
+
+  // Обновление конкретной цены из таблицы
+  const handlePriceChange = (key: keyof typeof prices, value: number) => {
+    setPrices(prev => ({ ...prev, [key]: value }))
+  }
 
   // === ИМИТАЦИЯ ИИ (ПАРСИНГ ТЕКСТА И ЛОГИКА ТРАССИРОВКИ) ===
   const handleGenerate = (e: React.FormEvent) => {
@@ -41,33 +55,27 @@ function EstimatorPage() {
     const switchesMatch = text.match(/(\d+)\s*выключат/)
     const lightsMatch = text.match(/(\d+)\s*светил/)
 
-    // Если цифры есть в тексте - берем их, если нет - считаем по норме на м2
     const socketsCount = socketsMatch ? parseInt(socketsMatch[1], 10) : Math.max(1, Math.ceil(area / 6))
     const switchesCount = switchesMatch ? parseInt(switchesMatch[1], 10) : 1
     const lightsCount = lightsMatch ? parseInt(lightsMatch[1], 10) : Math.max(1, Math.ceil(area / 5))
 
-    // Логика расчета кабеля (Щит -> Коробка + Опуски + Запас)
+    // Логика расчета
     const calcCable3x25 = Math.round(10 + (socketsCount * 3) + (area * 0.1)) 
     const calcCable3x15 = Math.round(10 + (switchesCount * 3) + (lightsCount * 2) + (area * 0.1))
+    const calcAutomat16A = Math.max(1, Math.ceil(socketsCount / 4))
+    const calcAutomat10A = Math.max(1, Math.ceil(lightsCount / 10))
+    const calcRcd = 1 
 
-    // Логика автоматики
-    const calcAutomat16A = Math.max(1, Math.ceil(socketsCount / 4)) // Грубо: 1 автомат на группу из 4 розеток
-    const calcAutomat10A = Math.max(1, Math.ceil(lightsCount / 10)) // 1 автомат на 10 светильников
-    const calcRcd = 1 // Минимум 1 вводное УЗО или дифавтомат
+    // Сбрасываем цены на базовые при новой генерации 
+    // (в будущем здесь будет функция fetchPricesFromAI(region) )
+    setPrices({
+      cable3x25: 85,
+      cable3x15: 65,
+      rcd: 2500,
+      breaker16A: 350,
+      breaker10A: 350,
+    })
 
-    // Моковые цены из базы мастера
-    const priceCable3x25 = 85
-    const priceCable3x15 = 65
-    const priceAutomat = 350
-    const priceRcd = 2500
-
-    const total = (calcCable3x25 * priceCable3x25) + 
-                  (calcCable3x15 * priceCable3x15) + 
-                  (calcAutomat16A * priceAutomat) + 
-                  (calcAutomat10A * priceAutomat) + 
-                  (calcRcd * priceRcd)
-
-    // Имитируем задержку ИИ в 2.5 секунды
     setTimeout(() => {
       setEstimatedData({
         cable3x25: calcCable3x25,
@@ -75,12 +83,19 @@ function EstimatorPage() {
         rcdQty: calcRcd,
         breaker16AQty: calcAutomat16A,
         breaker10AQty: calcAutomat10A,
-        totalPrice: total
       })
       setIsGenerating(false)
       setShowResult(true)
     }, 2500)
   }
+
+  // Мгновенный пересчет общей суммы
+  const totalSum = 
+    (estimatedData.cable3x25 * prices.cable3x25) +
+    (estimatedData.cable3x15 * prices.cable3x15) +
+    (estimatedData.rcdQty * prices.rcd) +
+    (estimatedData.breaker16AQty * prices.breaker16A) +
+    (estimatedData.breaker10AQty * prices.breaker10A)
 
   return (
     <div className="container mx-auto max-w-4xl animate-in fade-in duration-500 pb-24 relative px-4 sm:px-6">
@@ -138,7 +153,6 @@ function EstimatorPage() {
         </p>
       </div>
 
-      {/* ЛОГИКА БЛОКИРОВКИ ДЛЯ БАЗОВОГО ТАРИФА */}
       {tariff === 'free' ? (
         <div className="bg-orange-500/10 border-2 border-orange-500/20 rounded-3xl p-8 sm:p-12 text-center flex flex-col items-center">
           <div className="w-16 h-16 bg-orange-500/20 text-orange-500 rounded-full flex items-center justify-center mb-6">
@@ -153,11 +167,8 @@ function EstimatorPage() {
           </button>
         </div>
       ) : (
-        
-        /* РАБОЧАЯ ЗОНА ДЛЯ MASTER И PRO */
         <div className="space-y-6">
           
-          {/* ФОРМА ВВОДА ПАРАМЕТРОВ */}
           <div className="bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-sm">
             <div className="flex items-center gap-3 mb-6">
               <Settings className="w-5 h-5 text-primary" />
@@ -174,7 +185,7 @@ function EstimatorPage() {
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <MapPin className="h-5 w-5 text-muted-foreground" />
                     </div>
-                    <input type="text" required placeholder="Например: Новосибирск" 
+                    <input type="text" required value={region} onChange={(e) => setRegion(e.target.value)} placeholder="Например: Новосибирск" 
                       onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Пожалуйста, укажите регион')}
                       onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
                       className="w-full pl-12 pr-4 py-3.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" />
@@ -222,8 +233,8 @@ function EstimatorPage() {
                 {/* Использовать мои цены */}
                 <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl border border-border mt-auto gap-4">
                   <div className="flex-1">
-                    <p className="font-bold text-sm text-foreground mb-1 leading-tight">Использовать мои цены</p>
-                    <p className="text-xs text-muted-foreground leading-snug">Алгоритм подставит ваши прайсы</p>
+                    <p className="font-bold text-sm text-foreground mb-1 leading-tight">Использовать мои цены / Изменить</p>
+                    <p className="text-xs text-muted-foreground leading-snug">Алгоритм подставит ваши прайсы в таблицу</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer shrink-0">
                     <input type="checkbox" className="sr-only peer" checked={useMyPrices} onChange={(e) => setUseMyPrices(e.target.checked)} />
@@ -249,7 +260,7 @@ function EstimatorPage() {
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black py-4 px-6 rounded-xl transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-3 disabled:opacity-80 cursor-pointer"
               >
                 {isGenerating ? (
-                  <><Loader2 className="w-6 h-6 animate-spin" /> Изучаем ПУЭ и считаем трассы...</>
+                  <><Loader2 className="w-6 h-6 animate-spin" /> Анализ ПУЭ и трассировка...</>
                 ) : (
                   <><Sparkles className="w-6 h-6" /> Сгенерировать смету</>
                 )}
@@ -282,44 +293,52 @@ function EstimatorPage() {
                 </p>
               </div>
 
-              {/* Список материалов (ДИНАМИЧЕСКИЙ) */}
+              {/* === ТАБЛИЦА СМЕТЫ === */}
               <div className="space-y-3 mb-6">
+                
+                {/* Шапка таблицы (Только для компов) */}
+                <div className="hidden md:grid md:grid-cols-12 gap-4 px-4 pb-2 border-b border-border">
+                  <div className="col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Наименование работ / материалов</div>
+                  <div className="col-span-3 text-xs font-bold text-muted-foreground uppercase tracking-widest pl-2">Цена за ед.</div>
+                  <div className="col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-center">Кол-во</div>
+                  <div className="col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-right">Итого</div>
+                </div>
+
+                {/* Строки */}
                 <ResultItem 
-                  title="Кабель ВВГнг(А)-LS 3x2.5 (Розеточная группа)" 
-                  qty={`${estimatedData.cable3x25} м.`} 
-                  price={useMyPrices ? `${(estimatedData.cable3x25 * 85).toLocaleString('ru-RU')} ₽` : undefined} 
+                  title="Кабель ВВГнг(А)-LS 3x2.5 (м)" unit="м."
+                  qty={estimatedData.cable3x25} price={prices.cable3x25} isEditable={useMyPrices}
+                  onChange={(val) => handlePriceChange('cable3x25', val)} 
                 />
                 <ResultItem 
-                  title="Кабель ВВГнг(А)-LS 3x1.5 (Освещение)" 
-                  qty={`${estimatedData.cable3x15} м.`} 
-                  price={useMyPrices ? `${(estimatedData.cable3x15 * 65).toLocaleString('ru-RU')} ₽` : undefined} 
+                  title="Кабель ВВГнг(А)-LS 3x1.5 (м)" unit="м."
+                  qty={estimatedData.cable3x15} price={prices.cable3x15} isEditable={useMyPrices}
+                  onChange={(val) => handlePriceChange('cable3x15', val)} 
                 />
                 <ResultItem 
-                  title="УЗО 40А 30мА тип А (шт)" 
-                  qty={`${estimatedData.rcdQty} шт.`} 
-                  price={useMyPrices ? `${(estimatedData.rcdQty * 2500).toLocaleString('ru-RU')} ₽` : undefined} 
+                  title="УЗО 40А 30мА тип А (шт)" unit="шт."
+                  qty={estimatedData.rcdQty} price={prices.rcd} isEditable={useMyPrices}
+                  onChange={(val) => handlePriceChange('rcd', val)} 
                 />
                 <ResultItem 
-                  title="Автоматический выключатель 16А, х-ка С (шт)" 
-                  qty={`${estimatedData.breaker16AQty} шт.`} 
-                  price={useMyPrices ? `${(estimatedData.breaker16AQty * 350).toLocaleString('ru-RU')} ₽` : undefined} 
+                  title="Автомат 16А, х-ка С (шт)" unit="шт."
+                  qty={estimatedData.breaker16AQty} price={prices.breaker16A} isEditable={useMyPrices}
+                  onChange={(val) => handlePriceChange('breaker16A', val)} 
                 />
                 <ResultItem 
-                  title="Автоматический выключатель 10А, х-ка С (шт)" 
-                  qty={`${estimatedData.breaker10AQty} шт.`} 
-                  price={useMyPrices ? `${(estimatedData.breaker10AQty * 350).toLocaleString('ru-RU')} ₽` : undefined} 
+                  title="Автомат 10А, х-ка С (шт)" unit="шт."
+                  qty={estimatedData.breaker10AQty} price={prices.breaker10A} isEditable={useMyPrices}
+                  onChange={(val) => handlePriceChange('breaker10A', val)} 
                 />
                 
-                {/* ИТОГОВАЯ СУММА (Показывается только если включены цены) */}
-                {useMyPrices && (
-                  <div className="p-5 mt-4 bg-primary/10 border border-primary/20 rounded-xl flex justify-between items-center">
-                    <span className="font-bold text-foreground">Итого по материалам:</span>
-                    <span className="text-xl font-black text-primary">{estimatedData.totalPrice.toLocaleString('ru-RU')} ₽</span>
-                  </div>
-                )}
+                {/* ИТОГОВАЯ СУММА */}
+                <div className="p-5 mt-4 bg-primary/10 border border-primary/20 rounded-xl flex justify-between items-center">
+                  <span className="font-bold text-foreground">Итого по материалам:</span>
+                  <span className="text-xl font-black text-primary">{totalSum.toLocaleString('ru-RU')} ₽</span>
+                </div>
 
                 <div className="p-4 bg-muted/30 border border-border border-dashed rounded-xl text-center mt-4">
-                  <p className="text-sm font-medium text-muted-foreground italic">+ гофра, распаячные коробки и еще 14 позиций</p>
+                  <p className="text-sm font-medium text-muted-foreground italic">+ гофра, коробки и еще 14 позиций</p>
                 </div>
               </div>
 
@@ -336,16 +355,50 @@ function EstimatorPage() {
   )
 }
 
-function ResultItem({ title, qty, price }: { title: string, qty: string, price?: string }) {
+// === УМНАЯ СТРОКА ТАБЛИЦЫ ===
+function ResultItem({ title, unit, qty, price, isEditable, onChange }: { title: string, unit: string, qty: number, price: number, isEditable: boolean, onChange: (val: number) => void }) {
+  const total = qty * price
+
   return (
-    <div className="flex items-center justify-between p-4 bg-background border border-border rounded-xl">
-      <div className="flex items-center gap-3">
-        <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
-        <span className="font-medium text-sm sm:text-base text-foreground pr-4">{title}</span>
+    <div className="flex flex-col md:grid md:grid-cols-12 gap-4 items-start md:items-center p-4 bg-background border border-border rounded-xl">
+      {/* 1. Название */}
+      <div className="md:col-span-5 flex items-start gap-3 w-full">
+        <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+        <span className="font-medium text-sm sm:text-base text-foreground leading-tight">{title}</span>
       </div>
-      <div className="text-right ml-auto shrink-0">
-        <div className="font-black text-foreground whitespace-nowrap">{qty}</div>
-        {price && <div className="text-xs font-bold text-primary mt-1">{price}</div>}
+
+      {/* Блок метрик (Для мобилок выстраивается в ряд) */}
+      <div className="md:col-span-7 flex w-full justify-between md:grid md:grid-cols-7 gap-2 md:gap-4 items-center mt-2 md:mt-0 pt-2 border-t border-border md:border-0 md:pt-0">
+        
+        {/* 2. Цена (Редактируемая колонка) */}
+        <div className="md:col-span-3 flex flex-col w-1/3 md:w-auto">
+          <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1">Цена</span>
+          {isEditable ? (
+            <div className="relative max-w-[120px]">
+              <input
+                type="number"
+                value={price}
+                onChange={(e) => onChange(Number(e.target.value))}
+                className="w-full bg-muted border border-border rounded-lg py-1.5 pl-2 pr-6 text-sm font-bold focus:ring-1 focus:ring-primary outline-none transition-colors"
+              />
+              <span className="absolute right-2 top-1.5 text-xs text-muted-foreground">₽</span>
+            </div>
+          ) : (
+            <span className="font-bold text-sm mt-1 md:mt-0">{price.toLocaleString('ru-RU')} ₽</span>
+          )}
+        </div>
+
+        {/* 3. Количество */}
+        <div className="md:col-span-2 flex flex-col w-1/3 md:w-auto text-center">
+          <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1">Кол-во</span>
+          <span className="font-black text-sm whitespace-nowrap mt-1 md:mt-0">{qty} {unit}</span>
+        </div>
+
+        {/* 4. Итоговая сумма */}
+        <div className="md:col-span-2 flex flex-col w-1/3 md:w-auto text-right">
+          <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1">Итого</span>
+          <span className="font-black text-primary text-sm whitespace-nowrap mt-1 md:mt-0">{total.toLocaleString('ru-RU')} ₽</span>
+        </div>
       </div>
     </div>
   )
