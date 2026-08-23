@@ -12,7 +12,7 @@ function EstimatorPage() {
   const [tariff, setTariff] = useState<Tariff>('free')
   const [isGenerating, setIsGenerating] = useState(false)
   const [showResult, setShowResult] = useState(false)
-  const [isCopied, setIsCopied] = useState(false) // Для уведомления о копировании
+  const [isCopied, setIsCopied] = useState(false) 
 
   // === ЖИВЫЕ ДАННЫЕ ФОРМЫ ===
   const [region, setRegion] = useState('')
@@ -21,7 +21,7 @@ function EstimatorPage() {
   const [useMyPrices, setUseMyPrices] = useState(false)
   const [description, setDescription] = useState('Гараж, 1 выключатель, 2 розетки, 4 светильника')
 
-  // === КОЛИЧЕСТВО МАТЕРИАЛОВ (Считает ИИ) ===
+  // === КОЛИЧЕСТВО МАТЕРИАЛОВ ===
   const [estimatedData, setEstimatedData] = useState({
     cable3x25: 0,
     cable3x15: 0,
@@ -30,7 +30,7 @@ function EstimatorPage() {
     breaker10AQty: 0,
   })
 
-  // === БАЗОВЫЕ ЦЕНЫ ===
+  // === ЦЕНЫ ===
   const [prices, setPrices] = useState({
     cable3x25: 85,
     cable3x15: 65,
@@ -43,7 +43,6 @@ function EstimatorPage() {
     setPrices(prev => ({ ...prev, [key]: value }))
   }
 
-  // === ИМИТАЦИЯ ИИ ===
   const handleGenerate = (e: React.FormEvent) => {
     e.preventDefault()
     setIsGenerating(true)
@@ -87,37 +86,27 @@ function EstimatorPage() {
     (estimatedData.breaker16AQty * prices.breaker16A) +
     (estimatedData.breaker10AQty * prices.breaker10A)
 
-  // === ПЕЧАТЬ PDF ===
   const handlePrint = () => {
     window.print()
   }
 
-  // === ШЕРИНГ (Web Share API) ===
   const handleShare = async () => {
     let shareText = `⚡ ВольтПро | Смета\nОбъект: ${roomType}\nПлощадь: ${area} м²\n\nМатериалы:\n`
-    shareText += `• Кабель ВВГнг(А)-LS 3x2.5: ${estimatedData.cable3x25} м. ${useMyPrices ? `(${prices.cable3x25} ₽) = ${estimatedData.cable3x25 * prices.cable3x25} ₽` : ''}\n`
-    shareText += `• Кабель ВВГнг(А)-LS 3x1.5: ${estimatedData.cable3x15} м. ${useMyPrices ? `(${prices.cable3x15} ₽) = ${estimatedData.cable3x15 * prices.cable3x15} ₽` : ''}\n`
-    shareText += `• УЗО 40А 30мА: ${estimatedData.rcdQty} шт. ${useMyPrices ? `(${prices.rcd} ₽) = ${estimatedData.rcdQty * prices.rcd} ₽` : ''}\n`
-    shareText += `• Автомат 16А: ${estimatedData.breaker16AQty} шт. ${useMyPrices ? `(${prices.breaker16A} ₽) = ${estimatedData.breaker16AQty * prices.breaker16A} ₽` : ''}\n`
-    shareText += `• Автомат 10А: ${estimatedData.breaker10AQty} шт. ${useMyPrices ? `(${prices.breaker10A} ₽) = ${estimatedData.breaker10AQty * prices.breaker10A} ₽` : ''}\n`
-    
-    if (useMyPrices) {
-      shareText += `\nИТОГО ПО МАТЕРИАЛАМ: ${totalSum.toLocaleString('ru-RU')} ₽\n`
-    }
+    shareText += `• Кабель ВВГнг(А)-LS 3x2.5: ${estimatedData.cable3x25} м. (${prices.cable3x25} ₽) = ${estimatedData.cable3x25 * prices.cable3x25} ₽\n`
+    shareText += `• Кабель ВВГнг(А)-LS 3x1.5: ${estimatedData.cable3x15} м. (${prices.cable3x15} ₽) = ${estimatedData.cable3x15 * prices.cable3x15} ₽\n`
+    shareText += `• УЗО 40А 30мА: ${estimatedData.rcdQty} шт. (${prices.rcd} ₽) = ${estimatedData.rcdQty * prices.rcd} ₽\n`
+    shareText += `• Автомат 16А: ${estimatedData.breaker16AQty} шт. (${prices.breaker16A} ₽) = ${estimatedData.breaker16AQty * prices.breaker16A} ₽\n`
+    shareText += `• Автомат 10А: ${estimatedData.breaker10AQty} шт. (${prices.breaker10A} ₽) = ${estimatedData.breaker10AQty * prices.breaker10A} ₽\n`
+    shareText += `\nИТОГО ПО МАТЕРИАЛАМ: ${totalSum.toLocaleString('ru-RU')} ₽\n`
     shareText += `\n*Расчет приблизительный. Требуется проект.`
 
-    // Если браузер поддерживает шеринг (телефоны)
     if (navigator.share) {
       try {
-        await navigator.share({
-          title: `Смета: ${roomType}`,
-          text: shareText,
-        })
+        await navigator.share({ title: `Смета: ${roomType}`, text: shareText })
       } catch (error) {
         console.log('Пользователь отменил отправку')
       }
     } else {
-      // Фолбэк для ПК: копируем в буфер обмена
       navigator.clipboard.writeText(shareText)
       setIsCopied(true)
       setTimeout(() => setIsCopied(false), 2000)
@@ -125,21 +114,51 @@ function EstimatorPage() {
   }
 
   return (
-    // Добавлен класс print:bg-white чтобы при печати фон был белым, а не темным
-    <div className="container mx-auto max-w-4xl animate-in fade-in duration-500 pb-24 relative px-4 sm:px-6 print:bg-white print:text-black print:p-0">
+    <div className="container mx-auto max-w-4xl animate-in fade-in duration-500 pb-24 relative px-4 sm:px-6">
       
-      {/* 🛠 ПАНЕЛЬ ТЕСТИРОВАНИЯ ТАРИФОВ (Прячем при печати - print:hidden) */}
-      <div className="mb-8 p-4 bg-muted/30 border-2 border-border rounded-2xl flex flex-wrap items-center gap-4 print:hidden">
+      {/* 🚀 ИЗОЛИРУЮЩИЙ СТИЛЬ ДЛЯ ИДЕАЛЬНОЙ ПЕЧАТИ */}
+      <style>
+        {`
+          @media print {
+            /* Скрываем весь сайт */
+            body * { visibility: hidden; }
+            /* Показываем ТОЛЬКО блок со сметой */
+            #print-section, #print-section * { visibility: visible; }
+            /* Выносим смету на весь лист, убирая влияние боковых меню */
+            #print-section {
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 100%;
+              margin: 0;
+              padding: 0;
+            }
+            /* Разрешаем браузеру печатать все страницы без обрезки */
+            html, body, #root, main, div {
+              height: auto !important;
+              overflow: visible !important;
+            }
+            /* Сохраняем наши родные цвета (Без белых фонов!) */
+            body {
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+          }
+        `}
+      </style>
+
+      {/* 🛠 ПАНЕЛЬ ТЕСТИРОВАНИЯ ТАРИФОВ (Кнопки исправлены!) */}
+      <div className="mb-8 p-4 bg-muted/30 border-2 border-border rounded-2xl flex flex-wrap items-center gap-4">
         <span className="text-xs font-black text-muted-foreground uppercase tracking-widest w-full sm:w-auto mb-1 sm:mb-0 text-center sm:text-left flex items-center justify-center sm:justify-start gap-2">
           <Settings className="w-4 h-4" /> Тест тарифов:
         </span>
-        <button onClick={() => { setTariff('free'); setShowResult(false); }} className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${tariff === 'free' ? 'bg-primary text-primary-foreground shadow-lg scale-105' : 'bg-background border-2 border-border text-muted-foreground'}`}>Free</button>
-        <button onClick={() => setTariff('master')} className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${tariff === 'master' ? 'bg-primary text-primary-foreground shadow-lg scale-105' : 'bg-background border-2 border-border text-muted-foreground'}`}>Master</button>
-        <button onClick={() => setTariff('pro')} className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${tariff === 'pro' ? 'bg-primary text-primary-foreground shadow-lg scale-105' : 'bg-background border-2 border-border text-muted-foreground'}`}>PRO</button>
+        
+        <button onClick={() => { setTariff('free'); setShowResult(false); }} className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${tariff === 'free' ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'}`}>Free</button>
+        <button onClick={() => setTariff('master')} className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${tariff === 'master' ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'}`}>Master</button>
+        <button onClick={() => setTariff('pro')} className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${tariff === 'pro' ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'}`}>PRO</button>
       </div>
 
-      {/* Шапка (Прячем при печати) */}
-      <div className="mb-8 print:hidden">
+      <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shrink-0">
             <Bot className="w-7 h-7" />
@@ -152,7 +171,7 @@ function EstimatorPage() {
       </div>
 
       {tariff === 'free' ? (
-        <div className="bg-orange-500/10 border-2 border-orange-500/20 rounded-3xl p-8 sm:p-12 text-center flex flex-col items-center print:hidden">
+        <div className="bg-orange-500/10 border-2 border-orange-500/20 rounded-3xl p-8 sm:p-12 text-center flex flex-col items-center">
           <div className="w-16 h-16 bg-orange-500/20 text-orange-500 rounded-full flex items-center justify-center mb-6">
             <Lock className="w-8 h-8" />
           </div>
@@ -167,8 +186,7 @@ function EstimatorPage() {
       ) : (
         <div className="space-y-6">
           
-          {/* ФОРМА (Прячем при печати) */}
-          <div className="bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-sm print:hidden">
+          <div className="bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-sm">
             <div className="flex items-center gap-3 mb-6">
               <Settings className="w-5 h-5 text-primary" />
               <h2 className="text-lg font-bold text-foreground">Параметры объекта</h2>
@@ -176,7 +194,6 @@ function EstimatorPage() {
             
             <form onSubmit={handleGenerate} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
                 <div>
                   <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Регион / Город</label>
                   <div className="relative">
@@ -235,20 +252,20 @@ function EstimatorPage() {
             </form>
           </div>
 
-          {/* ВЫДАЧА РЕЗУЛЬТАТА (Контейнер настраивается для печати) */}
+          {/* ВЫДАЧА РЕЗУЛЬТАТА (Берется в печать целиком благодаря ID = print-section) */}
           {showResult && (
-            <div className="bg-card border-2 border-primary/30 rounded-3xl p-6 sm:p-8 shadow-xl animate-in slide-in-from-bottom-8 duration-500 relative overflow-hidden print:border-none print:shadow-none print:p-0 print:block">
+            <div id="print-section" className="bg-card border-2 border-primary/30 rounded-3xl p-6 sm:p-8 shadow-xl animate-in slide-in-from-bottom-8 duration-500 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50 print:hidden"></div>
               
               {/* Шапка для печати (Видна только на бумаге/PDF) */}
-              <div className="hidden print:flex justify-between items-center border-b border-black pb-4 mb-6">
+              <div className="hidden print:flex justify-between items-end border-b border-border pb-4 mb-6">
                 <div>
-                  <h1 className="text-2xl font-black text-black tracking-tight">ВольтПро</h1>
-                  <p className="text-sm text-gray-500">Система инженерных расчетов</p>
+                  <h1 className="text-2xl font-black text-foreground tracking-tight">ВольтПро</h1>
+                  <p className="text-sm text-muted-foreground">Система инженерных расчетов</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-bold text-black">Смета от: {new Date().toLocaleDateString('ru-RU')}</p>
-                  <p className="text-sm text-gray-500">Регион: {region || 'Не указан'}</p>
+                  <p className="text-sm font-bold text-foreground">Смета от: {new Date().toLocaleDateString('ru-RU')}</p>
+                  <p className="text-sm text-muted-foreground">Регион: {region || 'Не указан'}</p>
                 </div>
               </div>
               
@@ -256,13 +273,13 @@ function EstimatorPage() {
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 print:mb-2">
                 <div>
                   <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1 print:hidden">Готово</p>
-                  <h3 className="text-xl sm:text-2xl font-black text-foreground flex items-center gap-2 print:text-black">
+                  <h3 className="text-xl sm:text-2xl font-black text-foreground flex items-center gap-2">
                     <FileText className="w-6 h-6 text-muted-foreground print:hidden" /> Смета: {roomType}
                   </h3>
-                  <p className="hidden print:block text-sm text-gray-700 mt-1">Площадь объекта: {area} м²</p>
+                  <p className="hidden print:block text-sm text-muted-foreground mt-1">Площадь объекта: {area} м²</p>
                 </div>
                 
-                {/* Панель кнопок: Скачать и Поделиться (Прячем при печати) */}
+                {/* Панель кнопок (Прячем при печати!) */}
                 <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 print:hidden">
                   <button 
                     onClick={handleShare}
@@ -281,38 +298,36 @@ function EstimatorPage() {
               </div>
 
               {/* ДИСКЛЕЙМЕР */}
-              <div className="mb-6 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-start gap-3 print:bg-white print:border-gray-300 print:text-black">
+              <div className="mb-6 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-start gap-3">
                 <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5 print:hidden" />
-                <p className="text-xs sm:text-sm text-amber-600 dark:text-amber-500 leading-relaxed font-medium print:text-gray-600">
+                <p className="text-xs sm:text-sm text-amber-600 dark:text-amber-500 leading-relaxed font-medium">
                   Расчёт приблизительный, не является офертой. Перед работой проконсультируйтесь со специалистом!
                 </p>
               </div>
 
               {/* === ТАБЛИЦА СМЕТЫ === */}
-              <div className="space-y-3 mb-6 print:space-y-0 text-black">
+              <div className="space-y-3 mb-6">
                 
                 {/* Шапка таблицы */}
-                <div className="hidden md:grid md:grid-cols-12 gap-4 px-4 pb-2 border-b border-border print:grid print:border-black">
-                  <div className="col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-widest print:text-black">Наименование материалов</div>
-                  <div className="col-span-3 text-xs font-bold text-muted-foreground uppercase tracking-widest pl-2 print:text-black">Цена за ед.</div>
-                  <div className="col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-center print:text-black">Кол-во</div>
-                  <div className="col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-right print:text-black">Итого</div>
+                <div className="hidden md:grid md:grid-cols-12 gap-4 px-4 pb-2 border-b border-border">
+                  <div className="col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Наименование материалов</div>
+                  <div className="col-span-3 text-xs font-bold text-muted-foreground uppercase tracking-widest pl-2">Цена за ед.</div>
+                  <div className="col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-center">Кол-во</div>
+                  <div className="col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-right">Итого</div>
                 </div>
 
-                {/* Строки */}
+                {/* Строки с гарантированным отображением цен! */}
                 <ResultItem title="Кабель ВВГнг(А)-LS 3x2.5 (м)" unit="м." qty={estimatedData.cable3x25} price={prices.cable3x25} isEditable={useMyPrices} onChange={(val) => handlePriceChange('cable3x25', val)} />
                 <ResultItem title="Кабель ВВГнг(А)-LS 3x1.5 (м)" unit="м." qty={estimatedData.cable3x15} price={prices.cable3x15} isEditable={useMyPrices} onChange={(val) => handlePriceChange('cable3x15', val)} />
                 <ResultItem title="УЗО 40А 30мА тип А (шт)" unit="шт." qty={estimatedData.rcdQty} price={prices.rcd} isEditable={useMyPrices} onChange={(val) => handlePriceChange('rcd', val)} />
                 <ResultItem title="Автомат 16А, х-ка С (шт)" unit="шт." qty={estimatedData.breaker16AQty} price={prices.breaker16A} isEditable={useMyPrices} onChange={(val) => handlePriceChange('breaker16A', val)} />
                 <ResultItem title="Автомат 10А, х-ка С (шт)" unit="шт." qty={estimatedData.breaker10AQty} price={prices.breaker10A} isEditable={useMyPrices} onChange={(val) => handlePriceChange('breaker10A', val)} />
                 
-                {/* ИТОГОВАЯ СУММА */}
-                {useMyPrices && (
-                  <div className="p-5 mt-4 bg-primary/10 border border-primary/20 rounded-xl flex justify-between items-center print:bg-white print:border-t-2 print:border-black print:rounded-none print:mt-0 print:p-2">
-                    <span className="font-bold text-foreground print:text-black">Итого по материалам:</span>
-                    <span className="text-xl font-black text-primary print:text-black">{totalSum.toLocaleString('ru-RU')} ₽</span>
-                  </div>
-                )}
+                {/* ИТОГОВАЯ СУММА (ВСЕГДА НА ЭКРАНЕ) */}
+                <div className="p-5 mt-4 bg-primary/10 border border-primary/20 rounded-xl flex justify-between items-center">
+                  <span className="font-bold text-foreground">Итого по материалам:</span>
+                  <span className="text-xl font-black text-primary">{totalSum.toLocaleString('ru-RU')} ₽</span>
+                </div>
               </div>
 
             </div>
@@ -328,14 +343,15 @@ function ResultItem({ title, unit, qty, price, isEditable, onChange }: { title: 
   const total = qty * price
 
   return (
-    <div className="flex flex-col md:grid md:grid-cols-12 gap-4 items-start md:items-center p-4 bg-background border border-border rounded-xl print:grid print:p-2 print:border-b print:border-gray-200 print:rounded-none print:bg-white print:text-black">
+    <div className="flex flex-col md:grid md:grid-cols-12 gap-4 items-start md:items-center p-4 bg-background border border-border rounded-xl print:py-2 print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none">
       <div className="md:col-span-5 flex items-start gap-3 w-full">
         <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5 print:hidden" />
-        <span className="font-medium text-sm sm:text-base text-foreground leading-tight print:text-black">{title}</span>
+        <span className="font-medium text-sm sm:text-base text-foreground leading-tight">{title}</span>
       </div>
 
       <div className="md:col-span-7 flex w-full justify-between md:grid md:grid-cols-7 gap-2 md:gap-4 items-center mt-2 md:mt-0 pt-2 border-t border-border md:border-0 md:pt-0 print:border-0 print:pt-0">
         
+        {/* Цена (Поле ввода или Текст. ВСЕГДА показывает цифру) */}
         <div className="md:col-span-3 flex flex-col w-1/3 md:w-auto">
           <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1 print:hidden">Цена</span>
           {isEditable ? (
@@ -343,27 +359,27 @@ function ResultItem({ title, unit, qty, price, isEditable, onChange }: { title: 
               <input type="number" value={price} onChange={(e) => onChange(Number(e.target.value))} className="w-full bg-muted border border-border rounded-lg py-1.5 pl-2 pr-6 text-sm font-bold focus:ring-1 focus:ring-primary outline-none transition-colors" />
               <span className="absolute right-2 top-1.5 text-xs text-muted-foreground">₽</span>
             </div>
-          ) : null}
-          {/* При печати и выключенном ползунке показываем текст */}
-          <span className={`font-bold text-sm mt-1 md:mt-0 print:block print:text-black ${isEditable ? 'hidden' : 'block'}`}>
-            {isEditable ? `${price.toLocaleString('ru-RU')} ₽` : '-'}
-          </span>
-          {/* Дублируем текст для печати, когда ползунок включен (чтобы скрыть input) */}
+          ) : (
+            <span className="font-bold text-sm mt-1 md:mt-0 print:block">{price.toLocaleString('ru-RU')} ₽</span>
+          )}
+          {/* Дублируем текст для печати, когда ползунок включен (чтобы скрыть input на листе) */}
           {isEditable && (
-             <span className="hidden print:block font-bold text-sm text-black">
+             <span className="hidden print:block font-bold text-sm text-foreground">
                 {price.toLocaleString('ru-RU')} ₽
              </span>
           )}
         </div>
 
-        <div className="md:col-span-2 flex flex-col w-1/3 md:w-auto text-center print:text-right">
+        {/* Количество */}
+        <div className="md:col-span-2 flex flex-col w-1/3 md:w-auto text-center md:text-center print:text-center">
           <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1 print:hidden">Кол-во</span>
-          <span className="font-black text-sm whitespace-nowrap mt-1 md:mt-0 print:text-black">{qty} {unit}</span>
+          <span className="font-black text-sm whitespace-nowrap mt-1 md:mt-0">{qty} {unit}</span>
         </div>
 
-        <div className="md:col-span-2 flex flex-col w-1/3 md:w-auto text-right print:text-right">
+        {/* Итоговая сумма по позиции (ВСЕГДА показывает цифру) */}
+        <div className="md:col-span-2 flex flex-col w-1/3 md:w-auto text-right md:text-right print:text-right">
           <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1 print:hidden">Итого</span>
-          <span className="font-black text-primary text-sm whitespace-nowrap mt-1 md:mt-0 print:text-black">{isEditable ? `${total.toLocaleString('ru-RU')} ₽` : '-'}</span>
+          <span className="font-black text-primary text-sm whitespace-nowrap mt-1 md:mt-0">{total.toLocaleString('ru-RU')} ₽</span>
         </div>
       </div>
     </div>
