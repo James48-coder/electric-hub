@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Bot, MapPin, Home as HomeIcon, Ruler, Settings, Lock, Sparkles, Loader2, FileText, Download, CheckCircle2, ChevronDown, AlertTriangle } from 'lucide-react'
+import { Bot, MapPin, Home as HomeIcon, Ruler, Settings, Lock, Sparkles, Loader2, FileText, Download, CheckCircle2, ChevronDown, AlertTriangle, Share2, Copy } from 'lucide-react'
 import React, { useState } from 'react'
 
 export const Route = createFileRoute('/estimator')({
@@ -12,6 +12,7 @@ function EstimatorPage() {
   const [tariff, setTariff] = useState<Tariff>('free')
   const [isGenerating, setIsGenerating] = useState(false)
   const [showResult, setShowResult] = useState(false)
+  const [isCopied, setIsCopied] = useState(false) // Для уведомления о копировании
 
   // === ЖИВЫЕ ДАННЫЕ ФОРМЫ ===
   const [region, setRegion] = useState('')
@@ -29,7 +30,7 @@ function EstimatorPage() {
     breaker10AQty: 0,
   })
 
-  // === БАЗОВЫЕ ЦЕНЫ (Будут подтягиваться ИИ онлайн по региону, а пока можно менять руками) ===
+  // === БАЗОВЫЕ ЦЕНЫ ===
   const [prices, setPrices] = useState({
     cable3x25: 85,
     cable3x15: 65,
@@ -38,18 +39,17 @@ function EstimatorPage() {
     breaker10A: 350,
   })
 
-  // Обновление конкретной цены из таблицы
   const handlePriceChange = (key: keyof typeof prices, value: number) => {
     setPrices(prev => ({ ...prev, [key]: value }))
   }
 
-  // === ИМИТАЦИЯ ИИ (ПАРСИНГ ТЕКСТА И ЛОГИКА ТРАССИРОВКИ) ===
+  // === ИМИТАЦИЯ ИИ ===
   const handleGenerate = (e: React.FormEvent) => {
     e.preventDefault()
     setIsGenerating(true)
     setShowResult(false)
+    setIsCopied(false)
 
-    // ИИ "читает" текст задачи
     const text = description.toLowerCase()
     const socketsMatch = text.match(/(\d+)\s*розет/)
     const switchesMatch = text.match(/(\d+)\s*выключат/)
@@ -59,22 +59,13 @@ function EstimatorPage() {
     const switchesCount = switchesMatch ? parseInt(switchesMatch[1], 10) : 1
     const lightsCount = lightsMatch ? parseInt(lightsMatch[1], 10) : Math.max(1, Math.ceil(area / 5))
 
-    // Логика расчета
     const calcCable3x25 = Math.round(10 + (socketsCount * 3) + (area * 0.1)) 
     const calcCable3x15 = Math.round(10 + (switchesCount * 3) + (lightsCount * 2) + (area * 0.1))
     const calcAutomat16A = Math.max(1, Math.ceil(socketsCount / 4))
     const calcAutomat10A = Math.max(1, Math.ceil(lightsCount / 10))
     const calcRcd = 1 
 
-    // Сбрасываем цены на базовые при новой генерации 
-    // (в будущем здесь будет функция fetchPricesFromAI(region) )
-    setPrices({
-      cable3x25: 85,
-      cable3x15: 65,
-      rcd: 2500,
-      breaker16A: 350,
-      breaker10A: 350,
-    })
+    setPrices({ cable3x25: 85, cable3x15: 65, rcd: 2500, breaker16A: 350, breaker10A: 350 })
 
     setTimeout(() => {
       setEstimatedData({
@@ -89,7 +80,6 @@ function EstimatorPage() {
     }, 2500)
   }
 
-  // Мгновенный пересчет общей суммы
   const totalSum = 
     (estimatedData.cable3x25 * prices.cable3x25) +
     (estimatedData.cable3x15 * prices.cable3x15) +
@@ -97,51 +87,59 @@ function EstimatorPage() {
     (estimatedData.breaker16AQty * prices.breaker16A) +
     (estimatedData.breaker10AQty * prices.breaker10A)
 
+  // === ПЕЧАТЬ PDF ===
+  const handlePrint = () => {
+    window.print()
+  }
+
+  // === ШЕРИНГ (Web Share API) ===
+  const handleShare = async () => {
+    let shareText = `⚡ ВольтПро | Смета\nОбъект: ${roomType}\nПлощадь: ${area} м²\n\nМатериалы:\n`
+    shareText += `• Кабель ВВГнг(А)-LS 3x2.5: ${estimatedData.cable3x25} м. ${useMyPrices ? `(${prices.cable3x25} ₽) = ${estimatedData.cable3x25 * prices.cable3x25} ₽` : ''}\n`
+    shareText += `• Кабель ВВГнг(А)-LS 3x1.5: ${estimatedData.cable3x15} м. ${useMyPrices ? `(${prices.cable3x15} ₽) = ${estimatedData.cable3x15 * prices.cable3x15} ₽` : ''}\n`
+    shareText += `• УЗО 40А 30мА: ${estimatedData.rcdQty} шт. ${useMyPrices ? `(${prices.rcd} ₽) = ${estimatedData.rcdQty * prices.rcd} ₽` : ''}\n`
+    shareText += `• Автомат 16А: ${estimatedData.breaker16AQty} шт. ${useMyPrices ? `(${prices.breaker16A} ₽) = ${estimatedData.breaker16AQty * prices.breaker16A} ₽` : ''}\n`
+    shareText += `• Автомат 10А: ${estimatedData.breaker10AQty} шт. ${useMyPrices ? `(${prices.breaker10A} ₽) = ${estimatedData.breaker10AQty * prices.breaker10A} ₽` : ''}\n`
+    
+    if (useMyPrices) {
+      shareText += `\nИТОГО ПО МАТЕРИАЛАМ: ${totalSum.toLocaleString('ru-RU')} ₽\n`
+    }
+    shareText += `\n*Расчет приблизительный. Требуется проект.`
+
+    // Если браузер поддерживает шеринг (телефоны)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Смета: ${roomType}`,
+          text: shareText,
+        })
+      } catch (error) {
+        console.log('Пользователь отменил отправку')
+      }
+    } else {
+      // Фолбэк для ПК: копируем в буфер обмена
+      navigator.clipboard.writeText(shareText)
+      setIsCopied(true)
+      setTimeout(() => setIsCopied(false), 2000)
+    }
+  }
+
   return (
-    <div className="container mx-auto max-w-4xl animate-in fade-in duration-500 pb-24 relative px-4 sm:px-6">
+    // Добавлен класс print:bg-white чтобы при печати фон был белым, а не темным
+    <div className="container mx-auto max-w-4xl animate-in fade-in duration-500 pb-24 relative px-4 sm:px-6 print:bg-white print:text-black print:p-0">
       
-      {/* 🛠 ПАНЕЛЬ ТЕСТИРОВАНИЯ ТАРИФОВ */}
-      <div className="mb-8 p-4 bg-muted/30 border-2 border-border rounded-2xl flex flex-wrap items-center gap-4">
+      {/* 🛠 ПАНЕЛЬ ТЕСТИРОВАНИЯ ТАРИФОВ (Прячем при печати - print:hidden) */}
+      <div className="mb-8 p-4 bg-muted/30 border-2 border-border rounded-2xl flex flex-wrap items-center gap-4 print:hidden">
         <span className="text-xs font-black text-muted-foreground uppercase tracking-widest w-full sm:w-auto mb-1 sm:mb-0 text-center sm:text-left flex items-center justify-center sm:justify-start gap-2">
           <Settings className="w-4 h-4" /> Тест тарифов:
         </span>
-        
-        <button 
-          onClick={() => { setTariff('free'); setShowResult(false); }} 
-          className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${
-            tariff === 'free' 
-            ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' 
-            : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'
-          }`}
-        >
-          Free
-        </button>
-        
-        <button 
-          onClick={() => setTariff('master')} 
-          className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${
-            tariff === 'master' 
-            ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' 
-            : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'
-          }`}
-        >
-          Master
-        </button>
-        
-        <button 
-          onClick={() => setTariff('pro')} 
-          className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${
-            tariff === 'pro' 
-            ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' 
-            : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'
-          }`}
-        >
-          PRO
-        </button>
+        <button onClick={() => { setTariff('free'); setShowResult(false); }} className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${tariff === 'free' ? 'bg-primary text-primary-foreground shadow-lg scale-105' : 'bg-background border-2 border-border text-muted-foreground'}`}>Free</button>
+        <button onClick={() => setTariff('master')} className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${tariff === 'master' ? 'bg-primary text-primary-foreground shadow-lg scale-105' : 'bg-background border-2 border-border text-muted-foreground'}`}>Master</button>
+        <button onClick={() => setTariff('pro')} className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${tariff === 'pro' ? 'bg-primary text-primary-foreground shadow-lg scale-105' : 'bg-background border-2 border-border text-muted-foreground'}`}>PRO</button>
       </div>
 
-      {/* Шапка */}
-      <div className="mb-8">
+      {/* Шапка (Прячем при печати) */}
+      <div className="mb-8 print:hidden">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shrink-0">
             <Bot className="w-7 h-7" />
@@ -154,7 +152,7 @@ function EstimatorPage() {
       </div>
 
       {tariff === 'free' ? (
-        <div className="bg-orange-500/10 border-2 border-orange-500/20 rounded-3xl p-8 sm:p-12 text-center flex flex-col items-center">
+        <div className="bg-orange-500/10 border-2 border-orange-500/20 rounded-3xl p-8 sm:p-12 text-center flex flex-col items-center print:hidden">
           <div className="w-16 h-16 bg-orange-500/20 text-orange-500 rounded-full flex items-center justify-center mb-6">
             <Lock className="w-8 h-8" />
           </div>
@@ -169,7 +167,8 @@ function EstimatorPage() {
       ) : (
         <div className="space-y-6">
           
-          <div className="bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-sm">
+          {/* ФОРМА (Прячем при печати) */}
+          <div className="bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-sm print:hidden">
             <div className="flex items-center gap-3 mb-6">
               <Settings className="w-5 h-5 text-primary" />
               <h2 className="text-lg font-bold text-foreground">Параметры объекта</h2>
@@ -178,31 +177,19 @@ function EstimatorPage() {
             <form onSubmit={handleGenerate} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
-                {/* Регион */}
                 <div>
                   <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Регион / Город</label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <MapPin className="h-5 w-5 text-muted-foreground" />
-                    </div>
-                    <input type="text" required value={region} onChange={(e) => setRegion(e.target.value)} placeholder="Например: Новосибирск" 
-                      onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Пожалуйста, укажите регион')}
-                      onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
-                      className="w-full pl-12 pr-4 py-3.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" />
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><MapPin className="h-5 w-5 text-muted-foreground" /></div>
+                    <input type="text" required value={region} onChange={(e) => setRegion(e.target.value)} placeholder="Например: Новосибирск" className="w-full pl-12 pr-4 py-3.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" />
                   </div>
                 </div>
 
-                {/* Тип помещения */}
                 <div>
                   <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Тип помещения</label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <HomeIcon className="h-5 w-5 text-muted-foreground" />
-                    </div>
-                    <select required value={roomType} onChange={(e) => setRoomType(e.target.value)}
-                      onInvalid={(e) => (e.target as HTMLSelectElement).setCustomValidity('Пожалуйста, выберите тип помещения')}
-                      onInput={(e) => (e.target as HTMLSelectElement).setCustomValidity('')}
-                      className="w-full pl-12 pr-10 py-3.5 bg-background border border-border rounded-xl text-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none appearance-none cursor-pointer">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><HomeIcon className="h-5 w-5 text-muted-foreground" /></div>
+                    <select required value={roomType} onChange={(e) => setRoomType(e.target.value)} className="w-full pl-12 pr-10 py-3.5 bg-background border border-border rounded-xl text-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none appearance-none cursor-pointer">
                       <option value="Квартира (Новостройка)">Квартира (Новостройка)</option>
                       <option value="Квартира (Вторичка)">Квартира (Вторичка)</option>
                       <option value="Дом / Коттедж">Дом / Коттедж</option>
@@ -210,27 +197,18 @@ function EstimatorPage() {
                       <option value="Офис">Офис</option>
                       <option value="Гараж / Подсобное">Гараж / Подсобное</option>
                     </select>
-                    <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                      <ChevronDown className="h-5 w-5 text-muted-foreground" />
-                    </div>
+                    <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none"><ChevronDown className="h-5 w-5 text-muted-foreground" /></div>
                   </div>
                 </div>
 
-                {/* Площадь */}
                 <div>
                   <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Площадь (м²)</label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Ruler className="h-5 w-5 text-muted-foreground" />
-                    </div>
-                    <input type="number" required min="1" value={area || ''} onChange={(e) => setArea(Number(e.target.value))} placeholder="0"
-                      onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Пожалуйста, укажите площадь')}
-                      onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
-                      className="w-full pl-12 pr-4 py-3.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" />
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Ruler className="h-5 w-5 text-muted-foreground" /></div>
+                    <input type="number" required min="1" value={area || ''} onChange={(e) => setArea(Number(e.target.value))} placeholder="0" className="w-full pl-12 pr-4 py-3.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" />
                   </div>
                 </div>
 
-                {/* Использовать мои цены */}
                 <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl border border-border mt-auto gap-4">
                   <div className="flex-1">
                     <p className="font-bold text-sm text-foreground mb-1 leading-tight">Использовать мои цены / Изменить</p>
@@ -243,108 +221,99 @@ function EstimatorPage() {
                 </div>
               </div>
 
-              {/* Описание задачи */}
               <div>
                 <div className="flex justify-between items-end mb-2">
                   <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest">Описание задачи для ИИ</label>
                   <span className="text-xs text-muted-foreground">Опционально</span>
                 </div>
-                <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Пример: Гараж, 1 выключатель, 2 розетки, 4 светильника"
-                  className="w-full p-4 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none resize-none"></textarea>
+                <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Пример: Гараж, 1 выключатель, 2 розетки, 4 светильника" className="w-full p-4 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none resize-none"></textarea>
               </div>
 
-              {/* Кнопка генерации */}
-              <button 
-                type="submit" 
-                disabled={isGenerating}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black py-4 px-6 rounded-xl transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-3 disabled:opacity-80 cursor-pointer"
-              >
-                {isGenerating ? (
-                  <><Loader2 className="w-6 h-6 animate-spin" /> Анализ ПУЭ и трассировка...</>
-                ) : (
-                  <><Sparkles className="w-6 h-6" /> Сгенерировать смету</>
-                )}
+              <button type="submit" disabled={isGenerating} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black py-4 px-6 rounded-xl transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-3 disabled:opacity-80 cursor-pointer">
+                {isGenerating ? <><Loader2 className="w-6 h-6 animate-spin" /> Анализ ПУЭ и трассировка...</> : <><Sparkles className="w-6 h-6" /> Сгенерировать смету</>}
               </button>
             </form>
           </div>
 
-          {/* ВЫДАЧА РЕЗУЛЬТАТА */}
+          {/* ВЫДАЧА РЕЗУЛЬТАТА (Контейнер настраивается для печати) */}
           {showResult && (
-            <div className="bg-card border-2 border-primary/30 rounded-3xl p-6 sm:p-8 shadow-xl animate-in slide-in-from-bottom-8 duration-500 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50"></div>
+            <div className="bg-card border-2 border-primary/30 rounded-3xl p-6 sm:p-8 shadow-xl animate-in slide-in-from-bottom-8 duration-500 relative overflow-hidden print:border-none print:shadow-none print:p-0 print:block">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50 print:hidden"></div>
               
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+              {/* Шапка для печати (Видна только на бумаге/PDF) */}
+              <div className="hidden print:flex justify-between items-center border-b border-black pb-4 mb-6">
                 <div>
-                  <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">Готово</p>
-                  <h3 className="text-xl sm:text-2xl font-black text-foreground flex items-center gap-2">
-                    <FileText className="w-6 h-6 text-muted-foreground" /> Смета: {roomType}
-                  </h3>
+                  <h1 className="text-2xl font-black text-black tracking-tight">ВольтПро</h1>
+                  <p className="text-sm text-gray-500">Система инженерных расчетов</p>
                 </div>
-                <button className="flex items-center justify-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 text-foreground font-bold rounded-lg text-sm transition-colors border border-border">
-                  <Download className="w-4 h-4" /> Экспорт в PDF
-                </button>
+                <div className="text-right">
+                  <p className="text-sm font-bold text-black">Смета от: {new Date().toLocaleDateString('ru-RU')}</p>
+                  <p className="text-sm text-gray-500">Регион: {region || 'Не указан'}</p>
+                </div>
+              </div>
+              
+              {/* Шапка интерфейса и Кнопки действий */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 print:mb-2">
+                <div>
+                  <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1 print:hidden">Готово</p>
+                  <h3 className="text-xl sm:text-2xl font-black text-foreground flex items-center gap-2 print:text-black">
+                    <FileText className="w-6 h-6 text-muted-foreground print:hidden" /> Смета: {roomType}
+                  </h3>
+                  <p className="hidden print:block text-sm text-gray-700 mt-1">Площадь объекта: {area} м²</p>
+                </div>
+                
+                {/* Панель кнопок: Скачать и Поделиться (Прячем при печати) */}
+                <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 print:hidden">
+                  <button 
+                    onClick={handleShare}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-primary/10 hover:bg-primary/20 text-primary font-bold rounded-lg text-sm transition-colors border border-primary/20"
+                  >
+                    {isCopied ? <Copy className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
+                    {isCopied ? 'Скопировано!' : 'Поделиться'}
+                  </button>
+                  <button 
+                    onClick={handlePrint}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-muted hover:bg-muted/80 text-foreground font-bold rounded-lg text-sm transition-colors border border-border"
+                  >
+                    <Download className="w-4 h-4" /> Скачать PDF
+                  </button>
+                </div>
               </div>
 
               {/* ДИСКЛЕЙМЕР */}
-              <div className="mb-6 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-                <p className="text-xs sm:text-sm text-amber-600 dark:text-amber-500 leading-relaxed font-medium">
+              <div className="mb-6 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-start gap-3 print:bg-white print:border-gray-300 print:text-black">
+                <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5 print:hidden" />
+                <p className="text-xs sm:text-sm text-amber-600 dark:text-amber-500 leading-relaxed font-medium print:text-gray-600">
                   Расчёт приблизительный, не является офертой. Перед работой проконсультируйтесь со специалистом!
                 </p>
               </div>
 
               {/* === ТАБЛИЦА СМЕТЫ === */}
-              <div className="space-y-3 mb-6">
+              <div className="space-y-3 mb-6 print:space-y-0 text-black">
                 
-                {/* Шапка таблицы (Только для компов) */}
-                <div className="hidden md:grid md:grid-cols-12 gap-4 px-4 pb-2 border-b border-border">
-                  <div className="col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Наименование работ / материалов</div>
-                  <div className="col-span-3 text-xs font-bold text-muted-foreground uppercase tracking-widest pl-2">Цена за ед.</div>
-                  <div className="col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-center">Кол-во</div>
-                  <div className="col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-right">Итого</div>
+                {/* Шапка таблицы */}
+                <div className="hidden md:grid md:grid-cols-12 gap-4 px-4 pb-2 border-b border-border print:grid print:border-black">
+                  <div className="col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-widest print:text-black">Наименование материалов</div>
+                  <div className="col-span-3 text-xs font-bold text-muted-foreground uppercase tracking-widest pl-2 print:text-black">Цена за ед.</div>
+                  <div className="col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-center print:text-black">Кол-во</div>
+                  <div className="col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-right print:text-black">Итого</div>
                 </div>
 
                 {/* Строки */}
-                <ResultItem 
-                  title="Кабель ВВГнг(А)-LS 3x2.5 (м)" unit="м."
-                  qty={estimatedData.cable3x25} price={prices.cable3x25} isEditable={useMyPrices}
-                  onChange={(val) => handlePriceChange('cable3x25', val)} 
-                />
-                <ResultItem 
-                  title="Кабель ВВГнг(А)-LS 3x1.5 (м)" unit="м."
-                  qty={estimatedData.cable3x15} price={prices.cable3x15} isEditable={useMyPrices}
-                  onChange={(val) => handlePriceChange('cable3x15', val)} 
-                />
-                <ResultItem 
-                  title="УЗО 40А 30мА тип А (шт)" unit="шт."
-                  qty={estimatedData.rcdQty} price={prices.rcd} isEditable={useMyPrices}
-                  onChange={(val) => handlePriceChange('rcd', val)} 
-                />
-                <ResultItem 
-                  title="Автомат 16А, х-ка С (шт)" unit="шт."
-                  qty={estimatedData.breaker16AQty} price={prices.breaker16A} isEditable={useMyPrices}
-                  onChange={(val) => handlePriceChange('breaker16A', val)} 
-                />
-                <ResultItem 
-                  title="Автомат 10А, х-ка С (шт)" unit="шт."
-                  qty={estimatedData.breaker10AQty} price={prices.breaker10A} isEditable={useMyPrices}
-                  onChange={(val) => handlePriceChange('breaker10A', val)} 
-                />
+                <ResultItem title="Кабель ВВГнг(А)-LS 3x2.5 (м)" unit="м." qty={estimatedData.cable3x25} price={prices.cable3x25} isEditable={useMyPrices} onChange={(val) => handlePriceChange('cable3x25', val)} />
+                <ResultItem title="Кабель ВВГнг(А)-LS 3x1.5 (м)" unit="м." qty={estimatedData.cable3x15} price={prices.cable3x15} isEditable={useMyPrices} onChange={(val) => handlePriceChange('cable3x15', val)} />
+                <ResultItem title="УЗО 40А 30мА тип А (шт)" unit="шт." qty={estimatedData.rcdQty} price={prices.rcd} isEditable={useMyPrices} onChange={(val) => handlePriceChange('rcd', val)} />
+                <ResultItem title="Автомат 16А, х-ка С (шт)" unit="шт." qty={estimatedData.breaker16AQty} price={prices.breaker16A} isEditable={useMyPrices} onChange={(val) => handlePriceChange('breaker16A', val)} />
+                <ResultItem title="Автомат 10А, х-ка С (шт)" unit="шт." qty={estimatedData.breaker10AQty} price={prices.breaker10A} isEditable={useMyPrices} onChange={(val) => handlePriceChange('breaker10A', val)} />
                 
                 {/* ИТОГОВАЯ СУММА */}
-                <div className="p-5 mt-4 bg-primary/10 border border-primary/20 rounded-xl flex justify-between items-center">
-                  <span className="font-bold text-foreground">Итого по материалам:</span>
-                  <span className="text-xl font-black text-primary">{totalSum.toLocaleString('ru-RU')} ₽</span>
-                </div>
-
-                <div className="p-4 bg-muted/30 border border-border border-dashed rounded-xl text-center mt-4">
-                  <p className="text-sm font-medium text-muted-foreground italic">+ гофра, коробки и еще 14 позиций</p>
-                </div>
+                {useMyPrices && (
+                  <div className="p-5 mt-4 bg-primary/10 border border-primary/20 rounded-xl flex justify-between items-center print:bg-white print:border-t-2 print:border-black print:rounded-none print:mt-0 print:p-2">
+                    <span className="font-bold text-foreground print:text-black">Итого по материалам:</span>
+                    <span className="text-xl font-black text-primary print:text-black">{totalSum.toLocaleString('ru-RU')} ₽</span>
+                  </div>
+                )}
               </div>
-
-              <button className="w-full py-4 bg-background border border-border hover:border-primary/50 text-foreground font-bold rounded-xl transition-colors flex items-center justify-center gap-2">
-                Открыть полную смету
-              </button>
 
             </div>
           )}
@@ -355,49 +324,46 @@ function EstimatorPage() {
   )
 }
 
-// === УМНАЯ СТРОКА ТАБЛИЦЫ ===
 function ResultItem({ title, unit, qty, price, isEditable, onChange }: { title: string, unit: string, qty: number, price: number, isEditable: boolean, onChange: (val: number) => void }) {
   const total = qty * price
 
   return (
-    <div className="flex flex-col md:grid md:grid-cols-12 gap-4 items-start md:items-center p-4 bg-background border border-border rounded-xl">
-      {/* 1. Название */}
+    <div className="flex flex-col md:grid md:grid-cols-12 gap-4 items-start md:items-center p-4 bg-background border border-border rounded-xl print:grid print:p-2 print:border-b print:border-gray-200 print:rounded-none print:bg-white print:text-black">
       <div className="md:col-span-5 flex items-start gap-3 w-full">
-        <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-        <span className="font-medium text-sm sm:text-base text-foreground leading-tight">{title}</span>
+        <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5 print:hidden" />
+        <span className="font-medium text-sm sm:text-base text-foreground leading-tight print:text-black">{title}</span>
       </div>
 
-      {/* Блок метрик (Для мобилок выстраивается в ряд) */}
-      <div className="md:col-span-7 flex w-full justify-between md:grid md:grid-cols-7 gap-2 md:gap-4 items-center mt-2 md:mt-0 pt-2 border-t border-border md:border-0 md:pt-0">
+      <div className="md:col-span-7 flex w-full justify-between md:grid md:grid-cols-7 gap-2 md:gap-4 items-center mt-2 md:mt-0 pt-2 border-t border-border md:border-0 md:pt-0 print:border-0 print:pt-0">
         
-        {/* 2. Цена (Редактируемая колонка или текст) */}
         <div className="md:col-span-3 flex flex-col w-1/3 md:w-auto">
-          <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1">Цена</span>
+          <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1 print:hidden">Цена</span>
           {isEditable ? (
-            <div className="relative max-w-[120px]">
-              <input
-                type="number"
-                value={price}
-                onChange={(e) => onChange(Number(e.target.value))}
-                className="w-full bg-muted border border-border rounded-lg py-1.5 pl-2 pr-6 text-sm font-bold focus:ring-1 focus:ring-primary outline-none transition-colors"
-              />
+            <div className="relative max-w-[120px] print:hidden">
+              <input type="number" value={price} onChange={(e) => onChange(Number(e.target.value))} className="w-full bg-muted border border-border rounded-lg py-1.5 pl-2 pr-6 text-sm font-bold focus:ring-1 focus:ring-primary outline-none transition-colors" />
               <span className="absolute right-2 top-1.5 text-xs text-muted-foreground">₽</span>
             </div>
-          ) : (
-            <span className="font-bold text-sm mt-1 md:mt-0">{price.toLocaleString('ru-RU')} ₽</span>
+          ) : null}
+          {/* При печати и выключенном ползунке показываем текст */}
+          <span className={`font-bold text-sm mt-1 md:mt-0 print:block print:text-black ${isEditable ? 'hidden' : 'block'}`}>
+            {isEditable ? `${price.toLocaleString('ru-RU')} ₽` : '-'}
+          </span>
+          {/* Дублируем текст для печати, когда ползунок включен (чтобы скрыть input) */}
+          {isEditable && (
+             <span className="hidden print:block font-bold text-sm text-black">
+                {price.toLocaleString('ru-RU')} ₽
+             </span>
           )}
         </div>
 
-        {/* 3. Количество */}
-        <div className="md:col-span-2 flex flex-col w-1/3 md:w-auto text-center">
-          <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1">Кол-во</span>
-          <span className="font-black text-sm whitespace-nowrap mt-1 md:mt-0">{qty} {unit}</span>
+        <div className="md:col-span-2 flex flex-col w-1/3 md:w-auto text-center print:text-right">
+          <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1 print:hidden">Кол-во</span>
+          <span className="font-black text-sm whitespace-nowrap mt-1 md:mt-0 print:text-black">{qty} {unit}</span>
         </div>
 
-        {/* 4. Итоговая сумма */}
-        <div className="md:col-span-2 flex flex-col w-1/3 md:w-auto text-right">
-          <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1">Итого</span>
-          <span className="font-black text-primary text-sm whitespace-nowrap mt-1 md:mt-0">{total.toLocaleString('ru-RU')} ₽</span>
+        <div className="md:col-span-2 flex flex-col w-1/3 md:w-auto text-right print:text-right">
+          <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1 print:hidden">Итого</span>
+          <span className="font-black text-primary text-sm whitespace-nowrap mt-1 md:mt-0 print:text-black">{isEditable ? `${total.toLocaleString('ru-RU')} ₽` : '-'}</span>
         </div>
       </div>
     </div>
