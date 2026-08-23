@@ -114,69 +114,52 @@ function EstimatorPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-4xl animate-in fade-in duration-500 pb-24 relative px-4 sm:px-6">
+    // Важно: print:static print:p-0 print:m-0 убивают лишние отступы контейнера при печати!
+    <div className="container mx-auto max-w-4xl animate-in fade-in duration-500 pb-24 relative px-4 sm:px-6 print:static print:p-0 print:m-0 print:max-w-none">
       
-      {/* 🚀 ПОЛНОСТЬЮ ПЕРЕПИСАННЫЕ СТИЛИ ПЕЧАТИ */}
+      {/* 🚀 БЕЗОПАСНЫЕ СТИЛИ ПЕЧАТИ */}
       <style>
         {`
           @media print {
-            /* Скрываем весь сайт */
+            /* Прячем всё лишнее */
             body * { visibility: hidden; }
-            
-            /* Показываем ТОЛЬКО блок со сметой */
             #print-section, #print-section * { visibility: visible; }
             
-            /* Фикс листа: белый фон, черные шрифты, поля 40px */
+            /* Жестко фиксируем смету в самом левом верхнем углу (убивает "абзац") */
             #print-section {
-              position: absolute;
-              left: 0;
-              top: 0;
-              width: 100%;
-              margin: 0;
-              padding: 40px !important;
+              position: absolute !important;
+              left: 0 !important;
+              top: 0 !important;
+              width: 100% !important;
+              margin: 0 !important;
+              padding: 0 !important;
               background-color: white !important;
               border: none !important;
               box-shadow: none !important;
             }
 
-            /* Форсируем черный текст (убиваем темную тему) */
+            /* Белый лист, черный текст */
             #print-section * {
               color: black !important;
+              border-color: #d1d5db !important;
             }
-
-            /* Прозрачные фоны вместо карточек */
             #print-section div {
               background-color: transparent !important;
             }
 
-            /* Светло-серые границы */
-            #print-section .border,
-            #print-section .border-border,
-            #print-section .border-primary\\/20 {
-              border-color: #d1d5db !important;
+            /* Сбрасываем позиционирование корня для правильного вывода А4 */
+            html, body, #root {
+              position: static !important;
+              height: auto !important;
+              overflow: visible !important;
+              background-color: white !important;
             }
-
-            /* Надежно прячем кнопки и лишние иконки */
-            #print-section .print\\:hidden,
-            #print-section .print\\:hidden * {
-              display: none !important;
-            }
-            
-            /* ЖЕСТКАЯ СЕТКА (чтобы при печати колонки не съезжали в кучу) */
-            .print-grid-12 { display: grid !important; grid-template-columns: repeat(12, minmax(0, 1fr)) !important; }
-            .print-grid-7 { display: grid !important; grid-template-columns: repeat(7, minmax(0, 1fr)) !important; }
-            .print-col-5 { grid-column: span 5 / span 5 !important; }
-            .print-col-7 { grid-column: span 7 / span 7 !important; }
-            .print-col-3 { grid-column: span 3 / span 3 !important; }
-            .print-col-2 { grid-column: span 2 / span 2 !important; }
-            .print-text-right { text-align: right !important; }
-            .print-text-center { text-align: center !important; }
           }
         `}
       </style>
 
       {/* 🛠 ПАНЕЛЬ ТЕСТИРОВАНИЯ ТАРИФОВ */}
-      <div className="mb-8 p-4 bg-muted/30 border-2 border-border rounded-2xl flex flex-wrap items-center gap-4">
+      <div className="mb-8 p-4 bg-muted/30 border-2 border-border rounded-2xl flex flex-wrap items-center gap-4 print:hidden">
         <span className="text-xs font-black text-muted-foreground uppercase tracking-widest w-full sm:w-auto mb-1 sm:mb-0 text-center sm:text-left flex items-center justify-center sm:justify-start gap-2">
           <Settings className="w-4 h-4" /> Тест тарифов:
         </span>
@@ -186,7 +169,7 @@ function EstimatorPage() {
         <button onClick={() => setTariff('pro')} className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${tariff === 'pro' ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'}`}>PRO</button>
       </div>
 
-      <div className="mb-8">
+      <div className="mb-8 print:hidden">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shrink-0">
             <Bot className="w-7 h-7" />
@@ -199,7 +182,7 @@ function EstimatorPage() {
       </div>
 
       {tariff === 'free' ? (
-        <div className="bg-orange-500/10 border-2 border-orange-500/20 rounded-3xl p-8 sm:p-12 text-center flex flex-col items-center">
+        <div className="bg-orange-500/10 border-2 border-orange-500/20 rounded-3xl p-8 sm:p-12 text-center flex flex-col items-center print:hidden">
           <div className="w-16 h-16 bg-orange-500/20 text-orange-500 rounded-full flex items-center justify-center mb-6">
             <Lock className="w-8 h-8" />
           </div>
@@ -214,7 +197,7 @@ function EstimatorPage() {
       ) : (
         <div className="space-y-6">
           
-          <div className="bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-sm">
+          <div className="bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-sm print:hidden">
             <div className="flex items-center gap-3 mb-6">
               <Settings className="w-5 h-5 text-primary" />
               <h2 className="text-lg font-bold text-foreground">Параметры объекта</h2>
@@ -280,7 +263,7 @@ function EstimatorPage() {
             </form>
           </div>
 
-          {/* ВЫДАЧА РЕЗУЛЬТАТА (Берется в печать целиком благодаря ID = print-section) */}
+          {/* ВЫДАЧА РЕЗУЛЬТАТА */}
           {showResult && (
             <div id="print-section" className="bg-card border-2 border-primary/30 rounded-3xl p-6 sm:p-8 shadow-xl animate-in slide-in-from-bottom-8 duration-500 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50 print:hidden"></div>
@@ -297,7 +280,6 @@ function EstimatorPage() {
                 </div>
               </div>
               
-              {/* Шапка интерфейса и Кнопки действий */}
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 print:mb-2">
                 <div>
                   <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1 print:hidden">Готово</p>
@@ -307,7 +289,6 @@ function EstimatorPage() {
                   <p className="hidden print:block text-sm text-muted-foreground mt-1">Площадь объекта: {area} м²</p>
                 </div>
                 
-                {/* Панель кнопок (Прячем при печати!) */}
                 <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 print:hidden">
                   <button 
                     onClick={handleShare}
@@ -325,7 +306,6 @@ function EstimatorPage() {
                 </div>
               </div>
 
-              {/* ДИСКЛЕЙМЕР */}
               <div className="mb-6 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-start gap-3">
                 <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5 print:hidden" />
                 <p className="text-xs sm:text-sm text-amber-600 dark:text-amber-500 leading-relaxed font-medium">
@@ -336,12 +316,12 @@ function EstimatorPage() {
               {/* === ТАБЛИЦА СМЕТЫ === */}
               <div className="space-y-3 mb-6">
                 
-                {/* Шапка таблицы (Добавлены классы для строгой печати) */}
-                <div className="hidden md:grid print-grid-12 gap-4 px-4 pb-2 border-b border-border">
-                  <div className="md:col-span-5 print-col-5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Наименование материалов</div>
-                  <div className="md:col-span-3 print-col-3 text-xs font-bold text-muted-foreground uppercase tracking-widest pl-2">Цена за ед.</div>
-                  <div className="md:col-span-2 print-col-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-center print-text-center">Кол-во</div>
-                  <div className="md:col-span-2 print-col-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-right print-text-right">Итого</div>
+                {/* Шапка таблицы (Возвращены стандартные классы Tailwind) */}
+                <div className="hidden md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 px-4 pb-2 border-b border-border print:px-0">
+                  <div className="md:col-span-5 print:col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Наименование материалов</div>
+                  <div className="md:col-span-3 print:col-span-3 text-xs font-bold text-muted-foreground uppercase tracking-widest pl-2 print:pl-0">Цена за ед.</div>
+                  <div className="md:col-span-2 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-center">Кол-во</div>
+                  <div className="md:col-span-2 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-right">Итого</div>
                 </div>
 
                 {/* Строки */}
@@ -352,9 +332,9 @@ function EstimatorPage() {
                 <ResultItem title="Автомат 10А, х-ка С (шт)" unit="шт." qty={estimatedData.breaker10AQty} price={prices.breaker10A} isEditable={useMyPrices} onChange={(val) => handlePriceChange('breaker10A', val)} />
                 
                 {/* ИТОГОВАЯ СУММА */}
-                <div className="p-5 mt-4 bg-primary/10 border border-primary/20 rounded-xl flex justify-between items-center">
+                <div className="p-5 mt-4 bg-primary/10 border border-primary/20 rounded-xl flex justify-between items-center print:px-2 print:border-t-2 print:rounded-none">
                   <span className="font-bold text-foreground">Итого по материалам:</span>
-                  <span className="text-xl font-black text-primary">{totalSum.toLocaleString('ru-RU')} ₽</span>
+                  <span className="text-xl font-black text-primary whitespace-nowrap">{totalSum.toLocaleString('ru-RU')} ₽</span>
                 </div>
               </div>
 
@@ -372,43 +352,43 @@ function ResultItem({ title, unit, qty, price, isEditable, onChange }: { title: 
   const total = qty * price
 
   return (
-    // Добавлены классы print-grid-12 для правильного макета при печати
-    <div className="flex flex-col md:grid print-grid-12 gap-4 items-start md:items-center p-4 bg-background border border-border rounded-xl print:py-2 print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none print:px-0">
+    // Возвращена оригинальная надежная верстка: Flex для мобилки, Grid 12 для MD и Печати
+    <div className="flex flex-col md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 items-start md:items-center p-4 bg-background border border-border rounded-xl print:py-3 print:px-0 print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none">
       
-      <div className="md:col-span-5 print-col-5 flex items-start gap-3 w-full">
+      <div className="md:col-span-5 print:col-span-5 flex items-start gap-3 w-full">
         <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5 print:hidden" />
         <span className="font-medium text-sm sm:text-base text-foreground leading-tight">{title}</span>
       </div>
 
-      <div className="md:col-span-7 print-col-7 flex w-full justify-between md:grid print-grid-7 gap-2 md:gap-4 items-center mt-2 md:mt-0 pt-2 border-t border-border md:border-0 md:pt-0 print:border-0 print:pt-0">
+      <div className="md:col-span-7 print:col-span-7 flex w-full justify-between md:grid md:grid-cols-7 print:grid print:grid-cols-7 gap-2 md:gap-4 items-center mt-2 md:mt-0 pt-2 border-t border-border md:border-0 md:pt-0 print:border-0 print:pt-0">
         
-        {/* Цена */}
-        <div className="md:col-span-3 print-col-3 flex flex-col w-1/3 md:w-auto">
-          <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1 print:hidden">Цена</span>
+        {/* Цена (Добавлен whitespace-nowrap чтобы не было разрывов) */}
+        <div className="md:col-span-3 print:col-span-3 flex flex-col w-1/3 md:w-auto print:w-auto print:block">
+          <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Цена</span>
           {isEditable ? (
             <div className="relative max-w-[120px] print:hidden">
               <input type="number" value={price} onChange={(e) => onChange(Number(e.target.value))} className="w-full bg-muted border border-border rounded-lg py-1.5 pl-2 pr-6 text-sm font-bold focus:ring-1 focus:ring-primary outline-none transition-colors" />
               <span className="absolute right-2 top-1.5 text-xs text-muted-foreground">₽</span>
             </div>
           ) : (
-            <span className="font-bold text-sm mt-1 md:mt-0 print:block">{price.toLocaleString('ru-RU')} ₽</span>
+            <span className="font-bold text-sm mt-1 md:mt-0 print:block whitespace-nowrap">{price.toLocaleString('ru-RU')} ₽</span>
           )}
           {isEditable && (
-             <span className="hidden print:block font-bold text-sm text-foreground">
+             <span className="hidden print:block font-bold text-sm text-foreground whitespace-nowrap">
                 {price.toLocaleString('ru-RU')} ₽
              </span>
           )}
         </div>
 
         {/* Количество */}
-        <div className="md:col-span-2 print-col-2 flex flex-col w-1/3 md:w-auto text-center md:text-center print-text-center">
-          <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1 print:hidden">Кол-во</span>
+        <div className="md:col-span-2 print:col-span-2 flex flex-col w-1/3 md:w-auto text-center md:text-center print:text-center print:w-auto print:block">
+          <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Кол-во</span>
           <span className="font-black text-sm whitespace-nowrap mt-1 md:mt-0">{qty} {unit}</span>
         </div>
 
-        {/* Итого */}
-        <div className="md:col-span-2 print-col-2 flex flex-col w-1/3 md:w-auto text-right md:text-right print-text-right">
-          <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1 print:hidden">Итого</span>
+        {/* Итого (Добавлен whitespace-nowrap) */}
+        <div className="md:col-span-2 print:col-span-2 flex flex-col w-1/3 md:w-auto text-right md:text-right print:text-right print:w-auto print:block">
+          <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Итого</span>
           <span className="font-black text-primary text-sm whitespace-nowrap mt-1 md:mt-0">{total.toLocaleString('ru-RU')} ₽</span>
         </div>
       </div>
