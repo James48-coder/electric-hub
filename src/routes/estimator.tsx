@@ -13,9 +13,9 @@ function EstimatorPage() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [showResult, setShowResult] = useState(false)
   
-  // Состояния для модалки шеринга и загрузки PDF
+  // Состояния для модалки шеринга и ошибки PDF
   const [showShareModal, setShowShareModal] = useState(false)
-  const [isPdfDownloading, setIsPdfDownloading] = useState(false)
+  const [pdfError, setPdfError] = useState(false)
 
   // === ЖИВЫЕ ДАННЫЕ ФОРМЫ ===
   const [region, setRegion] = useState('')
@@ -40,6 +40,7 @@ function EstimatorPage() {
     e.preventDefault()
     setIsGenerating(true)
     setShowResult(false)
+    setPdfError(false)
 
     const text = description.toLowerCase()
     const socketsMatch = text.match(/(\d+)\s*розет/)
@@ -85,7 +86,6 @@ function EstimatorPage() {
   }
 
   const handleShare = async () => {
-    // Пробуем вызвать нативное меню
     if (navigator.share) {
       try {
         await navigator.share({ title: `Смета: ${roomType}`, text: getShareText() })
@@ -98,47 +98,59 @@ function EstimatorPage() {
     }
   }
 
-  // === СОЗДАНИЕ НАСТОЯЩЕГО PDF-ФАЙЛА (Без терминалов и npm!) ===
-  const handlePdfDownload = async () => {
-    setIsPdfDownloading(true)
+  // === БЕЗОПАСНАЯ ПЕЧАТЬ С ОБРАБОТКОЙ ОШИБОК ===
+  const handlePdfDownload = () => {
+    setPdfError(false)
     try {
-      if (!(window as any).html2pdf) {
-        await new Promise((resolve, reject) => {
-          const script = document.createElement('script')
-          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js'
-          script.onload = resolve
-          script.onerror = reject
-          document.head.appendChild(script)
-        })
+      if (typeof window.print !== 'function') {
+        setPdfError(true)
+        return
       }
-
-      const element = document.getElementById('pdf-content')
-      const elementsToHide = element?.querySelectorAll('.no-pdf')
-      elementsToHide?.forEach(el => (el as HTMLElement).style.display = 'none')
-
-      const opt = {
-        margin:       10,
-        filename:     `Смета_${roomType.replace(/\s+/g, '_')}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      }
-
-      await (window as any).html2pdf().set(opt).from(element).save()
-
-      elementsToHide?.forEach(el => (el as HTMLElement).style.display = '')
-    } catch (err) {
-      alert("Не удалось скачать PDF. Проверьте интернет-соединение.")
-    } finally {
-      setIsPdfDownloading(false)
+      window.print()
+    } catch (error) {
+      setPdfError(true)
     }
   }
 
   return (
-    <div className="container mx-auto max-w-4xl animate-in fade-in duration-500 pb-24 relative px-4 sm:px-6">
+    <div className="container mx-auto max-w-4xl animate-in fade-in duration-500 pb-24 relative px-4 sm:px-6 print:static print:p-0 print:m-0 print:max-w-none">
       
+      {/* 🚀 СТРОГИЕ СТИЛИ ПЕЧАТИ (Оставляем те, что работали идеально) */}
+      <style>
+        {`
+          @media print {
+            body * { visibility: hidden; }
+            #print-section, #print-section * { visibility: visible; }
+            #print-section {
+              position: absolute !important;
+              left: 0 !important;
+              top: 0 !important;
+              width: 100% !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              background-color: white !important;
+              border: none !important;
+              box-shadow: none !important;
+            }
+            #print-section * {
+              color: black !important;
+              border-color: #d1d5db !important;
+            }
+            #print-section div {
+              background-color: transparent !important;
+            }
+            html, body, #root {
+              position: static !important;
+              height: auto !important;
+              overflow: visible !important;
+              background-color: white !important;
+            }
+          }
+        `}
+      </style>
+
       {/* 🛠 ПАНЕЛЬ ТЕСТИРОВАНИЯ ТАРИФОВ */}
-      <div className="mb-8 p-4 bg-muted/30 border-2 border-border rounded-2xl flex flex-wrap items-center gap-4">
+      <div className="mb-8 p-4 bg-muted/30 border-2 border-border rounded-2xl flex flex-wrap items-center gap-4 print:hidden">
         <span className="text-xs font-black text-muted-foreground uppercase tracking-widest w-full sm:w-auto mb-1 sm:mb-0 text-center sm:text-left flex items-center justify-center sm:justify-start gap-2">
           <Settings className="w-4 h-4" /> Тест тарифов:
         </span>
@@ -147,7 +159,7 @@ function EstimatorPage() {
         <button onClick={() => setTariff('pro')} className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${tariff === 'pro' ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'}`}>PRO</button>
       </div>
 
-      <div className="mb-8">
+      <div className="mb-8 print:hidden">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shrink-0">
             <Bot className="w-7 h-7" />
@@ -160,7 +172,7 @@ function EstimatorPage() {
       </div>
 
       {tariff === 'free' ? (
-        <div className="bg-orange-500/10 border-2 border-orange-500/20 rounded-3xl p-8 sm:p-12 text-center flex flex-col items-center">
+        <div className="bg-orange-500/10 border-2 border-orange-500/20 rounded-3xl p-8 sm:p-12 text-center flex flex-col items-center print:hidden">
           <div className="w-16 h-16 bg-orange-500/20 text-orange-500 rounded-full flex items-center justify-center mb-6">
             <Lock className="w-8 h-8" />
           </div>
@@ -172,7 +184,7 @@ function EstimatorPage() {
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-sm">
+          <div className="bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-sm print:hidden">
             <div className="flex items-center gap-3 mb-6">
               <Settings className="w-5 h-5 text-primary" />
               <h2 className="text-lg font-bold text-foreground">Параметры объекта</h2>
@@ -230,34 +242,51 @@ function EstimatorPage() {
             </form>
           </div>
 
-          {/* === КОНТЕЙНЕР ДЛЯ ГЕНЕРАЦИИ PDF === */}
+          {/* === КОНТЕЙНЕР ДЛЯ ГЕНЕРАЦИИ СМЕТЫ === */}
           {showResult && (
-            <div id="pdf-content" className="bg-card border-2 border-primary/30 rounded-3xl p-6 sm:p-8 shadow-xl animate-in slide-in-from-bottom-8 relative">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50 no-pdf"></div>
+            <div id="print-section" className="bg-card border-2 border-primary/30 rounded-3xl p-6 sm:p-8 shadow-xl animate-in slide-in-from-bottom-8 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50 print:hidden"></div>
               
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+              <div className="hidden print:flex justify-between items-end border-b border-border pb-4 mb-6">
                 <div>
-                  <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1 no-pdf">Готово</p>
+                  <h1 className="text-2xl font-black text-foreground tracking-tight">ВольтПро</h1>
+                  <p className="text-sm text-muted-foreground">Система инженерных расчетов</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-bold text-foreground">Смета от: {new Date().toLocaleDateString('ru-RU')}</p>
+                  <p className="text-sm text-muted-foreground">Регион: {region || 'Не указан'}</p>
+                </div>
+              </div>
+              
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 print:mb-2">
+                <div>
+                  <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1 print:hidden">Готово</p>
                   <h3 className="text-xl sm:text-2xl font-black text-foreground flex items-center gap-2">
-                    <FileText className="w-6 h-6 text-muted-foreground no-pdf" /> Смета: {roomType}
+                    <FileText className="w-6 h-6 text-muted-foreground print:hidden" /> Смета: {roomType}
                   </h3>
-                  <p className="text-sm text-muted-foreground mt-1">Площадь: {area} м² | Регион: {region || 'Не указан'}</p>
+                  <p className="text-sm text-muted-foreground mt-1 hidden print:block">Площадь: {area} м² | Регион: {region || 'Не указан'}</p>
                 </div>
                 
-                {/* КНОПКИ ДЕЙСТВИЙ */}
-                <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 no-pdf">
+                <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 print:hidden">
                   <button onClick={handleShare} className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-primary/10 hover:bg-primary/20 text-primary font-bold rounded-lg text-sm border border-primary/20 transition-colors">
                     <Share2 className="w-4 h-4" /> Поделиться
                   </button>
-                  <button onClick={handlePdfDownload} disabled={isPdfDownloading} className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-muted hover:bg-muted/80 text-foreground font-bold rounded-lg text-sm border border-border disabled:opacity-50 transition-colors">
-                    {isPdfDownloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                    {isPdfDownloading ? 'Сохранение...' : 'Скачать PDF'}
+                  <button onClick={handlePdfDownload} className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-muted hover:bg-muted/80 text-foreground font-bold rounded-lg text-sm border border-border transition-colors">
+                    <Download className="w-4 h-4" /> Скачать PDF
                   </button>
                 </div>
               </div>
 
-              <div className="mb-6 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5 no-pdf" />
+              {/* ВНУТРИИНТЕРФЕЙСНАЯ ОШИБКА (ВМЕСТО АЛЕРТОВ) */}
+              {pdfError && (
+                <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-sm font-medium animate-in fade-in print:hidden">
+                  <span className="font-bold">⚠️ Функция скачивания PDF заблокирована вашим браузером.</span><br/>
+                  Возможно, вы используете режим "Инкогнито" или встроенный браузер соцсети. Пожалуйста, откройте сайт в стандартном браузере (Chrome, Safari, Яндекс).
+                </div>
+              )}
+
+              <div className="mb-6 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-start gap-3 print:hidden">
+                <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
                 <p className="text-xs sm:text-sm text-amber-600 dark:text-amber-500 leading-relaxed font-medium">
                   Расчёт приблизительный, не является офертой. Перед работой проконсультируйтесь со специалистом!
                 </p>
@@ -265,11 +294,11 @@ function EstimatorPage() {
 
               {/* ТАБЛИЦА СМЕТЫ */}
               <div className="space-y-3 mb-6">
-                <div className="hidden md:grid md:grid-cols-12 gap-4 px-4 pb-2 border-b border-border">
-                  <div className="md:col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Наименование</div>
-                  <div className="md:col-span-3 text-xs font-bold text-muted-foreground uppercase tracking-widest pl-2">Цена за ед.</div>
-                  <div className="md:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-center">Кол-во</div>
-                  <div className="md:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-right">Итого</div>
+                <div className="hidden md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 px-4 pb-2 border-b border-border print:px-0">
+                  <div className="md:col-span-5 print:col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Наименование</div>
+                  <div className="md:col-span-3 print:col-span-3 text-xs font-bold text-muted-foreground uppercase tracking-widest pl-2 print:pl-0">Цена за ед.</div>
+                  <div className="md:col-span-2 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-center">Кол-во</div>
+                  <div className="md:col-span-2 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-right">Итого</div>
                 </div>
 
                 <ResultItem title="Кабель ВВГнг(А)-LS 3x2.5 (м)" unit="м." qty={estimatedData.cable3x25} price={prices.cable3x25} isEditable={useMyPrices} onChange={(val) => handlePriceChange('cable3x25', val)} />
@@ -278,7 +307,7 @@ function EstimatorPage() {
                 <ResultItem title="Автомат 16А, х-ка С (шт)" unit="шт." qty={estimatedData.breaker16AQty} price={prices.breaker16A} isEditable={useMyPrices} onChange={(val) => handlePriceChange('breaker16A', val)} />
                 <ResultItem title="Автомат 10А, х-ка С (шт)" unit="шт." qty={estimatedData.breaker10AQty} price={prices.breaker10A} isEditable={useMyPrices} onChange={(val) => handlePriceChange('breaker10A', val)} />
                 
-                <div className="p-5 mt-4 bg-primary/10 border border-primary/20 rounded-xl flex justify-between items-center">
+                <div className="p-5 mt-4 bg-primary/10 border border-primary/20 rounded-xl flex justify-between items-center print:px-2 print:border-t-2 print:rounded-none">
                   <span className="font-bold text-foreground">Итого по материалам:</span>
                   <span className="text-xl font-black text-primary whitespace-nowrap">{totalSum.toLocaleString('ru-RU')} ₽</span>
                 </div>
@@ -301,23 +330,23 @@ function EstimatorPage() {
             </div>
             
             <div className="space-y-3">
-              {/* Telegram */}
-              <a href={`https://t.me/share/url?url=&text=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-[#0088cc]/10 text-[#0088cc] hover:bg-[#0088cc]/20 rounded-xl font-bold transition-colors">
+              {/* Telegram - Плотный фон, белый текст */}
+              <a href={`https://t.me/share/url?url=&text=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-[#0088cc] text-white hover:bg-[#0088cc]/90 rounded-xl font-bold transition-colors shadow-md">
                 <Send className="w-6 h-6" /> Telegram
               </a>
               
-              {/* WhatsApp */}
-              <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 rounded-xl font-bold transition-colors">
+              {/* WhatsApp - Плотный фон, белый текст */}
+              <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-[#25D366] text-white hover:bg-[#25D366]/90 rounded-xl font-bold transition-colors shadow-md">
                 <MessageCircle className="w-6 h-6" /> WhatsApp
               </a>
 
-              {/* ВКонтакте */}
-              <a href={`https://vk.com/share.php?url=https://voltpro.ru&title=Смета&comment=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-[#0077FF]/10 text-[#0077FF] hover:bg-[#0077FF]/20 rounded-xl font-bold transition-colors">
+              {/* ВКонтакте - Плотный фон, белый текст */}
+              <a href={`https://vk.com/share.php?url=https://voltpro.ru&title=Смета&comment=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-[#0077FF] text-white hover:bg-[#0077FF]/90 rounded-xl font-bold transition-colors shadow-md">
                 <Users className="w-6 h-6" /> ВКонтакте
               </a>
 
-              {/* Мессенджер MAX */}
-              <a href={`max://share?text=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-purple-500/10 text-purple-500 hover:bg-purple-500/20 rounded-xl font-bold transition-colors">
+              {/* Мессенджер MAX - Плотный фон, белый текст */}
+              <a href={`max://share?text=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-purple-600 text-white hover:bg-purple-700 rounded-xl font-bold transition-colors shadow-md">
                 <MessageSquare className="w-6 h-6" /> Мессенджер MAX
               </a>
             </div>
@@ -337,37 +366,37 @@ function ResultItem({ title, unit, qty, price, isEditable, onChange }: { title: 
   const total = qty * price
 
   return (
-    <div className="flex flex-col md:grid md:grid-cols-12 gap-4 items-start md:items-center p-4 bg-background border border-border rounded-xl">
-      <div className="md:col-span-5 flex items-start gap-3 w-full">
-        <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5 no-pdf" />
+    <div className="flex flex-col md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 items-start md:items-center p-4 bg-background border border-border rounded-xl print:py-3 print:px-0 print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none">
+      <div className="md:col-span-5 print:col-span-5 flex items-start gap-3 w-full">
+        <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5 print:hidden" />
         <span className="font-medium text-sm sm:text-base text-foreground leading-tight">{title}</span>
       </div>
 
-      <div className="md:col-span-7 flex w-full justify-between md:grid md:grid-cols-7 gap-2 md:gap-4 items-center mt-2 md:mt-0 pt-2 border-t border-border md:border-0 md:pt-0">
-        <div className="md:col-span-3 flex flex-col w-1/3 md:w-auto">
-          <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1 no-pdf">Цена</span>
+      <div className="md:col-span-7 print:col-span-7 flex w-full justify-between md:grid md:grid-cols-7 print:grid print:grid-cols-7 gap-2 md:gap-4 items-center mt-2 md:mt-0 pt-2 border-t border-border md:border-0 md:pt-0 print:border-0 print:pt-0">
+        <div className="md:col-span-3 print:col-span-3 flex flex-col w-1/3 md:w-auto print:w-auto print:block">
+          <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Цена</span>
           {isEditable ? (
-            <div className="relative max-w-[120px] no-pdf">
+            <div className="relative max-w-[120px] print:hidden">
               <input type="number" value={price} onChange={(e) => onChange(Number(e.target.value))} className="w-full bg-muted border border-border rounded-lg py-1.5 pl-2 pr-6 text-sm font-bold focus:ring-1 focus:ring-primary outline-none transition-colors" />
               <span className="absolute right-2 top-1.5 text-xs text-muted-foreground">₽</span>
             </div>
           ) : (
-            <span className="font-bold text-sm mt-1 md:mt-0 whitespace-nowrap">{price.toLocaleString('ru-RU')} ₽</span>
+            <span className="font-bold text-sm mt-1 md:mt-0 print:block whitespace-nowrap">{price.toLocaleString('ru-RU')} ₽</span>
           )}
           {isEditable && (
-             <span className="hidden font-bold text-sm text-foreground whitespace-nowrap" style={{ display: 'none' }} id="pdf-price">
+             <span className="hidden print:block font-bold text-sm text-foreground whitespace-nowrap">
                 {price.toLocaleString('ru-RU')} ₽
              </span>
           )}
         </div>
 
-        <div className="md:col-span-2 flex flex-col w-1/3 md:w-auto text-center md:text-center">
-          <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1 no-pdf">Кол-во</span>
+        <div className="md:col-span-2 print:col-span-2 flex flex-col w-1/3 md:w-auto text-center md:text-center print:text-center print:w-auto print:block">
+          <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Кол-во</span>
           <span className="font-black text-sm whitespace-nowrap mt-1 md:mt-0">{qty} {unit}</span>
         </div>
 
-        <div className="md:col-span-2 flex flex-col w-1/3 md:w-auto text-right md:text-right">
-          <span className="text-[10px] text-muted-foreground uppercase md:hidden mb-1 no-pdf">Итого</span>
+        <div className="md:col-span-2 print:col-span-2 flex flex-col w-1/3 md:w-auto text-right md:text-right print:text-right print:w-auto print:block">
+          <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Итого</span>
           <span className="font-black text-primary text-sm whitespace-nowrap mt-1 md:mt-0">{total.toLocaleString('ru-RU')} ₽</span>
         </div>
       </div>
