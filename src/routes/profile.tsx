@@ -59,8 +59,24 @@ function ProfilePage() {
       {/* 🛠 ДЕБАГ-ПАНЕЛЬ */}
       <div className="mb-8 p-4 bg-muted/30 border-2 border-border rounded-2xl flex flex-wrap items-center gap-4">
         <span className="text-xs font-black text-muted-foreground uppercase tracking-widest w-full sm:w-auto mb-1 sm:mb-0 text-center sm:text-left flex items-center justify-center sm:justify-start gap-2">
-          <Settings className="w-4 h-4" /> Тест тарифов:
+          <Settings className="w-4 h-4" /> Тест:
         </span>
+        
+        {/* НОВАЯ КНОПКА ТЕСТА СВЯЗИ */}
+        <button 
+          onClick={async () => {
+            try {
+              const res = await fetch('/api/ping');
+              const data = await res.json();
+              alert('УСПЕХ: ' + data.message);
+            } catch (e) {
+              alert('ОШИБКА 404: API не отвечает. Связь сломана.');
+            }
+          }}
+          className="flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 bg-emerald-500/10 text-emerald-500 border-2 border-emerald-500/50 hover:bg-emerald-500 hover:text-white"
+        >
+          Пинг API
+        </button>
         
         <button 
           onClick={() => setCurrentTariff('free')} 
