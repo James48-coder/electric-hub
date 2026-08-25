@@ -22,11 +22,9 @@ function EstimatorPage() {
   const [area, setArea] = useState<number>(24)
   const [description, setDescription] = useState('Гараж, 1 выключатель, 2 розетки, 4 светильника')
   
-  // ТУМБЛЕРЫ
   const [useMyPrices, setUseMyPrices] = useState(false)
   const [includeWorks, setIncludeWorks] = useState(false)
 
-  // === ДАННЫЕ АВТОРАСЧЕТОВ ИИ ===
   const [estimatedData, setEstimatedData] = useState({
     cable3x25: 0, cable3x15: 0, rcdQty: 0, breaker16AQty: 0, breaker10AQty: 0,
   })
@@ -43,14 +41,12 @@ function EstimatorPage() {
     cableRouting: 150, pointsInstall: 450, shieldAssembly: 500,
   })
 
-  // === КАСТОМНЫЕ ПОЗИЦИИ ===
   const [customMaterials, setCustomMaterials] = useState<any[]>([])
   const [customWorks, setCustomWorks] = useState<any[]>([])
 
   const handlePriceChange = (key: keyof typeof prices, value: number) => setPrices(prev => ({ ...prev, [key]: value }))
   const handleWorkPriceChange = (key: keyof typeof workPrices, value: number) => setWorkPrices(prev => ({ ...prev, [key]: value }))
 
-  // Управление кастомными строками
   const addCustomItem = (setter: any, list: any[]) => {
     setter([...list, { id: Date.now().toString(), title: '', qty: 1, price: 0 }])
   }
@@ -92,14 +88,13 @@ function EstimatorPage() {
         pointsInstall: socketsCount + switchesCount + lightsCount,
         shieldAssembly: calcAutomat16A + calcAutomat10A + calcRcd
       })
-      setCustomMaterials([]) // Очищаем ручные вводы при новой генерации
+      setCustomMaterials([]) 
       setCustomWorks([])
       setIsGenerating(false)
       setShowResult(true)
     }, 2500)
   }
 
-  // === ПОДСЧЕТ ИТОГОВ ===
   const materialsBaseSum = (estimatedData.cable3x25 * prices.cable3x25) + (estimatedData.cable3x15 * prices.cable3x15) + (estimatedData.rcdQty * prices.rcd) + (estimatedData.breaker16AQty * prices.breaker16A) + (estimatedData.breaker10AQty * prices.breaker10A)
   const materialsCustomSum = customMaterials.reduce((acc, curr) => acc + (curr.qty * curr.price), 0)
   const totalMaterials = materialsBaseSum + materialsCustomSum
@@ -110,7 +105,6 @@ function EstimatorPage() {
 
   const grandTotal = totalMaterials + totalWorks
 
-  // === ГЕНЕРАЦИЯ ТЕКСТА ДЛЯ ШЕРИНГА ===
   const getShareText = () => {
     let text = `⚡ ВольтПро | Смета\nОбъект: ${roomType}\nПлощадь: ${area} м²\n\n`
     
@@ -166,7 +160,6 @@ function EstimatorPage() {
   return (
     <div className="container mx-auto max-w-4xl animate-in fade-in duration-500 pb-24 relative px-4 sm:px-6 print:static print:p-0 print:m-0 print:max-w-none">
       
-      {/* 🚀 СТРОГИЕ СТИЛИ ПЕЧАТИ */}
       <style>
         {`
           @media print {
@@ -186,13 +179,11 @@ function EstimatorPage() {
             #print-section * { color: black !important; border-color: #d1d5db !important; }
             #print-section div { background-color: transparent !important; }
             html, body, #root { position: static !important; height: auto !important; overflow: visible !important; background-color: white !important; }
-            /* Скрываем placeholder'ы в инпутах на печати, если они пустые */
             input::placeholder { color: transparent !important; }
           }
         `}
       </style>
 
-      {/* ПАНЕЛЬ ТАРИФОВ */}
       <div className="mb-8 p-4 bg-muted/30 border-2 border-border rounded-2xl flex flex-wrap items-center gap-4 print:hidden">
         <span className="text-xs font-black text-muted-foreground uppercase tracking-widest w-full sm:w-auto mb-1 sm:mb-0 text-center sm:text-left flex items-center justify-center sm:justify-start gap-2">
           <Settings className="w-4 h-4" /> Тест тарифов:
@@ -267,9 +258,7 @@ function EstimatorPage() {
                   </div>
                 </div>
 
-                {/* БЛОК С ТУМБЛЕРАМИ */}
                 <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Тумблер 1: Цены */}
                   <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl border border-border gap-4">
                     <div className="flex-1">
                       <p className="font-bold text-sm text-foreground mb-1 leading-tight">Цены материалов</p>
@@ -281,7 +270,6 @@ function EstimatorPage() {
                     </label>
                   </div>
 
-                  {/* Тумблер 2: Стоимость работ */}
                   <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl border border-border gap-4">
                     <div className="flex-1">
                       <p className="font-bold text-sm text-foreground mb-1 leading-tight">Стоимость работ</p>
@@ -309,7 +297,6 @@ function EstimatorPage() {
             </form>
           </div>
 
-          {/* === КОНТЕЙНЕР ДЛЯ ГЕНЕРАЦИИ СМЕТЫ === */}
           {showResult && (
             <div id="print-section" className="bg-card border-2 border-primary/30 rounded-3xl p-6 sm:p-8 shadow-xl animate-in slide-in-from-bottom-8 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50 print:hidden"></div>
@@ -358,7 +345,6 @@ function EstimatorPage() {
                 </p>
               </div>
 
-              {/* === МАТЕРИАЛЫ === */}
               <div className="space-y-3 mb-8">
                 <h4 className="text-sm font-bold text-foreground mb-4 uppercase tracking-widest border-l-4 border-primary pl-3">Материалы</h4>
                 
@@ -369,14 +355,12 @@ function EstimatorPage() {
                   <div className="md:col-span-2 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-right">Итого</div>
                 </div>
 
-                {/* Базовые материалы */}
                 <ResultItem title="Кабель ВВГнг(А)-LS 3x2.5 (м)" unit="м." qty={estimatedData.cable3x25} price={prices.cable3x25} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('cable3x25', val)} />
                 <ResultItem title="Кабель ВВГнг(А)-LS 3x1.5 (м)" unit="м." qty={estimatedData.cable3x15} price={prices.cable3x15} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('cable3x15', val)} />
                 <ResultItem title="УЗО 40А 30мА тип А (шт)" unit="шт." qty={estimatedData.rcdQty} price={prices.rcd} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('rcd', val)} />
                 <ResultItem title="Автомат 16А, х-ка С (шт)" unit="шт." qty={estimatedData.breaker16AQty} price={prices.breaker16A} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('breaker16A', val)} />
                 <ResultItem title="Автомат 10А, х-ка С (шт)" unit="шт." qty={estimatedData.breaker10AQty} price={prices.breaker10A} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('breaker10A', val)} />
                 
-                {/* Кастомные материалы */}
                 {customMaterials.map(item => (
                   <ResultItem 
                     key={item.id} title={item.title} unit="ед." qty={item.qty} price={item.price} isEditable={true} isCustom={true}
@@ -397,7 +381,6 @@ function EstimatorPage() {
                 </div>
               </div>
 
-              {/* === РАБОТЫ === */}
               {includeWorks && (
                 <div className="space-y-3 mb-8">
                   <h4 className="text-sm font-bold text-foreground mb-4 uppercase tracking-widest border-l-4 border-primary pl-3">Монтажные работы</h4>
@@ -413,7 +396,6 @@ function EstimatorPage() {
                   <ResultItem title="Монтаж установочных мест" unit="шт." qty={estimatedWorks.pointsInstall} price={workPrices.pointsInstall} isEditable={true} onChangePrice={(val) => handleWorkPriceChange('pointsInstall', val)} />
                   <ResultItem title="Сборка и монтаж щита" unit="мод." qty={estimatedWorks.shieldAssembly} price={workPrices.shieldAssembly} isEditable={true} onChangePrice={(val) => handleWorkPriceChange('shieldAssembly', val)} />
                   
-                  {/* Кастомные работы */}
                   {customWorks.map(item => (
                     <ResultItem 
                       key={item.id} title={item.title} unit="ед." qty={item.qty} price={item.price} isEditable={true} isCustom={true}
@@ -435,7 +417,6 @@ function EstimatorPage() {
                 </div>
               )}
 
-              {/* ГРАНД ИТОГ */}
               <div className="p-5 bg-primary/10 border-2 border-primary/20 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4 print:px-2 print:bg-transparent print:border-none print:border-t-4 print:border-black print:rounded-none">
                 <span className="font-black text-xl text-foreground">ОБЩАЯ СУММА:</span>
                 <span className="text-3xl font-black text-primary whitespace-nowrap">{grandTotal.toLocaleString('ru-RU')} ₽</span>
@@ -446,11 +427,9 @@ function EstimatorPage() {
         </div>
       )}
 
-      {/* === НАШЕ СОБСТВЕННОЕ МОДАЛЬНОЕ ОКНО "ПОДЕЛИТЬСЯ" === */}
       {showShareModal && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-card border border-border rounded-3xl w-full max-w-sm p-6 shadow-2xl relative">
-            
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-black text-foreground">Куда отправить?</h3>
               <button onClick={() => setShowShareModal(false)} className="p-2 bg-muted hover:bg-muted/80 rounded-full transition-colors">
@@ -459,27 +438,19 @@ function EstimatorPage() {
             </div>
             
             <div className="space-y-3">
-              {/* Telegram */}
               <a href={`https://t.me/share/url?url=&text=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-[#0088cc] text-white hover:bg-[#0088cc]/90 rounded-xl font-bold transition-colors shadow-md">
                 <Send className="w-6 h-6" /> Telegram
               </a>
-              
-              {/* WhatsApp */}
               <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-[#25D366] text-white hover:bg-[#25D366]/90 rounded-xl font-bold transition-colors shadow-md">
                 <MessageCircle className="w-6 h-6" /> WhatsApp
               </a>
-
-              {/* ВКонтакте */}
               <a href={`https://vk.com/share.php?url=https://voltpro.ru&title=Смета&comment=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-[#0077FF] text-white hover:bg-[#0077FF]/90 rounded-xl font-bold transition-colors shadow-md">
                 <Users className="w-6 h-6" /> ВКонтакте
               </a>
-
-              {/* Мессенджер MAX */}
               <a href={`max://share?text=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-purple-600 text-white hover:bg-purple-700 rounded-xl font-bold transition-colors shadow-md">
                 <MessageSquare className="w-6 h-6" /> Мессенджер MAX
               </a>
             </div>
-            
             <p className="text-[10px] text-muted-foreground text-center mt-6">
               Нажмите на нужный мессенджер, и смета будет прикреплена к сообщению.
             </p>
@@ -490,7 +461,6 @@ function EstimatorPage() {
   )
 }
 
-// === УМНАЯ СТРОКА ТАБЛИЦЫ С ПОДДЕРЖКОЙ КАСТОМНЫХ ПОЗИЦИЙ ===
 function ResultItem({ 
   title, unit, qty, price, isEditable, isCustom = false, 
   onChangePrice, onChangeTitle, onChangeQty, onRemove 
@@ -505,14 +475,12 @@ function ResultItem({
   return (
     <div className="flex flex-col md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 items-start md:items-center p-4 bg-background border border-border rounded-xl print:py-2 print:px-0 print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none group relative">
       
-      {/* Кнопка удаления для мобилок (абсолютно в углу) */}
       {isCustom && (
         <button onClick={onRemove} className="md:hidden absolute right-2 top-2 p-2 text-muted-foreground hover:text-red-500 print:hidden transition-colors">
           <Trash2 className="w-4 h-4" />
         </button>
       )}
 
-      {/* Наименование */}
       <div className="md:col-span-5 print:col-span-5 flex items-start md:items-center gap-3 w-full pr-8 md:pr-0">
         {!isCustom ? (
           <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5 md:mt-0 print:hidden" />
@@ -532,18 +500,19 @@ function ResultItem({
         )}
       </div>
 
-      <div className="md:col-span-7 print:col-span-7 flex w-full justify-between md:grid md:grid-cols-7 print:grid print:grid-cols-7 gap-2 md:gap-4 items-center mt-2 md:mt-0 pt-3 border-t border-border md:border-0 md:pt-0 print:border-0 print:pt-0">
+      {/* ЖЕСТКАЯ СЕТКА GRID ДЛЯ МОБИЛОК: grid-cols-3 гарантирует, что блоки не залезут друг на друга */}
+      <div className="md:col-span-7 print:col-span-7 grid grid-cols-3 w-full md:grid-cols-7 print:grid print:grid-cols-7 gap-1 sm:gap-4 items-center mt-2 md:mt-0 pt-3 border-t border-border md:border-0 md:pt-0 print:border-0 print:pt-0">
         
         {/* Цена */}
-        <div className="md:col-span-3 print:col-span-3 flex flex-col w-1/3 md:w-auto print:w-auto print:block">
+        <div className="md:col-span-3 print:col-span-3 flex flex-col print:block">
           <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Цена</span>
           {isEditable ? (
-            <div className="relative max-w-[120px] print:hidden">
-              <input type="number" value={price || ''} onChange={(e) => onChangePrice(Number(e.target.value))} placeholder="0" className="w-full bg-muted border border-border rounded-lg py-1.5 pl-2 pr-6 text-sm font-bold focus:ring-1 focus:ring-primary outline-none transition-colors" />
+            <div className="relative w-full max-w-[100px] sm:max-w-[120px] print:hidden">
+              <input type="number" value={price || ''} onChange={(e) => onChangePrice(Number(e.target.value))} placeholder="0" className="w-full bg-muted border border-border rounded-lg py-1.5 pl-1.5 sm:pl-2 pr-7 sm:pr-8 text-xs sm:text-sm font-bold focus:ring-1 focus:ring-primary outline-none transition-colors" />
               <span className="absolute right-2 top-1.5 text-xs text-muted-foreground">₽</span>
             </div>
           ) : (
-            <span className="font-bold text-sm mt-1 md:mt-0 print:block whitespace-nowrap">{price.toLocaleString('ru-RU')} ₽</span>
+            <span className="font-bold text-xs sm:text-sm mt-1 md:mt-0 print:block whitespace-nowrap">{price.toLocaleString('ru-RU')} ₽</span>
           )}
           {isEditable && (
              <span className="hidden print:block font-bold text-sm text-foreground whitespace-nowrap">
@@ -553,15 +522,15 @@ function ResultItem({
         </div>
 
         {/* Количество */}
-        <div className="md:col-span-2 print:col-span-2 flex flex-col w-1/3 md:w-auto text-center md:text-center print:text-center print:w-auto print:block">
+        <div className="md:col-span-2 print:col-span-2 flex flex-col items-center md:items-center print:text-center print:block">
           <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Кол-во</span>
           {isCustom ? (
-            <div className="flex items-center justify-center md:justify-center gap-1 print:hidden">
-              <input type="number" value={qty || ''} onChange={(e) => onChangeQty && onChangeQty(Number(e.target.value))} placeholder="1" className="w-16 bg-muted border border-border rounded-lg py-1 px-2 text-sm font-bold text-center focus:ring-1 focus:ring-primary outline-none" />
-              <span className="text-sm font-black">{unit}</span>
+            <div className="flex items-center justify-center gap-1 print:hidden">
+              <input type="number" value={qty || ''} onChange={(e) => onChangeQty && onChangeQty(Number(e.target.value))} placeholder="1" className="w-10 sm:w-16 bg-muted border border-border rounded-lg py-1 px-1 sm:px-2 text-xs sm:text-sm font-bold text-center focus:ring-1 focus:ring-primary outline-none" />
+              <span className="text-xs sm:text-sm font-black">{unit}</span>
             </div>
           ) : (
-            <span className="font-black text-sm whitespace-nowrap mt-1 md:mt-0">{qty} {unit}</span>
+            <span className="font-black text-xs sm:text-sm whitespace-nowrap mt-1 md:mt-0">{qty} {unit}</span>
           )}
           {isCustom && (
              <span className="hidden print:block font-black text-sm whitespace-nowrap">
@@ -571,9 +540,9 @@ function ResultItem({
         </div>
 
         {/* Итого */}
-        <div className="md:col-span-2 print:col-span-2 flex flex-col w-1/3 md:w-auto text-right md:text-right print:text-right print:w-auto print:block">
+        <div className="md:col-span-2 print:col-span-2 flex flex-col items-end md:items-end print:text-right print:block text-right">
           <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Итого</span>
-          <span className="font-black text-primary text-sm whitespace-nowrap mt-1 md:mt-0">{total.toLocaleString('ru-RU')} ₽</span>
+          <span className="font-black text-primary text-xs sm:text-sm whitespace-nowrap mt-1 md:mt-0">{total.toLocaleString('ru-RU')} ₽</span>
         </div>
       </div>
     </div>
