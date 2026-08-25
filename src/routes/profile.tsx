@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { User, Settings, LogOut, Zap, Shield, CreditCard, Coffee, HelpCircle, CheckCircle2, ChevronRight, Trash2 } from 'lucide-react'
+import { User, Settings, LogOut, Zap, Shield, CreditCard, Coffee, HelpCircle, CheckCircle2, ChevronRight, Trash2, Briefcase, Save, Loader2 } from 'lucide-react'
 import React, { useState } from 'react'
 
 export const Route = createFileRoute('/profile')({
@@ -12,10 +12,33 @@ function ProfilePage() {
   const [currentTariff, setCurrentTariff] = useState<TariffType>('free')
   const navigate = useNavigate()
 
-  // Логика выхода (удаляем память и переходим на главную)
+  // === СТЕЙТ ДЛЯ ПРАЙС-ЛИСТА ===
+  const [myPrices, setMyPrices] = useState({
+    cable3x25: 85, cable3x15: 65, rcd: 2500, breaker16A: 350, breaker10A: 350,
+    cableRouting: 150, pointsInstall: 450, shieldAssembly: 500
+  })
+  const [isSaving, setIsSaving] = useState(false)
+  const [isSaved, setIsSaved] = useState(false)
+
+  const handlePriceChange = (key: keyof typeof myPrices, value: string) => {
+    setMyPrices(prev => ({ ...prev, [key]: Number(value) }))
+  }
+
+  // Заглушка для будущего сохранения в базу данных D1
+  const handleSavePrices = () => {
+    setIsSaving(true)
+    setIsSaved(false)
+    setTimeout(() => {
+      setIsSaving(false)
+      setIsSaved(true)
+      setTimeout(() => setIsSaved(false), 2500) // Убираем галочку через 2.5 сек
+    }, 1000)
+  }
+
+  // Логика выхода
   const handleLogout = () => {
     localStorage.removeItem('voltpro_auth')
-    window.dispatchEvent(new Event('auth-change')) // Оповещаем всё меню
+    window.dispatchEvent(new Event('auth-change'))
     navigate({ to: '/' })
   }
 
@@ -76,8 +99,8 @@ function ProfilePage() {
         <p className="text-sm sm:text-base text-muted-foreground">Управление аккаунтом и подпиской</p>
       </div>
 
-      {/* ВЕРХНЯЯ ПАНЕЛЬ */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+      {/* ВЕРХНЯЯ ПАНЕЛЬ: ПРОФИЛЬ */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         
         {/* Карточка пользователя */}
         <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex items-center gap-6 relative overflow-hidden">
@@ -98,7 +121,6 @@ function ProfilePage() {
               <button className="flex-1 bg-background border border-border py-2 rounded-lg text-xs font-bold text-foreground hover:border-primary/50 hover:text-primary transition-colors">
                 Настройки
               </button>
-              {/* РАБОЧАЯ КНОПКА ВЫХОДА */}
               <button onClick={handleLogout} className="px-3 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white py-2 rounded-lg transition-colors">
                 <LogOut className="w-4 h-4" />
               </button>
@@ -121,6 +143,57 @@ function ProfilePage() {
         </div>
 
       </div>
+
+      {/* === БЛОК: МОИ РАСЦЕНКИ (ПРАЙС-ЛИСТ) === */}
+      <div className="bg-card border-2 border-primary/20 rounded-3xl p-6 sm:p-8 mb-12 shadow-sm relative overflow-hidden">
+        {/* Декоративная полоса сверху */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50"></div>
+        
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-black text-foreground mb-1 flex items-center gap-2">
+              <Briefcase className="w-6 h-6 text-primary" />
+              Мои расценки
+            </h2>
+            <p className="text-sm text-muted-foreground">Эти цены будут автоматически подставляться в ИИ-сметчик</p>
+          </div>
+          
+          <button 
+            onClick={handleSavePrices} 
+            disabled={isSaving}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2.5 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-80 w-full sm:w-auto"
+          >
+            {isSaving ? (
+              <><Loader2 className="w-4 h-4 animate-spin" /> Сохранение...</>
+            ) : isSaved ? (
+              <><CheckCircle2 className="w-4 h-4" /> Сохранено</>
+            ) : (
+              <><Save className="w-4 h-4" /> Сохранить прайс</>
+            )}
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Колонка 1: Материалы */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest border-l-4 border-primary pl-3 mb-4">Материалы</h4>
+            <PriceInput label="Кабель ВВГнг(А)-LS 3x2.5 (м)" value={myPrices.cable3x25} onChange={(val) => handlePriceChange('cable3x25', val)} />
+            <PriceInput label="Кабель ВВГнг(А)-LS 3x1.5 (м)" value={myPrices.cable3x15} onChange={(val) => handlePriceChange('cable3x15', val)} />
+            <PriceInput label="УЗО 40А 30мА (шт)" value={myPrices.rcd} onChange={(val) => handlePriceChange('rcd', val)} />
+            <PriceInput label="Автомат 16А (шт)" value={myPrices.breaker16A} onChange={(val) => handlePriceChange('breaker16A', val)} />
+            <PriceInput label="Автомат 10А (шт)" value={myPrices.breaker10A} onChange={(val) => handlePriceChange('breaker10A', val)} />
+          </div>
+
+          {/* Колонка 2: Работы */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest border-l-4 border-primary pl-3 mb-4">Монтажные работы</h4>
+            <PriceInput label="Прокладка кабельных линий (м)" value={myPrices.cableRouting} onChange={(val) => handlePriceChange('cableRouting', val)} />
+            <PriceInput label="Монтаж установочных мест (шт)" value={myPrices.pointsInstall} onChange={(val) => handlePriceChange('pointsInstall', val)} />
+            <PriceInput label="Сборка и монтаж щита (мод)" value={myPrices.shieldAssembly} onChange={(val) => handlePriceChange('shieldAssembly', val)} />
+          </div>
+        </div>
+      </div>
+      {/* === КОНЕЦ БЛОКА ПРАЙС-ЛИСТА === */}
 
       {/* НИЖНЯЯ ПАНЕЛЬ: ВИТРИНА ТАРИФОВ */}
       <div className="mb-10 text-center">
@@ -299,6 +372,25 @@ function FeatureItem({ text, active, highlight = false }: { text: string, active
       <span className={`text-sm leading-relaxed ${active ? (highlight ? 'font-bold text-foreground' : 'font-medium text-foreground') : 'text-muted-foreground line-through'}`}>
         {text}
       </span>
+    </div>
+  )
+}
+
+// Вспомогательный компонент для строк прайс-листа
+function PriceInput({ label, value, onChange }: { label: string, value: number, onChange: (val: string) => void }) {
+  return (
+    <div className="flex items-center justify-between gap-4 p-3 bg-background border border-border rounded-xl hover:border-primary/30 transition-colors">
+      <span className="text-sm font-medium text-foreground leading-tight">{label}</span>
+      <div className="relative w-24 shrink-0">
+        <input 
+          type="number" 
+          value={value || ''} 
+          onChange={(e) => onChange(e.target.value)} 
+          placeholder="0"
+          className="w-full bg-muted border border-border rounded-lg py-1.5 pl-2 pr-6 text-sm font-bold focus:ring-1 focus:ring-primary outline-none transition-colors" 
+        />
+        <span className="absolute right-2 top-1.5 text-xs text-muted-foreground font-medium pointer-events-none">₽</span>
+      </div>
     </div>
   )
 }
