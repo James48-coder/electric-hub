@@ -160,7 +160,6 @@ function EstimatorPage() {
   return (
     <div className="container mx-auto max-w-4xl animate-in fade-in duration-500 pb-24 relative px-4 sm:px-6 print:static print:p-0 print:m-0 print:max-w-none">
       
-      {/* 🚀 ОЧИЩЕННЫЕ СТИЛИ ПЕЧАТИ (Без position: absolute) */}
       <style>
         {`
           @media print {
@@ -301,131 +300,132 @@ function EstimatorPage() {
           </div>
 
           {showResult && (
-            <div id="print-section" className="bg-card border-2 border-primary/30 rounded-3xl p-6 sm:p-8 shadow-xl animate-in slide-in-from-bottom-8 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50 print:hidden"></div>
-              
-              <div className="hidden print:flex justify-between items-end border-b border-border pb-4 mb-6">
-                <div>
-                  <h1 className="text-2xl font-black text-foreground tracking-tight">ВольтПро</h1>
-                  <p className="text-sm text-muted-foreground">Система инженерных расчетов</p>
+            <>
+              {/* === КАРТОЧКА СМЕТЫ === */}
+              <div id="print-section" className="bg-card border-2 border-primary/30 rounded-3xl p-6 sm:p-8 shadow-xl animate-in slide-in-from-bottom-8 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50 print:hidden"></div>
+                
+                <div className="hidden print:flex justify-between items-end border-b border-border pb-4 mb-6">
+                  <div>
+                    <h1 className="text-2xl font-black text-foreground tracking-tight">ВольтПро</h1>
+                    <p className="text-sm text-muted-foreground">Система инженерных расчетов</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-foreground">Смета от: {new Date().toLocaleDateString('ru-RU')}</p>
+                    <p className="text-sm text-muted-foreground">Регион: {region || 'Не указан'}</p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-bold text-foreground">Смета от: {new Date().toLocaleDateString('ru-RU')}</p>
-                  <p className="text-sm text-muted-foreground">Регион: {region || 'Не указан'}</p>
-                </div>
-              </div>
-              
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 print:mb-2">
-                <div>
+                
+                <div className="mb-6 print:mb-2">
                   <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1 print:hidden">Готово</p>
                   <h3 className="text-xl sm:text-2xl font-black text-foreground flex items-center gap-2">
                     <FileText className="w-6 h-6 text-muted-foreground print:hidden" /> Смета: {roomType}
                   </h3>
                   <p className="text-sm text-muted-foreground mt-1 hidden print:block">Площадь: {area} м² | Регион: {region || 'Не указан'}</p>
                 </div>
-                
-                <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 print:hidden">
-                  <button onClick={handleShare} className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-primary/10 hover:bg-primary/20 text-primary font-bold rounded-lg text-sm border border-primary/20 transition-colors">
-                    <Share2 className="w-4 h-4" /> Поделиться
-                  </button>
-                  <button onClick={handlePdfDownload} className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-muted hover:bg-muted/80 text-foreground font-bold rounded-lg text-sm border border-border transition-colors">
-                    <Download className="w-4 h-4" /> Скачать PDF
-                  </button>
-                </div>
-              </div>
 
-              {pdfError && (
-                <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-sm font-medium animate-in fade-in print:hidden">
-                  <span className="font-bold">⚠️ Функция скачивания PDF заблокирована вашим браузером.</span><br/>
-                  Возможно, вы используете режим "Инкогнито" или встроенный браузер соцсети. Пожалуйста, откройте сайт в стандартном браузере (Chrome, Safari, Яндекс).
-                </div>
-              )}
-
-              <div className="mb-8 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-start gap-3 print:hidden">
-                <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-                <p className="text-xs sm:text-sm text-amber-600 dark:text-amber-500 leading-relaxed font-medium">
-                  Расчёт приблизительный, не является офертой. Перед работой проконсультируйтесь со специалистом!
-                </p>
-              </div>
-
-              <div className="space-y-3 mb-8">
-                <h4 className="text-sm font-bold text-foreground mb-4 uppercase tracking-widest border-l-4 border-primary pl-3">Материалы</h4>
-                
-                <div className="hidden md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 px-4 pb-2 border-b border-border print:px-0">
-                  <div className="md:col-span-5 print:col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Наименование</div>
-                  <div className="md:col-span-3 print:col-span-3 text-xs font-bold text-muted-foreground uppercase tracking-widest pl-2 print:pl-0">Цена за ед.</div>
-                  <div className="md:col-span-2 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-center">Кол-во</div>
-                  <div className="md:col-span-2 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-right">Итого</div>
+                <div className="mb-8 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-start gap-3 print:hidden">
+                  <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                  <p className="text-xs sm:text-sm text-amber-600 dark:text-amber-500 leading-relaxed font-medium">
+                    Расчёт приблизительный, не является офертой. Перед работой проконсультируйтесь со специалистом!
+                  </p>
                 </div>
 
-                <ResultItem title="Кабель ВВГнг(А)-LS 3x2.5 (м)" unit="м." qty={estimatedData.cable3x25} price={prices.cable3x25} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('cable3x25', val)} />
-                <ResultItem title="Кабель ВВГнг(А)-LS 3x1.5 (м)" unit="м." qty={estimatedData.cable3x15} price={prices.cable3x15} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('cable3x15', val)} />
-                <ResultItem title="УЗО 40А 30мА тип А (шт)" unit="шт." qty={estimatedData.rcdQty} price={prices.rcd} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('rcd', val)} />
-                <ResultItem title="Автомат 16А, х-ка С (шт)" unit="шт." qty={estimatedData.breaker16AQty} price={prices.breaker16A} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('breaker16A', val)} />
-                <ResultItem title="Автомат 10А, х-ка С (шт)" unit="шт." qty={estimatedData.breaker10AQty} price={prices.breaker10A} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('breaker10A', val)} />
-                
-                {customMaterials.map(item => (
-                  <ResultItem 
-                    key={item.id} title={item.title} unit="ед." qty={item.qty} price={item.price} isEditable={true} isCustom={true}
-                    onChangeTitle={(val) => updateCustomItem(setCustomMaterials, customMaterials, item.id, 'title', val)}
-                    onChangeQty={(val) => updateCustomItem(setCustomMaterials, customMaterials, item.id, 'qty', val)}
-                    onChangePrice={(val) => updateCustomItem(setCustomMaterials, customMaterials, item.id, 'price', val)}
-                    onRemove={() => removeCustomItem(setCustomMaterials, customMaterials, item.id)}
-                  />
-                ))}
-
-                <button onClick={() => addCustomItem(setCustomMaterials, customMaterials)} className="w-full py-3 border-2 border-dashed border-border rounded-xl text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors flex items-center justify-center gap-2 text-sm font-bold print:hidden">
-                  <PlusCircle className="w-4 h-4" /> Добавить материал
-                </button>
-                
-                <div className="p-4 bg-muted/30 border border-border rounded-xl flex justify-between items-center print:px-2 print:border-none print:border-t-2 print:border-black print:rounded-none">
-                  <span className="font-bold text-foreground">Подытог материалы:</span>
-                  <span className="text-lg font-black text-foreground whitespace-nowrap">{totalMaterials.toLocaleString('ru-RU')} ₽</span>
-                </div>
-              </div>
-
-              {includeWorks && (
-                <div className="space-y-3 mb-8 print:break-before-page">
-                  <h4 className="text-sm font-bold text-foreground mb-4 uppercase tracking-widest border-l-4 border-primary pl-3">Монтажные работы</h4>
+                <div className="space-y-3 mb-8">
+                  <h4 className="text-sm font-bold text-foreground mb-4 uppercase tracking-widest border-l-4 border-primary pl-3">Материалы</h4>
                   
                   <div className="hidden md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 px-4 pb-2 border-b border-border print:px-0">
-                    <div className="md:col-span-5 print:col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Наименование работ</div>
+                    <div className="md:col-span-5 print:col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Наименование</div>
                     <div className="md:col-span-3 print:col-span-3 text-xs font-bold text-muted-foreground uppercase tracking-widest pl-2 print:pl-0">Цена за ед.</div>
                     <div className="md:col-span-2 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-center">Кол-во</div>
                     <div className="md:col-span-2 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-right">Итого</div>
                   </div>
 
-                  <ResultItem title="Прокладка кабельных линий" unit="м." qty={estimatedWorks.cableRouting} price={workPrices.cableRouting} isEditable={true} onChangePrice={(val) => handleWorkPriceChange('cableRouting', val)} />
-                  <ResultItem title="Монтаж установочных мест" unit="шт." qty={estimatedWorks.pointsInstall} price={workPrices.pointsInstall} isEditable={true} onChangePrice={(val) => handleWorkPriceChange('pointsInstall', val)} />
-                  <ResultItem title="Сборка и монтаж щита" unit="мод." qty={estimatedWorks.shieldAssembly} price={workPrices.shieldAssembly} isEditable={true} onChangePrice={(val) => handleWorkPriceChange('shieldAssembly', val)} />
+                  <ResultItem title="Кабель ВВГнг(А)-LS 3x2.5 (м)" unit="м." qty={estimatedData.cable3x25} price={prices.cable3x25} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('cable3x25', val)} />
+                  <ResultItem title="Кабель ВВГнг(А)-LS 3x1.5 (м)" unit="м." qty={estimatedData.cable3x15} price={prices.cable3x15} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('cable3x15', val)} />
+                  <ResultItem title="УЗО 40А 30мА тип А (шт)" unit="шт." qty={estimatedData.rcdQty} price={prices.rcd} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('rcd', val)} />
+                  <ResultItem title="Автомат 16А, х-ка С (шт)" unit="шт." qty={estimatedData.breaker16AQty} price={prices.breaker16A} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('breaker16A', val)} />
+                  <ResultItem title="Автомат 10А, х-ка С (шт)" unit="шт." qty={estimatedData.breaker10AQty} price={prices.breaker10A} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('breaker10A', val)} />
                   
-                  {customWorks.map(item => (
+                  {customMaterials.map(item => (
                     <ResultItem 
                       key={item.id} title={item.title} unit="ед." qty={item.qty} price={item.price} isEditable={true} isCustom={true}
-                      onChangeTitle={(val) => updateCustomItem(setCustomWorks, customWorks, item.id, 'title', val)}
-                      onChangeQty={(val) => updateCustomItem(setCustomWorks, customWorks, item.id, 'qty', val)}
-                      onChangePrice={(val) => updateCustomItem(setCustomWorks, customWorks, item.id, 'price', val)}
-                      onRemove={() => removeCustomItem(setCustomWorks, customWorks, item.id)}
+                      onChangeTitle={(val) => updateCustomItem(setCustomMaterials, customMaterials, item.id, 'title', val)}
+                      onChangeQty={(val) => updateCustomItem(setCustomMaterials, customMaterials, item.id, 'qty', val)}
+                      onChangePrice={(val) => updateCustomItem(setCustomMaterials, customMaterials, item.id, 'price', val)}
+                      onRemove={() => removeCustomItem(setCustomMaterials, customMaterials, item.id)}
                     />
                   ))}
 
-                  <button onClick={() => addCustomItem(setCustomWorks, customWorks)} className="w-full py-3 border-2 border-dashed border-border rounded-xl text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors flex items-center justify-center gap-2 text-sm font-bold print:hidden">
-                    <PlusCircle className="w-4 h-4" /> Добавить работу
+                  <button onClick={() => addCustomItem(setCustomMaterials, customMaterials)} className="w-full py-3 border-2 border-dashed border-border rounded-xl text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors flex items-center justify-center gap-2 text-sm font-bold print:hidden">
+                    <PlusCircle className="w-4 h-4" /> Добавить материал
                   </button>
-
+                  
                   <div className="p-4 bg-muted/30 border border-border rounded-xl flex justify-between items-center print:px-2 print:border-none print:border-t-2 print:border-black print:rounded-none">
-                    <span className="font-bold text-foreground">Подытог работы:</span>
-                    <span className="text-lg font-black text-foreground whitespace-nowrap">{totalWorks.toLocaleString('ru-RU')} ₽</span>
+                    <span className="font-bold text-foreground">Подытог материалы:</span>
+                    <span className="text-lg font-black text-foreground whitespace-nowrap">{totalMaterials.toLocaleString('ru-RU')} ₽</span>
                   </div>
+                </div>
+
+                {includeWorks && (
+                  <div className="space-y-3 mb-8 print:break-before-page">
+                    <h4 className="text-sm font-bold text-foreground mb-4 uppercase tracking-widest border-l-4 border-primary pl-3">Монтажные работы</h4>
+                    
+                    <div className="hidden md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 px-4 pb-2 border-b border-border print:px-0">
+                      <div className="md:col-span-5 print:col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Наименование работ</div>
+                      <div className="md:col-span-3 print:col-span-3 text-xs font-bold text-muted-foreground uppercase tracking-widest pl-2 print:pl-0">Цена за ед.</div>
+                      <div className="md:col-span-2 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-center">Кол-во</div>
+                      <div className="md:col-span-2 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-right">Итого</div>
+                    </div>
+
+                    <ResultItem title="Прокладка кабельных линий" unit="м." qty={estimatedWorks.cableRouting} price={workPrices.cableRouting} isEditable={true} onChangePrice={(val) => handleWorkPriceChange('cableRouting', val)} />
+                    <ResultItem title="Монтаж установочных мест" unit="шт." qty={estimatedWorks.pointsInstall} price={workPrices.pointsInstall} isEditable={true} onChangePrice={(val) => handleWorkPriceChange('pointsInstall', val)} />
+                    <ResultItem title="Сборка и монтаж щита" unit="мод." qty={estimatedWorks.shieldAssembly} price={workPrices.shieldAssembly} isEditable={true} onChangePrice={(val) => handleWorkPriceChange('shieldAssembly', val)} />
+                    
+                    {customWorks.map(item => (
+                      <ResultItem 
+                        key={item.id} title={item.title} unit="ед." qty={item.qty} price={item.price} isEditable={true} isCustom={true}
+                        onChangeTitle={(val) => updateCustomItem(setCustomWorks, customWorks, item.id, 'title', val)}
+                        onChangeQty={(val) => updateCustomItem(setCustomWorks, customWorks, item.id, 'qty', val)}
+                        onChangePrice={(val) => updateCustomItem(setCustomWorks, customWorks, item.id, 'price', val)}
+                        onRemove={() => removeCustomItem(setCustomWorks, customWorks, item.id)}
+                      />
+                    ))}
+
+                    <button onClick={() => addCustomItem(setCustomWorks, customWorks)} className="w-full py-3 border-2 border-dashed border-border rounded-xl text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors flex items-center justify-center gap-2 text-sm font-bold print:hidden">
+                      <PlusCircle className="w-4 h-4" /> Добавить работу
+                    </button>
+
+                    <div className="p-4 bg-muted/30 border border-border rounded-xl flex justify-between items-center print:px-2 print:border-none print:border-t-2 print:border-black print:rounded-none">
+                      <span className="font-bold text-foreground">Подытог работы:</span>
+                      <span className="text-lg font-black text-foreground whitespace-nowrap">{totalWorks.toLocaleString('ru-RU')} ₽</span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="p-5 bg-primary/10 border-2 border-primary/20 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4 print:px-2 print:bg-transparent print:border-none print:border-t-4 print:border-black print:rounded-none print:break-inside-avoid">
+                  <span className="font-black text-xl text-foreground">ОБЩАЯ СУММА:</span>
+                  <span className="text-3xl font-black text-primary whitespace-nowrap">{grandTotal.toLocaleString('ru-RU')} ₽</span>
+                </div>
+              </div>
+              
+              {/* === БЛОК ОШИБКИ И МАССИВНЫЕ КНОПКИ ДЕЙСТВИЙ (ВНИЗУ) === */}
+              {pdfError && (
+                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-sm font-medium animate-in fade-in print:hidden">
+                  <span className="font-bold">⚠️ Функция скачивания PDF заблокирована вашим браузером.</span><br/>
+                  Возможно, вы используете режим "Инкогнито" или встроенный браузер соцсети. Пожалуйста, откройте сайт в стандартном браузере (Chrome, Safari, Яндекс).
                 </div>
               )}
 
-              <div className="p-5 bg-primary/10 border-2 border-primary/20 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4 print:px-2 print:bg-transparent print:border-none print:border-t-4 print:border-black print:rounded-none print:break-inside-avoid">
-                <span className="font-black text-xl text-foreground">ОБЩАЯ СУММА:</span>
-                <span className="text-3xl font-black text-primary whitespace-nowrap">{grandTotal.toLocaleString('ru-RU')} ₽</span>
+              <div className="flex flex-col sm:flex-row gap-4 animate-in slide-in-from-bottom-8 print:hidden">
+                <button onClick={handlePdfDownload} className="w-full sm:flex-1 bg-muted hover:bg-muted/80 text-foreground font-black py-4 px-6 rounded-xl border border-border shadow-lg transition-colors flex items-center justify-center gap-3 text-base sm:text-lg">
+                  <Download className="w-6 h-6" /> Скачать PDF
+                </button>
+                <button onClick={handleShare} className="w-full sm:flex-1 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 font-black py-4 px-6 rounded-xl shadow-lg transition-colors flex items-center justify-center gap-3 text-base sm:text-lg">
+                  <Share2 className="w-6 h-6" /> Поделиться
+                </button>
               </div>
-
-            </div>
+            </>
           )}
         </div>
       )}
