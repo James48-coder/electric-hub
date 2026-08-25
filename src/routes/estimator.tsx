@@ -160,26 +160,29 @@ function EstimatorPage() {
   return (
     <div className="container mx-auto max-w-4xl animate-in fade-in duration-500 pb-24 relative px-4 sm:px-6 print:static print:p-0 print:m-0 print:max-w-none">
       
+      {/* 🚀 ОЧИЩЕННЫЕ СТИЛИ ПЕЧАТИ (Без position: absolute) */}
       <style>
         {`
           @media print {
-            body * { visibility: hidden; }
-            #print-section, #print-section * { visibility: visible; }
+            html, body, #root { 
+              background-color: white !important; 
+              height: auto !important; 
+            }
             #print-section {
-              position: absolute !important;
-              left: 0 !important;
-              top: 0 !important;
-              width: 100% !important;
-              margin: 0 !important;
-              padding: 0 !important;
               background-color: white !important;
               border: none !important;
               box-shadow: none !important;
             }
-            #print-section * { color: black !important; border-color: #d1d5db !important; }
-            #print-section div { background-color: transparent !important; }
-            html, body, #root { position: static !important; height: auto !important; overflow: visible !important; background-color: white !important; }
-            input::placeholder { color: transparent !important; }
+            #print-section * { 
+              color: black !important; 
+              border-color: #d1d5db !important; 
+            }
+            #print-section div { 
+              background-color: transparent !important; 
+            }
+            input::placeholder { 
+              color: transparent !important; 
+            }
           }
         `}
       </style>
@@ -345,7 +348,6 @@ function EstimatorPage() {
                 </p>
               </div>
 
-              {/* === МАТЕРИАЛЫ === */}
               <div className="space-y-3 mb-8">
                 <h4 className="text-sm font-bold text-foreground mb-4 uppercase tracking-widest border-l-4 border-primary pl-3">Материалы</h4>
                 
@@ -382,7 +384,6 @@ function EstimatorPage() {
                 </div>
               </div>
 
-              {/* === РАБОТЫ (С РАЗРЫВОМ СТРАНИЦЫ ПРИ ПЕЧАТИ) === */}
               {includeWorks && (
                 <div className="space-y-3 mb-8 print:break-before-page">
                   <h4 className="text-sm font-bold text-foreground mb-4 uppercase tracking-widest border-l-4 border-primary pl-3">Монтажные работы</h4>
@@ -419,7 +420,6 @@ function EstimatorPage() {
                 </div>
               )}
 
-              {/* ГРАНД ИТОГ (Защищен от разрезания при печати) */}
               <div className="p-5 bg-primary/10 border-2 border-primary/20 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4 print:px-2 print:bg-transparent print:border-none print:border-t-4 print:border-black print:rounded-none print:break-inside-avoid">
                 <span className="font-black text-xl text-foreground">ОБЩАЯ СУММА:</span>
                 <span className="text-3xl font-black text-primary whitespace-nowrap">{grandTotal.toLocaleString('ru-RU')} ₽</span>
@@ -430,7 +430,6 @@ function EstimatorPage() {
         </div>
       )}
 
-      {/* МОДАЛЬНОЕ ОКНО */}
       {showShareModal && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-card border border-border rounded-3xl w-full max-w-sm p-6 shadow-2xl relative">
@@ -474,7 +473,6 @@ function ResultItem({
   const total = qty * price
 
   return (
-    // Защита от разрыва строки при печати (print:break-inside-avoid)
     <div className="flex flex-col md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 items-start md:items-center p-4 bg-background border border-border rounded-xl print:py-2 print:px-0 print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none group relative print:break-inside-avoid">
       
       {isCustom && (
@@ -502,10 +500,8 @@ function ResultItem({
         )}
       </div>
 
-      {/* НОВАЯ СЕТКА ДЛЯ МОБИЛОК (Цена и Кол-во сверху, Итого снизу) */}
       <div className="md:col-span-7 print:col-span-7 grid grid-cols-2 md:grid-cols-7 print:grid print:grid-cols-7 gap-y-3 gap-x-2 md:gap-4 items-center w-full mt-2 md:mt-0 pt-3 border-t border-border md:border-0 md:pt-0 print:border-0 print:pt-0">
         
-        {/* Цена (Левая колонка на мобилке, 3 колонки на ПК) */}
         <div className="col-span-1 md:col-span-3 print:col-span-3 flex flex-col print:block">
           <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Цена</span>
           {isEditable ? (
@@ -523,7 +519,6 @@ function ResultItem({
           )}
         </div>
 
-        {/* Количество (Правая колонка на мобилке, 2 колонки на ПК) */}
         <div className="col-span-1 md:col-span-2 print:col-span-2 flex flex-col items-end md:items-center print:text-center print:block">
           <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Кол-во</span>
           {isCustom ? (
@@ -541,7 +536,6 @@ function ResultItem({
           )}
         </div>
 
-        {/* Итого (Занимает всю ширину (2 колонки) снизу на мобилке, 2 колонки справа на ПК) */}
         <div className="col-span-2 md:col-span-2 print:col-span-2 flex items-center justify-between md:flex-col md:items-end print:text-right print:block pt-2 border-t border-border/50 md:border-0 md:pt-0 print:border-0 print:pt-0">
           <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden">Итого</span>
           <span className="font-black text-primary text-sm whitespace-nowrap">{total.toLocaleString('ru-RU')} ₽</span>
@@ -550,4 +544,3 @@ function ResultItem({
     </div>
   )
 }
- 
