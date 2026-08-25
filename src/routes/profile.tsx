@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { User, Settings, LogOut, Zap, Shield, CreditCard, Coffee, HelpCircle, CheckCircle2, ChevronRight, Trash2, Briefcase, Save, Loader2 } from 'lucide-react'
+import { User, Settings, LogOut, Zap, Shield, CreditCard, Coffee, HelpCircle, CheckCircle2, ChevronRight, Trash2, Briefcase, Save, Loader2, Lock } from 'lucide-react'
 import React, { useState } from 'react'
 
 export const Route = createFileRoute('/profile')({
@@ -26,6 +26,8 @@ function ProfilePage() {
 
   // Заглушка для будущего сохранения в базу данных D1
   const handleSavePrices = () => {
+    if (currentTariff !== 'pro') return // Защита от хитрецов
+
     setIsSaving(true)
     setIsSaved(false)
     setTimeout(() => {
@@ -149,7 +151,7 @@ function ProfilePage() {
         {/* Декоративная полоса сверху */}
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50"></div>
         
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 relative z-10">
           <div>
             <h2 className="text-xl sm:text-2xl font-black text-foreground mb-1 flex items-center gap-2">
               <Briefcase className="w-6 h-6 text-primary" />
@@ -160,8 +162,12 @@ function ProfilePage() {
           
           <button 
             onClick={handleSavePrices} 
-            disabled={isSaving}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2.5 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-80 w-full sm:w-auto"
+            disabled={isSaving || currentTariff !== 'pro'}
+            className={`font-bold py-2.5 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto ${
+              currentTariff === 'pro' 
+              ? 'bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-80' 
+              : 'bg-muted text-muted-foreground cursor-not-allowed border border-border'
+            }`}
           >
             {isSaving ? (
               <><Loader2 className="w-4 h-4 animate-spin" /> Сохранение...</>
@@ -173,23 +179,45 @@ function ProfilePage() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Колонка 1: Материалы */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest border-l-4 border-primary pl-3 mb-4">Материалы</h4>
-            <PriceInput label="Кабель ВВГнг(А)-LS 3x2.5 (м)" value={myPrices.cable3x25} onChange={(val) => handlePriceChange('cable3x25', val)} />
-            <PriceInput label="Кабель ВВГнг(А)-LS 3x1.5 (м)" value={myPrices.cable3x15} onChange={(val) => handlePriceChange('cable3x15', val)} />
-            <PriceInput label="УЗО 40А 30мА (шт)" value={myPrices.rcd} onChange={(val) => handlePriceChange('rcd', val)} />
-            <PriceInput label="Автомат 16А (шт)" value={myPrices.breaker16A} onChange={(val) => handlePriceChange('breaker16A', val)} />
-            <PriceInput label="Автомат 10А (шт)" value={myPrices.breaker10A} onChange={(val) => handlePriceChange('breaker10A', val)} />
-          </div>
+        <div className="relative">
+          {/* 🔒 ПАНЕЛЬ БЛОКИРОВКИ ДЛЯ НЕ-PRO ТАРИФОВ */}
+          {currentTariff !== 'pro' && (
+            <div className="absolute inset-0 z-20 backdrop-blur-[3px] bg-background/50 rounded-2xl flex flex-col items-center justify-center p-6 border border-border/50">
+              <div className="w-14 h-14 bg-background border-2 border-primary/20 text-primary rounded-full flex items-center justify-center mb-4 shadow-lg">
+                <Lock className="w-7 h-7" />
+              </div>
+              <h3 className="text-xl font-black text-foreground mb-2">Доступно в PRO</h3>
+              <p className="text-sm text-muted-foreground text-center mb-6 max-w-sm">
+                Создание собственного прайс-листа и автоматическая подстановка цен в сметы — это премиум-функция.
+              </p>
+              <button 
+                onClick={() => setCurrentTariff('pro')}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 px-8 rounded-xl transition-colors shadow-lg shadow-primary/20 flex items-center gap-2"
+              >
+                <Zap className="w-4 h-4" />
+                Оформить PRO
+              </button>
+            </div>
+          )}
 
-          {/* Колонка 2: Работы */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest border-l-4 border-primary pl-3 mb-4">Монтажные работы</h4>
-            <PriceInput label="Прокладка кабельных линий (м)" value={myPrices.cableRouting} onChange={(val) => handlePriceChange('cableRouting', val)} />
-            <PriceInput label="Монтаж установочных мест (шт)" value={myPrices.pointsInstall} onChange={(val) => handlePriceChange('pointsInstall', val)} />
-            <PriceInput label="Сборка и монтаж щита (мод)" value={myPrices.shieldAssembly} onChange={(val) => handlePriceChange('shieldAssembly', val)} />
+          <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 transition-opacity duration-300 ${currentTariff !== 'pro' ? 'opacity-30 pointer-events-none select-none' : ''}`}>
+            {/* Колонка 1: Материалы */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest border-l-4 border-primary pl-3 mb-4">Материалы</h4>
+              <PriceInput label="Кабель ВВГнг(А)-LS 3x2.5 (м)" value={myPrices.cable3x25} onChange={(val) => handlePriceChange('cable3x25', val)} />
+              <PriceInput label="Кабель ВВГнг(А)-LS 3x1.5 (м)" value={myPrices.cable3x15} onChange={(val) => handlePriceChange('cable3x15', val)} />
+              <PriceInput label="УЗО 40А 30мА (шт)" value={myPrices.rcd} onChange={(val) => handlePriceChange('rcd', val)} />
+              <PriceInput label="Автомат 16А (шт)" value={myPrices.breaker16A} onChange={(val) => handlePriceChange('breaker16A', val)} />
+              <PriceInput label="Автомат 10А (шт)" value={myPrices.breaker10A} onChange={(val) => handlePriceChange('breaker10A', val)} />
+            </div>
+
+            {/* Колонка 2: Работы */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest border-l-4 border-primary pl-3 mb-4">Монтажные работы</h4>
+              <PriceInput label="Прокладка кабельных линий (м)" value={myPrices.cableRouting} onChange={(val) => handlePriceChange('cableRouting', val)} />
+              <PriceInput label="Монтаж установочных мест (шт)" value={myPrices.pointsInstall} onChange={(val) => handlePriceChange('pointsInstall', val)} />
+              <PriceInput label="Сборка и монтаж щита (мод)" value={myPrices.shieldAssembly} onChange={(val) => handlePriceChange('shieldAssembly', val)} />
+            </div>
           </div>
         </div>
       </div>
@@ -376,7 +404,6 @@ function FeatureItem({ text, active, highlight = false }: { text: string, active
   )
 }
 
-// Вспомогательный компонент для строк прайс-листа
 function PriceInput({ label, value, onChange }: { label: string, value: number, onChange: (val: string) => void }) {
   return (
     <div className="flex items-center justify-between gap-4 p-3 bg-background border border-border rounded-xl hover:border-primary/30 transition-colors">
