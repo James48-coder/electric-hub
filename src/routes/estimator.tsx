@@ -345,6 +345,7 @@ function EstimatorPage() {
                 </p>
               </div>
 
+              {/* === МАТЕРИАЛЫ === */}
               <div className="space-y-3 mb-8">
                 <h4 className="text-sm font-bold text-foreground mb-4 uppercase tracking-widest border-l-4 border-primary pl-3">Материалы</h4>
                 
@@ -381,8 +382,9 @@ function EstimatorPage() {
                 </div>
               </div>
 
+              {/* === РАБОТЫ (С РАЗРЫВОМ СТРАНИЦЫ ПРИ ПЕЧАТИ) === */}
               {includeWorks && (
-                <div className="space-y-3 mb-8">
+                <div className="space-y-3 mb-8 print:break-before-page">
                   <h4 className="text-sm font-bold text-foreground mb-4 uppercase tracking-widest border-l-4 border-primary pl-3">Монтажные работы</h4>
                   
                   <div className="hidden md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 px-4 pb-2 border-b border-border print:px-0">
@@ -417,7 +419,8 @@ function EstimatorPage() {
                 </div>
               )}
 
-              <div className="p-5 bg-primary/10 border-2 border-primary/20 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4 print:px-2 print:bg-transparent print:border-none print:border-t-4 print:border-black print:rounded-none">
+              {/* ГРАНД ИТОГ (Защищен от разрезания при печати) */}
+              <div className="p-5 bg-primary/10 border-2 border-primary/20 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4 print:px-2 print:bg-transparent print:border-none print:border-t-4 print:border-black print:rounded-none print:break-inside-avoid">
                 <span className="font-black text-xl text-foreground">ОБЩАЯ СУММА:</span>
                 <span className="text-3xl font-black text-primary whitespace-nowrap">{grandTotal.toLocaleString('ru-RU')} ₽</span>
               </div>
@@ -427,6 +430,7 @@ function EstimatorPage() {
         </div>
       )}
 
+      {/* МОДАЛЬНОЕ ОКНО */}
       {showShareModal && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-card border border-border rounded-3xl w-full max-w-sm p-6 shadow-2xl relative">
@@ -451,9 +455,6 @@ function EstimatorPage() {
                 <MessageSquare className="w-6 h-6" /> Мессенджер MAX
               </a>
             </div>
-            <p className="text-[10px] text-muted-foreground text-center mt-6">
-              Нажмите на нужный мессенджер, и смета будет прикреплена к сообщению.
-            </p>
           </div>
         </div>
       )}
@@ -473,7 +474,8 @@ function ResultItem({
   const total = qty * price
 
   return (
-    <div className="flex flex-col md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 items-start md:items-center p-4 bg-background border border-border rounded-xl print:py-2 print:px-0 print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none group relative">
+    // Защита от разрыва строки при печати (print:break-inside-avoid)
+    <div className="flex flex-col md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 items-start md:items-center p-4 bg-background border border-border rounded-xl print:py-2 print:px-0 print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none group relative print:break-inside-avoid">
       
       {isCustom && (
         <button onClick={onRemove} className="md:hidden absolute right-2 top-2 p-2 text-muted-foreground hover:text-red-500 print:hidden transition-colors">
@@ -500,15 +502,15 @@ function ResultItem({
         )}
       </div>
 
-      {/* ЖЕСТКАЯ СЕТКА GRID ДЛЯ МОБИЛОК: grid-cols-3 гарантирует, что блоки не залезут друг на друга */}
-      <div className="md:col-span-7 print:col-span-7 grid grid-cols-3 w-full md:grid-cols-7 print:grid print:grid-cols-7 gap-1 sm:gap-4 items-center mt-2 md:mt-0 pt-3 border-t border-border md:border-0 md:pt-0 print:border-0 print:pt-0">
+      {/* НОВАЯ СЕТКА ДЛЯ МОБИЛОК (Цена и Кол-во сверху, Итого снизу) */}
+      <div className="md:col-span-7 print:col-span-7 grid grid-cols-2 md:grid-cols-7 print:grid print:grid-cols-7 gap-y-3 gap-x-2 md:gap-4 items-center w-full mt-2 md:mt-0 pt-3 border-t border-border md:border-0 md:pt-0 print:border-0 print:pt-0">
         
-        {/* Цена */}
-        <div className="md:col-span-3 print:col-span-3 flex flex-col print:block">
+        {/* Цена (Левая колонка на мобилке, 3 колонки на ПК) */}
+        <div className="col-span-1 md:col-span-3 print:col-span-3 flex flex-col print:block">
           <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Цена</span>
           {isEditable ? (
-            <div className="relative w-full max-w-[100px] sm:max-w-[120px] print:hidden">
-              <input type="number" value={price || ''} onChange={(e) => onChangePrice(Number(e.target.value))} placeholder="0" className="w-full bg-muted border border-border rounded-lg py-1.5 pl-1.5 sm:pl-2 pr-7 sm:pr-8 text-xs sm:text-sm font-bold focus:ring-1 focus:ring-primary outline-none transition-colors" />
+            <div className="relative w-full max-w-[120px] print:hidden">
+              <input type="number" value={price || ''} onChange={(e) => onChangePrice(Number(e.target.value))} placeholder="0" className="w-full bg-muted border border-border rounded-lg py-1.5 pl-2 pr-7 text-xs sm:text-sm font-bold focus:ring-1 focus:ring-primary outline-none transition-colors" />
               <span className="absolute right-2 top-1.5 text-xs text-muted-foreground">₽</span>
             </div>
           ) : (
@@ -521,12 +523,12 @@ function ResultItem({
           )}
         </div>
 
-        {/* Количество */}
-        <div className="md:col-span-2 print:col-span-2 flex flex-col items-center md:items-center print:text-center print:block">
+        {/* Количество (Правая колонка на мобилке, 2 колонки на ПК) */}
+        <div className="col-span-1 md:col-span-2 print:col-span-2 flex flex-col items-end md:items-center print:text-center print:block">
           <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Кол-во</span>
           {isCustom ? (
-            <div className="flex items-center justify-center gap-1 print:hidden">
-              <input type="number" value={qty || ''} onChange={(e) => onChangeQty && onChangeQty(Number(e.target.value))} placeholder="1" className="w-10 sm:w-16 bg-muted border border-border rounded-lg py-1 px-1 sm:px-2 text-xs sm:text-sm font-bold text-center focus:ring-1 focus:ring-primary outline-none" />
+            <div className="flex items-center justify-end md:justify-center gap-1 print:hidden">
+              <input type="number" value={qty || ''} onChange={(e) => onChangeQty && onChangeQty(Number(e.target.value))} placeholder="1" className="w-12 sm:w-16 bg-muted border border-border rounded-lg py-1 px-1 sm:px-2 text-xs sm:text-sm font-bold text-center focus:ring-1 focus:ring-primary outline-none" />
               <span className="text-xs sm:text-sm font-black">{unit}</span>
             </div>
           ) : (
@@ -539,10 +541,10 @@ function ResultItem({
           )}
         </div>
 
-        {/* Итого */}
-        <div className="md:col-span-2 print:col-span-2 flex flex-col items-end md:items-end print:text-right print:block text-right">
-          <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Итого</span>
-          <span className="font-black text-primary text-xs sm:text-sm whitespace-nowrap mt-1 md:mt-0">{total.toLocaleString('ru-RU')} ₽</span>
+        {/* Итого (Занимает всю ширину (2 колонки) снизу на мобилке, 2 колонки справа на ПК) */}
+        <div className="col-span-2 md:col-span-2 print:col-span-2 flex items-center justify-between md:flex-col md:items-end print:text-right print:block pt-2 border-t border-border/50 md:border-0 md:pt-0 print:border-0 print:pt-0">
+          <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden">Итого</span>
+          <span className="font-black text-primary text-sm whitespace-nowrap">{total.toLocaleString('ru-RU')} ₽</span>
         </div>
       </div>
     </div>
