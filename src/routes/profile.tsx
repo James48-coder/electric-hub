@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { User, Settings, LogOut, Zap, Shield, CreditCard, Coffee, HelpCircle, CheckCircle2, ChevronRight, Trash2, Briefcase, Save, Loader2, Lock } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 export const Route = createFileRoute('/profile')({
   component: ProfilePage,
@@ -20,21 +20,38 @@ function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
 
+  // ЗАГРУЗКА ЦЕН ИЗ ПАМЯТИ БРАУЗЕРА ПРИ ОТКРЫТИИ
+  useEffect(() => {
+    const saved = localStorage.getItem('voltpro_prices')
+    if (saved) {
+      try {
+        setMyPrices(JSON.parse(saved))
+      } catch (e) {
+        console.error('Ошибка чтения прайса', e)
+      }
+    }
+  }, [])
+
   const handlePriceChange = (key: keyof typeof myPrices, value: string) => {
     setMyPrices(prev => ({ ...prev, [key]: Number(value) }))
   }
 
-  // Заглушка для будущего сохранения в базу данных D1
+  // СОХРАНЕНИЕ ЦЕН В ПАМЯТЬ БРАУЗЕРА
   const handleSavePrices = () => {
     if (currentTariff !== 'pro') return // Защита от хитрецов
 
     setIsSaving(true)
     setIsSaved(false)
+    
+    // Сохраняем в локальное хранилище
+    localStorage.setItem('voltpro_prices', JSON.stringify(myPrices))
+    
+    // Анимация загрузки
     setTimeout(() => {
       setIsSaving(false)
       setIsSaved(true)
       setTimeout(() => setIsSaved(false), 2500) // Убираем галочку через 2.5 сек
-    }, 1000)
+    }, 600)
   }
 
   // Логика выхода
@@ -62,7 +79,6 @@ function ProfilePage() {
           <Settings className="w-4 h-4" /> Тест:
         </span>
         
-        {/* НОВАЯ КНОПКА ТЕСТА СВЯЗИ */}
         <button 
           onClick={async () => {
             try {
