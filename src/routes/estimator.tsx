@@ -1,12 +1,20 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Bot, MapPin, Home as HomeIcon, Ruler, Settings, Lock, Sparkles, Loader2, FileText, Download, CheckCircle2, ChevronDown, AlertTriangle, Share2, X, Send, MessageCircle, Users, MessageSquare, PlusCircle, Trash2 } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 export const Route = createFileRoute('/estimator')({
   component: EstimatorPage,
 })
 
 type Tariff = 'free' | 'master' | 'pro'
+
+// === БАЗОВЫЕ (РЕГИОНАЛЬНЫЕ) ЦЕНЫ ПО УМОЛЧАНИЮ ===
+const DEFAULT_PRICES = {
+  cable3x25: 85, cable3x15: 65, rcd: 2500, breaker16A: 350, breaker10A: 350,
+}
+const DEFAULT_WORK_PRICES = {
+  cableRouting: 150, pointsInstall: 450, shieldAssembly: 500,
+}
 
 function EstimatorPage() {
   const [tariff, setTariff] = useState<Tariff>('free')
@@ -16,7 +24,6 @@ function EstimatorPage() {
   const [showShareModal, setShowShareModal] = useState(false)
   const [pdfError, setPdfError] = useState(false)
 
-  // === ЖИВЫЕ ДАННЫЕ ФОРМЫ ===
   const [region, setRegion] = useState('')
   const [roomType, setRoomType] = useState('Коммерческое помещение')
   const [area, setArea] = useState<number>(24)
@@ -33,16 +40,43 @@ function EstimatorPage() {
     cableRouting: 0, pointsInstall: 0, shieldAssembly: 0
   })
 
-  const [prices, setPrices] = useState({
-    cable3x25: 85, cable3x15: 65, rcd: 2500, breaker16A: 350, breaker10A: 350,
-  })
-  
-  const [workPrices, setWorkPrices] = useState({
-    cableRouting: 150, pointsInstall: 450, shieldAssembly: 500,
-  })
+  // Инициализируем стейт базовыми ценами
+  const [prices, setPrices] = useState({ ...DEFAULT_PRICES })
+  const [workPrices, setWorkPrices] = useState({ ...DEFAULT_WORK_PRICES })
 
   const [customMaterials, setCustomMaterials] = useState<any[]>([])
   const [customWorks, setCustomWorks] = useState<any[]>([])
+
+  // === ЛОГИКА ТУМБЛЕРА: РЕГИОНАЛЬНЫЕ ЦЕНЫ <-> ЦЕНЫ ИЗ ПРОФИЛЯ ===
+  useEffect(() => {
+    if (useMyPrices) {
+      // Если тумблер включен - достаем личные цены мастера
+      const saved = localStorage.getItem('voltpro_prices')
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved)
+          setPrices({
+            cable3x25: parsed.cable3x25 || DEFAULT_PRICES.cable3x25,
+            cable3x15: parsed.cable3x15 || DEFAULT_PRICES.cable3x15,
+            rcd: parsed.rcd || DEFAULT_PRICES.rcd,
+            breaker16A: parsed.breaker16A || DEFAULT_PRICES.breaker16A,
+            breaker10A: parsed.breaker10A || DEFAULT_PRICES.breaker10A,
+          })
+          setWorkPrices({
+            cableRouting: parsed.cableRouting || DEFAULT_WORK_PRICES.cableRouting,
+            pointsInstall: parsed.pointsInstall || DEFAULT_WORK_PRICES.pointsInstall,
+            shieldAssembly: parsed.shieldAssembly || DEFAULT_WORK_PRICES.shieldAssembly,
+          })
+        } catch (e) {
+          console.error('Ошибка чтения прайса', e)
+        }
+      }
+    } else {
+      // Если тумблер выключен - возвращаем базовые региональные цены
+      setPrices({ ...DEFAULT_PRICES })
+      setWorkPrices({ ...DEFAULT_WORK_PRICES })
+    }
+  }, [useMyPrices]) // Эффект срабатывает каждый раз при клике на ползунок
 
   const handlePriceChange = (key: keyof typeof prices, value: number) => setPrices(prev => ({ ...prev, [key]: value }))
   const handleWorkPriceChange = (key: keyof typeof workPrices, value: number) => setWorkPrices(prev => ({ ...prev, [key]: value }))
@@ -63,6 +97,30 @@ function EstimatorPage() {
     setShowResult(false)
     setPdfError(false)
 
+    // === ФОРМИРОВАНИЕ ИДЕАЛЬНОГО ПРОМПТА ДЛЯ ИИ ===
+    const aiPrompt = `Ты профессиональный сметчик-электромонтажник. 
+Составь смету по стандартам ПУЭ-7 и ГОСТ Р 50571.5.52-2011.
+ЗАПРЕЩЕНО: использовать кабели ПВС, ШВВП, ПУНП для стационарной проводки. Только ВВГнг(А)-LS или NYM.
+ОБЯЗАТЕЛЬНО: дифференциальная защита (УЗО/Дифавтоматы) на розеточные группы и влажные зоны.
+
+Объект: ${roomType}
+Площадь: ${area} м²
+Регион: ${region}
+Вводные от клиента: ${description}
+
+Используемые расценки (${useMyPrices ? 'Личный прайс мастера' : 'Средние по региону'}):
+- ВВГнг-LS 3x2.5: ${prices.cable3x25} руб/м
+- ВВГнг-LS 3x1.5: ${prices.cable3x15} руб/м
+- УЗО 40А 30мА: ${prices.rcd} руб/шт
+- Автомат 16А: ${prices.breaker16A} руб/шт
+- Автомат 10А: ${prices.breaker10A} руб/шт
+
+Рассчитай необходимое количество материалов. Выведи результат в формате структурированного JSON.`
+
+    console.log('--- ОТПРАВКА ПРОМПТА В ИИ ---')
+    console.log(aiPrompt)
+    console.log('-----------------------------')
+
     const text = description.toLowerCase()
     const socketsMatch = text.match(/(\d+)\s*розет/)
     const switchesMatch = text.match(/(\d+)\s*выключат/)
@@ -77,9 +135,6 @@ function EstimatorPage() {
     const calcAutomat16A = Math.max(1, Math.ceil(socketsCount / 4))
     const calcAutomat10A = Math.max(1, Math.ceil(lightsCount / 10))
     const calcRcd = 1 
-
-    setPrices({ cable3x25: 85, cable3x15: 65, rcd: 2500, breaker16A: 350, breaker10A: 350 })
-    setWorkPrices({ cableRouting: 150, pointsInstall: 450, shieldAssembly: 500 })
 
     setTimeout(() => {
       setEstimatedData({ cable3x25: calcCable3x25, cable3x15: calcCable3x15, rcdQty: calcRcd, breaker16AQty: calcAutomat16A, breaker10AQty: calcAutomat10A })
