@@ -50,7 +50,6 @@ function EstimatorPage() {
   // === ЛОГИКА ТУМБЛЕРА: РЕГИОНАЛЬНЫЕ ЦЕНЫ <-> ЦЕНЫ ИЗ ПРОФИЛЯ ===
   useEffect(() => {
     if (useMyPrices) {
-      // Если тумблер включен - достаем личные цены мастера
       const saved = localStorage.getItem('voltpro_prices')
       if (saved) {
         try {
@@ -72,11 +71,10 @@ function EstimatorPage() {
         }
       }
     } else {
-      // Если тумблер выключен - возвращаем базовые региональные цены
       setPrices({ ...DEFAULT_PRICES })
       setWorkPrices({ ...DEFAULT_WORK_PRICES })
     }
-  }, [useMyPrices]) // Эффект срабатывает каждый раз при клике на ползунок
+  }, [useMyPrices])
 
   const handlePriceChange = (key: keyof typeof prices, value: number) => setPrices(prev => ({ ...prev, [key]: value }))
   const handleWorkPriceChange = (key: keyof typeof workPrices, value: number) => setWorkPrices(prev => ({ ...prev, [key]: value }))
@@ -97,7 +95,7 @@ function EstimatorPage() {
     setShowResult(false)
     setPdfError(false)
 
-    // === ФОРМИРОВАНИЕ ИДЕАЛЬНОГО ПРОМПТА ДЛЯ ИИ ===
+    // ПРОМПТ ИИ ОСТАЕТСЯ ПРЕЖНИМ (ПУЭ-7, ГОСТ)
     const aiPrompt = `Ты профессиональный сметчик-электромонтажник. 
 Составь смету по стандартам ПУЭ-7 и ГОСТ Р 50571.5.52-2011.
 ЗАПРЕЩЕНО: использовать кабели ПВС, ШВВП, ПУНП для стационарной проводки. Только ВВГнг(А)-LS или NYM.
@@ -218,14 +216,20 @@ function EstimatorPage() {
       <style>
         {`
           @media print {
+            @page {
+              margin: 10mm; /* Убираем колонтитулы браузера с датой и ссылками */
+            }
             html, body, #root { 
               background-color: white !important; 
               height: auto !important; 
             }
+            /* КЛЮЧЕВОЙ ФИКС ДЛЯ ОБРЕЗАННЫХ СТРОК: overflow: visible */
             #print-section {
               background-color: white !important;
               border: none !important;
               box-shadow: none !important;
+              overflow: visible !important;
+              padding: 0 !important;
             }
             #print-section * { 
               color: black !important; 
@@ -356,11 +360,11 @@ function EstimatorPage() {
 
           {showResult && (
             <>
-              {/* === КАРТОЧКА СМЕТЫ === */}
-              <div id="print-section" className="bg-card border-2 border-primary/30 rounded-3xl p-6 sm:p-8 shadow-xl animate-in slide-in-from-bottom-8 relative overflow-hidden">
+              {/* === КАРТОЧКА СМЕТЫ (ДОБАВЛЕН ФИКС OVERFLOW ДЛЯ ПЕЧАТИ) === */}
+              <div id="print-section" className="bg-card border-2 border-primary/30 rounded-3xl p-6 sm:p-8 shadow-xl animate-in slide-in-from-bottom-8 relative overflow-hidden print:overflow-visible print:p-0 print:border-none print:shadow-none">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50 print:hidden"></div>
                 
-                <div className="hidden print:flex justify-between items-end border-b border-border pb-4 mb-6">
+                <div className="hidden print:flex justify-between items-end border-b border-border pb-4 mb-4">
                   <div>
                     <h1 className="text-2xl font-black text-foreground tracking-tight">ВольтПро</h1>
                     <p className="text-sm text-muted-foreground">Система инженерных расчетов</p>
@@ -371,12 +375,12 @@ function EstimatorPage() {
                   </div>
                 </div>
                 
-                <div className="mb-6 print:mb-2">
+                <div className="mb-6 print:mb-4">
                   <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1 print:hidden">Готово</p>
-                  <h3 className="text-xl sm:text-2xl font-black text-foreground flex items-center gap-2">
+                  <h3 className="text-xl sm:text-2xl font-black text-foreground flex items-center gap-2 print:text-lg">
                     <FileText className="w-6 h-6 text-muted-foreground print:hidden" /> Смета: {roomType}
                   </h3>
-                  <p className="text-sm text-muted-foreground mt-1 hidden print:block">Площадь: {area} м² | Регион: {region || 'Не указан'}</p>
+                  <p className="text-sm text-muted-foreground mt-1 hidden print:block">Площадь: {area} м²</p>
                 </div>
 
                 <div className="mb-8 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-start gap-3 print:hidden">
@@ -386,8 +390,8 @@ function EstimatorPage() {
                   </p>
                 </div>
 
-                <div className="space-y-3 mb-8">
-                  <h4 className="text-sm font-bold text-foreground mb-4 uppercase tracking-widest border-l-4 border-primary pl-3">Материалы</h4>
+                <div className="space-y-3 mb-8 print:mb-6">
+                  <h4 className="text-sm font-bold text-foreground mb-4 uppercase tracking-widest border-l-4 border-primary pl-3 print:mb-2 print:text-xs">Материалы</h4>
                   
                   <div className="hidden md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 px-4 pb-2 border-b border-border print:px-0">
                     <div className="md:col-span-5 print:col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Наименование</div>
@@ -416,15 +420,16 @@ function EstimatorPage() {
                     <PlusCircle className="w-4 h-4" /> Добавить материал
                   </button>
                   
-                  <div className="p-4 bg-muted/30 border border-border rounded-xl flex justify-between items-center print:px-2 print:border-none print:border-t-2 print:border-black print:rounded-none">
+                  <div className="p-4 bg-muted/30 border border-border rounded-xl flex justify-between items-center print:px-0 print:py-2 print:border-none print:border-t-2 print:border-black print:rounded-none">
                     <span className="font-bold text-foreground">Подытог материалы:</span>
-                    <span className="text-lg font-black text-foreground whitespace-nowrap">{totalMaterials.toLocaleString('ru-RU')} ₽</span>
+                    <span className="text-lg font-black text-foreground whitespace-nowrap print:text-base">{totalMaterials.toLocaleString('ru-RU')} ₽</span>
                   </div>
                 </div>
 
                 {includeWorks && (
-                  <div className="space-y-3 mb-8 print:break-before-page">
-                    <h4 className="text-sm font-bold text-foreground mb-4 uppercase tracking-widest border-l-4 border-primary pl-3">Монтажные работы</h4>
+                  {/* УБРАН ЖЕСТКИЙ ПЕРЕНОС СТРАНИЦЫ (print:break-before-page) */}
+                  <div className="space-y-3 mb-8 print:mb-6">
+                    <h4 className="text-sm font-bold text-foreground mb-4 uppercase tracking-widest border-l-4 border-primary pl-3 print:mb-2 print:text-xs">Монтажные работы</h4>
                     
                     <div className="hidden md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 px-4 pb-2 border-b border-border print:px-0">
                       <div className="md:col-span-5 print:col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Наименование работ</div>
@@ -451,20 +456,19 @@ function EstimatorPage() {
                       <PlusCircle className="w-4 h-4" /> Добавить работу
                     </button>
 
-                    <div className="p-4 bg-muted/30 border border-border rounded-xl flex justify-between items-center print:px-2 print:border-none print:border-t-2 print:border-black print:rounded-none">
+                    <div className="p-4 bg-muted/30 border border-border rounded-xl flex justify-between items-center print:px-0 print:py-2 print:border-none print:border-t-2 print:border-black print:rounded-none">
                       <span className="font-bold text-foreground">Подытог работы:</span>
-                      <span className="text-lg font-black text-foreground whitespace-nowrap">{totalWorks.toLocaleString('ru-RU')} ₽</span>
+                      <span className="text-lg font-black text-foreground whitespace-nowrap print:text-base">{totalWorks.toLocaleString('ru-RU')} ₽</span>
                     </div>
                   </div>
                 )}
 
-                <div className="p-5 bg-primary/10 border-2 border-primary/20 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4 print:px-2 print:bg-transparent print:border-none print:border-t-4 print:border-black print:rounded-none print:break-inside-avoid">
+                <div className="p-5 bg-primary/10 border-2 border-primary/20 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4 print:p-0 print:pt-4 print:bg-transparent print:border-none print:border-t-4 print:border-black print:rounded-none print:break-inside-avoid">
                   <span className="font-black text-xl text-foreground">ОБЩАЯ СУММА:</span>
-                  <span className="text-3xl font-black text-primary whitespace-nowrap">{grandTotal.toLocaleString('ru-RU')} ₽</span>
+                  <span className="text-3xl font-black text-primary whitespace-nowrap print:text-2xl">{grandTotal.toLocaleString('ru-RU')} ₽</span>
                 </div>
               </div>
               
-              {/* === БЛОК ОШИБКИ И МАССИВНЫЕ КНОПКИ ДЕЙСТВИЙ (ВНИЗУ) === */}
               {pdfError && (
                 <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-sm font-medium animate-in fade-in print:hidden">
                   <span className="font-bold">⚠️ Функция скачивания PDF заблокирована вашим браузером.</span><br/>
@@ -528,7 +532,7 @@ function ResultItem({
   const total = qty * price
 
   return (
-    <div className="flex flex-col md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 items-start md:items-center p-4 bg-background border border-border rounded-xl print:py-2 print:px-0 print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:rounded-none group relative print:break-inside-avoid">
+    <div className="flex flex-col md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 items-start md:items-center p-4 bg-background border border-border rounded-xl print:py-1.5 print:px-0 print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:border-gray-300 print:rounded-none group relative print:break-inside-avoid">
       
       {isCustom && (
         <button onClick={onRemove} className="md:hidden absolute right-2 top-2 p-2 text-muted-foreground hover:text-red-500 print:hidden transition-colors">
@@ -548,10 +552,10 @@ function ResultItem({
         {isCustom ? (
           <div className="w-full">
             <input type="text" value={title} onChange={(e) => onChangeTitle && onChangeTitle(e.target.value)} placeholder="Введите название..." className="w-full bg-transparent border-b border-border focus:border-primary outline-none py-1 text-sm font-medium text-foreground print:hidden placeholder:text-muted-foreground/50" />
-            <span className="hidden print:inline font-medium text-sm text-foreground">{title || 'Без названия'}</span>
+            <span className="hidden print:inline font-medium text-xs text-foreground">{title || 'Без названия'}</span>
           </div>
         ) : (
-          <span className="font-medium text-sm sm:text-base text-foreground leading-tight">{title}</span>
+          <span className="font-medium text-sm sm:text-base text-foreground leading-tight print:text-xs">{title}</span>
         )}
       </div>
 
@@ -568,7 +572,7 @@ function ResultItem({
             <span className="font-bold text-xs sm:text-sm mt-1 md:mt-0 print:block whitespace-nowrap">{price.toLocaleString('ru-RU')} ₽</span>
           )}
           {isEditable && (
-             <span className="hidden print:block font-bold text-sm text-foreground whitespace-nowrap">
+             <span className="hidden print:block font-bold text-xs text-foreground whitespace-nowrap">
                 {price.toLocaleString('ru-RU')} ₽
              </span>
           )}
@@ -585,7 +589,7 @@ function ResultItem({
             <span className="font-black text-xs sm:text-sm whitespace-nowrap mt-1 md:mt-0">{qty} {unit}</span>
           )}
           {isCustom && (
-             <span className="hidden print:block font-black text-sm whitespace-nowrap">
+             <span className="hidden print:block font-black text-xs whitespace-nowrap">
                 {qty} {unit}
              </span>
           )}
@@ -593,7 +597,7 @@ function ResultItem({
 
         <div className="col-span-2 md:col-span-2 print:col-span-2 flex items-center justify-between md:flex-col md:items-end print:text-right print:block pt-2 border-t border-border/50 md:border-0 md:pt-0 print:border-0 print:pt-0">
           <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden">Итого</span>
-          <span className="font-black text-primary text-sm whitespace-nowrap">{total.toLocaleString('ru-RU')} ₽</span>
+          <span className="font-black text-primary text-sm whitespace-nowrap print:text-black">{total.toLocaleString('ru-RU')} ₽</span>
         </div>
       </div>
     </div>
