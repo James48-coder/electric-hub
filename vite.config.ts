@@ -11,4 +11,18 @@ export default defineConfig({
     react(),
     tsconfigPaths()
   ],
+  build: {
+    target: 'esnext', // Используем современные стандарты для скорости
+    minify: 'esbuild', // Максимально быстрая минификация кода
+    cssMinify: true, // Сжатие стилей
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Выделяем тяжелые библиотеки в отдельные файлы, чтобы браузер их кэшировал
+          vendor: ['react', 'react-dom', '@tanstack/react-router'],
+          icons: ['lucide-react'] 
+        }
+      }
+    }
+  }
 })
