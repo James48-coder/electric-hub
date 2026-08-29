@@ -1,10 +1,10 @@
-import { createRootRoute, Outlet, ScrollRestoration, Link } from "@tanstack/react-router";
+import { createRootRoute, Outlet, ScrollRestoration, Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/header";
 import { AppSidebar } from "@/components/app-sidebar"; 
 import { Footer } from "@/components/footer";
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Menu, X, Calculator, Waypoints, MessageSquare, User, Home, BookOpen, Bot, Zap, FileText, Users, HelpCircle } from "lucide-react";
 
 export const Route = createRootRoute({
@@ -14,6 +14,31 @@ export const Route = createRootRoute({
 function RootComponent() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // === ИНСТРУМЕНТЫ РОУТЕРА ===
+  const currentPath = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
+  const isInitialMount = useRef(true);
+
+  // === 1. ВОССТАНОВЛЕНИЕ СЕССИИ (При запуске) ===
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      const savedRoute = localStorage.getItem('voltpro_last_route');
+      
+      // Если PWA/браузер открыл главную страницу, но в памяти есть другой маршрут — перекидываем туда
+      if (savedRoute && savedRoute !== '/' && currentPath === '/') {
+        navigate({ to: savedRoute, replace: true });
+      }
+    }
+  }, [currentPath, navigate]);
+
+  // === 2. СОХРАНЕНИЕ СЕССИИ (При каждом переходе) ===
+  useEffect(() => {
+    if (currentPath) {
+      localStorage.setItem('voltpro_last_route', currentPath);
+    }
+  }, [currentPath]);
 
   useEffect(() => {
     // Функция проверки метки в памяти браузера
@@ -74,7 +99,6 @@ function RootComponent() {
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-4 mb-1 ml-3">Сообщество и аккаунт</p>
               <MobileNavLink to="/masters-chat" icon={<Users className="w-5 h-5"/>} label="Чат мастеров" onClick={() => setIsMobileMenuOpen(false)} />
               
-              {/* === УМНАЯ ССЫЛКА (Теперь работает из памяти!) === */}
               <MobileNavLink 
                 to={isAuthenticated ? "/profile" : "/login"} 
                 icon={<User className="w-5 h-5"/>} 
