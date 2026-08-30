@@ -8,7 +8,6 @@ export const Route = createFileRoute('/estimator')({
 
 type Tariff = 'free' | 'master' | 'pro'
 
-// === БАЗОВЫЕ (РЕГИОНАЛЬНЫЕ) ЦЕНЫ ПО УМОЛЧАНИЮ ===
 const DEFAULT_PRICES = {
   cable3x25: 85, cable3x15: 65, rcd: 2500, breaker16A: 350, breaker10A: 350,
 }
@@ -46,7 +45,6 @@ function EstimatorPage() {
   const [customMaterials, setCustomMaterials] = useState<any[]>([])
   const [customWorks, setCustomWorks] = useState<any[]>([])
 
-  // === ПОДТЯГИВАНИЕ ЦЕН ИЗ ПРОФИЛЯ ===
   useEffect(() => {
     if (useMyPrices) {
       const saved = localStorage.getItem('voltpro_prices')
@@ -88,33 +86,27 @@ function EstimatorPage() {
     setter(list.filter((item) => item.id !== id))
   }
 
-  // === БОЕВАЯ ГЕНЕРАЦИЯ СО СМАРТ-ПАРСЕРОМ ТЕКСТА ===
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsGenerating(true)
     setShowResult(false)
     setPdfError(false)
 
-    // Умный локальный алгоритм (на случай если Яндекс затупит)
     const text = description.toLowerCase()
     
-    // Считаем точки
     const socketsCount = parseInt(text.match(/(\d+)\s*розет/)?.[1] || "0", 10) || Math.max(1, Math.ceil(area / 6))
     const switchesOneGang = parseInt(text.match(/(\d+)\s*одноклавиш/)?.[1] || "0", 10)
     const switchesTwoGang = parseInt(text.match(/(\d+)\s*двухклавиш/)?.[1] || "0", 10)
     const totalSwitches = (switchesOneGang + switchesTwoGang) || parseInt(text.match(/(\d+)\s*выкл/)?.[1] || "0", 10) || 1
     const lightsCount = parseInt(text.match(/(\d+)\s*люстр/)?.[1] || "0", 10) + parseInt(text.match(/(\d+)\s*светил/)?.[1] || "0", 10) || Math.max(1, Math.ceil(area / 5))
 
-    // Считаем кабель и автоматы
     const calcCable3x25 = Math.round(15 + (socketsCount * 3.5) + (area * 0.2)) 
     const calcCable3x15 = Math.round(15 + (totalSwitches * 3.5) + (lightsCount * 2.5) + (area * 0.15))
     const calcAutomat16A = Math.max(1, Math.ceil(socketsCount / 4))
     const calcAutomat10A = Math.max(1, Math.ceil(lightsCount / 8))
     
-    // Адекватный расчет УЗО (1 УЗО на 3 автомата розеточных групп)
     const calcRcd = Math.max(1, Math.ceil(calcAutomat16A / 3))
 
-    // Умный парсинг дополнительных материалов прямо из текста
     const smartCustomMaterials = []
     const modMatch = text.match(/(\d+)\s*модул/)
     if (text.includes('щит') || text.includes('бокс')) {
@@ -136,8 +128,7 @@ function EstimatorPage() {
     }
 
     try {
-      // Пытаемся спросить Яндекс
-      const response = await fetch('[https://functions.yandexcloud.net/d4ea349ivafiequjv2fi](https://functions.yandexcloud.net/d4ea349ivafiequjv2fi)', {
+      const response = await fetch('https://functions.yandexcloud.net/d4ea349ivafiequjv2fi', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: description })
@@ -146,12 +137,9 @@ function EstimatorPage() {
       if (!response.ok) throw new Error('Yandex GPT не ответил JSON форматом');
       const data = await response.json();
       
-      // ИСПРАВЛЕННАЯ СТРОКА: Убрали глючные регулярки, используем безопасный split
       const cleanJsonString = data.result.split('```json').join('').split('```').join('').trim();
-      
       const aiResult = JSON.parse(cleanJsonString);
 
-      // Если Яндекс ответил - берем его, если он забыл доп. материалы - подкидываем наши умные
       setEstimatedData({ 
         cable3x25: aiResult.cable3x25 || calcCable3x25, 
         cable3x15: aiResult.cable3x15 || calcCable3x15, 
@@ -160,7 +148,7 @@ function EstimatorPage() {
         breaker10AQty: aiResult.breaker10AQty || calcAutomat10A 
       });
 
-      const finalCustom = (aiResult.additionalMaterials && aiResult.additionalMaterials.length > 0) 
+      const finalCustom = (aiResult.additionalMaterials && aiResult.additionalMaterials.length !== 0) 
         ? aiResult.additionalMaterials.map((item: any, i: number) => ({ id: 'ai'+i, title: item.title, qty: item.qty, price: 0 }))
         : smartCustomMaterials;
 
@@ -175,7 +163,6 @@ function EstimatorPage() {
     } catch (error) {
       console.warn("Сработал умный локальный алгоритм защиты от сбоев ИИ");
       
-      // Включаем умную математику
       setEstimatedData({ cable3x25: calcCable3x25, cable3x15: calcCable3x15, rcdQty: calcRcd, breaker16AQty: calcAutomat16A, breaker10AQty: calcAutomat10A });
       setCustomMaterials(smartCustomMaterials);
       setEstimatedWorks({
@@ -318,4 +305,327 @@ function EstimatorPage() {
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><HomeIcon className="h-5 w-5 text-muted-foreground" /></div>
                     <select required value={roomType} onChange={(e) => setRoomType(e.target.value)} className="w-full pl-12 pr-10 py-3.5 bg-background border border-border rounded-xl text-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none appearance-none cursor-pointer">
                       <option value="Квартира (Новостройка)">Квартира (Новостройка)</option>
-                      <option value="Квартира (Вторичка)">Квартира
+                      <option value="Квартира (Вторичка)">Квартира (Вторичка)</option>
+                      <option value="Дом / Коттедж">Дом / Коттедж</option>
+                      <option value="Коммерческое помещение">Коммерческое помещение</option>
+                      <option value="Офис">Офис</option>
+                      <option value="Гараж / Подсобное">Гараж / Подсобное</option>
+                    </select>
+                    <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none"><ChevronDown className="h-5 w-5 text-muted-foreground" /></div>
+                  </div>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Площадь (м²)</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Ruler className="h-5 w-5 text-muted-foreground" /></div>
+                    <input type="number" required min="1" value={area || ''} onChange={(e) => setArea(Number(e.target.value))} placeholder="0" className="w-full pl-12 pr-4 py-3.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none" />
+                  </div>
+                </div>
+
+                <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl border border-border gap-4">
+                    <div className="flex-1">
+                      <p className="font-bold text-sm text-foreground mb-1 leading-tight">Цены материалов</p>
+                      <p className="text-xs text-muted-foreground leading-snug">Ручное изменение прайсов</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                      <input type="checkbox" className="sr-only peer" checked={useMyPrices} onChange={(e) => setUseMyPrices(e.target.checked)} />
+                      <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary border border-border"></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl border border-border gap-4">
+                    <div className="flex-1">
+                      <p className="font-bold text-sm text-foreground mb-1 leading-tight">Стоимость работ</p>
+                      <p className="text-xs text-muted-foreground leading-snug">Включить работы в смету</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                      <input type="checkbox" className="sr-only peer" checked={includeWorks} onChange={(e) => setIncludeWorks(e.target.checked)} />
+                      <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary border border-border"></div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <div className="flex justify-between items-end mb-2">
+                  <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest">Описание задачи для ИИ</label>
+                  <span className="text-xs text-muted-foreground">Опционально</span>
+                </div>
+                <textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} className="w-full p-4 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none resize-none"></textarea>
+                
+                <div className="mt-3 flex items-start gap-2 px-1">
+                  <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Кратко перечислите нужные элементы: количество розеток, выключателей (одно/двухклавишных), светильников, наличие щитка (укажите кол-во модулей), счетчика, ЯТП, распаечных коробок и т.д.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-4">
+                <div className="p-1.5 rounded-2xl bg-gradient-to-r from-primary/30 via-primary/60 to-primary/30">
+                  <button type="submit" disabled={isGenerating} className="w-full bg-background/95 backdrop-blur-sm hover:bg-primary hover:text-primary-foreground text-foreground font-black py-4 px-6 rounded-xl border border-border shadow-lg flex items-center justify-center gap-3 disabled:opacity-80 transition-all duration-300">
+                    {isGenerating && (
+                      <span className="flex items-center gap-3">
+                        <Loader2 className="w-6 h-6 animate-spin text-primary group-hover:text-primary-foreground" /> 
+                        <span className="hidden sm:inline">Анализ ПУЭ и генерация...</span>
+                        <span className="sm:hidden">Генерация...</span>
+                      </span>
+                    )}
+                    {!isGenerating && (
+                      <span className="flex items-center gap-3">
+                        <Sparkles className="w-6 h-6 text-primary group-hover:text-primary-foreground" /> 
+                        Сгенерировать смету (ИИ)
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+            </form>
+          </div>
+
+          {showResult && (
+            <>
+              <div id="print-section" className="bg-card border-2 border-primary/30 rounded-3xl p-4 sm:p-8 shadow-xl animate-in slide-in-from-bottom-8 relative overflow-hidden print:overflow-visible print:p-0 print:border-none print:shadow-none">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50 print:hidden"></div>
+                
+                <div className="hidden print:flex justify-between items-end border-b border-border pb-4 mb-4">
+                  <div>
+                    <h1 className="text-2xl font-black text-foreground tracking-tight">ВольтПро</h1>
+                    <p className="text-sm text-muted-foreground">Система инженерных расчетов</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-foreground">Смета от: {new Date().toLocaleDateString('ru-RU')}</p>
+                    <p className="text-sm text-muted-foreground">Регион: {region || 'Не указан'}</p>
+                  </div>
+                </div>
+                
+                <div className="mb-6 print:mb-4">
+                  <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1 print:hidden">Готово</p>
+                  <h3 className="text-xl sm:text-2xl font-black text-foreground flex items-center gap-2 print:text-lg">
+                    <FileText className="w-6 h-6 text-muted-foreground print:hidden" /> Смета: {roomType}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1 hidden print:block">Площадь: {area} м²</p>
+                </div>
+
+                <div className="mb-8 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-start gap-3 print:hidden">
+                  <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                  <p className="text-xs sm:text-sm text-amber-600 dark:text-amber-500 leading-relaxed font-medium">
+                    Расчёт является приблизительным и не служит официальной офертой. 
+                  </p>
+                </div>
+
+                <div className="space-y-3 mb-8 print:mb-6">
+                  <h4 className="text-sm font-bold text-foreground mb-4 uppercase tracking-widest border-l-4 border-primary pl-3 print:mb-2 print:text-xs">Материалы</h4>
+                  
+                  <div className="hidden md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 px-4 pb-2 border-b border-border print:px-0">
+                    <div className="md:col-span-5 print:col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Наименование</div>
+                    <div className="md:col-span-3 print:col-span-3 text-xs font-bold text-muted-foreground uppercase tracking-widest pl-2 print:pl-0">Цена за ед.</div>
+                    <div className="md:col-span-2 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-center">Кол-во</div>
+                    <div className="md:col-span-2 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-right">Итого</div>
+                  </div>
+
+                  <ResultItem title="Кабель ВВГнг(А)-LS 3x2.5 (м)" unit="м." qty={estimatedData.cable3x25} price={prices.cable3x25} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('cable3x25', val)} />
+                  <ResultItem title="Кабель ВВГнг(А)-LS 3x1.5 (м)" unit="м." qty={estimatedData.cable3x15} price={prices.cable3x15} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('cable3x15', val)} />
+                  <ResultItem title="УЗО 40А 30мА тип А (шт)" unit="шт." qty={estimatedData.rcdQty} price={prices.rcd} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('rcd', val)} />
+                  <ResultItem title="Автомат 16А, х-ка С (шт)" unit="шт." qty={estimatedData.breaker16AQty} price={prices.breaker16A} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('breaker16A', val)} />
+                  <ResultItem title="Автомат 10А, х-ка С (шт)" unit="шт." qty={estimatedData.breaker10AQty} price={prices.breaker10A} isEditable={useMyPrices} onChangePrice={(val) => handlePriceChange('breaker10A', val)} />
+                  
+                  {customMaterials.map(item => (
+                    <ResultItem 
+                      key={item.id} title={item.title} unit="ед." qty={item.qty} price={item.price} isEditable={true} isCustom={true}
+                      onChangeTitle={(val) => updateCustomItem(setCustomMaterials, customMaterials, item.id, 'title', val)}
+                      onChangeQty={(val) => updateCustomItem(setCustomMaterials, customMaterials, item.id, 'qty', val)}
+                      onChangePrice={(val) => updateCustomItem(setCustomMaterials, customMaterials, item.id, 'price', val)}
+                      onRemove={() => removeCustomItem(setCustomMaterials, customMaterials, item.id)}
+                    />
+                  ))}
+
+                  <button onClick={() => addCustomItem(setCustomMaterials, customMaterials)} className="w-full py-3 border-2 border-dashed border-border rounded-xl text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors flex items-center justify-center gap-2 text-sm font-bold print:hidden">
+                    <PlusCircle className="w-4 h-4" /> Добавить материал
+                  </button>
+                  
+                  <div className="p-4 bg-muted/30 border border-border rounded-xl flex justify-between items-center print:px-0 print:py-2 print:border-none print:border-t-2 print:border-black print:rounded-none">
+                    <span className="font-bold text-foreground">Подытог материалы:</span>
+                    <span className="text-lg font-black text-foreground whitespace-nowrap print:text-base">{totalMaterials.toLocaleString('ru-RU')} ₽</span>
+                  </div>
+                </div>
+
+                {includeWorks && (
+                  <div className="space-y-3 mb-8 print:mb-6">
+                    <h4 className="text-sm font-bold text-foreground mb-4 uppercase tracking-widest border-l-4 border-primary pl-3 print:mb-2 print:text-xs">Монтажные работы</h4>
+                    
+                    <div className="hidden md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 px-4 pb-2 border-b border-border print:px-0">
+                      <div className="md:col-span-5 print:col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Наименование работ</div>
+                      <div className="md:col-span-3 print:col-span-3 text-xs font-bold text-muted-foreground uppercase tracking-widest pl-2 print:pl-0">Цена за ед.</div>
+                      <div className="md:col-span-2 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-center">Кол-во</div>
+                      <div className="md:col-span-2 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-right">Итого</div>
+                    </div>
+
+                    <ResultItem title="Прокладка кабельных линий" unit="м." qty={estimatedWorks.cableRouting} price={workPrices.cableRouting} isEditable={true} onChangePrice={(val) => handleWorkPriceChange('cableRouting', val)} />
+                    <ResultItem title="Монтаж установочных мест" unit="шт." qty={estimatedWorks.pointsInstall} price={workPrices.pointsInstall} isEditable={true} onChangePrice={(val) => handleWorkPriceChange('pointsInstall', val)} />
+                    <ResultItem title="Сборка и монтаж щита" unit="мод." qty={estimatedWorks.shieldAssembly} price={workPrices.shieldAssembly} isEditable={true} onChangePrice={(val) => handleWorkPriceChange('shieldAssembly', val)} />
+                    
+                    {customWorks.map(item => (
+                      <ResultItem 
+                        key={item.id} title={item.title} unit="ед." qty={item.qty} price={item.price} isEditable={true} isCustom={true}
+                        onChangeTitle={(val) => updateCustomItem(setCustomWorks, customWorks, item.id, 'title', val)}
+                        onChangeQty={(val) => updateCustomItem(setCustomWorks, customWorks, item.id, 'qty', val)}
+                        onChangePrice={(val) => updateCustomItem(setCustomWorks, customWorks, item.id, 'price', val)}
+                        onRemove={() => removeCustomItem(setCustomWorks, customWorks, item.id)}
+                      />
+                    ))}
+
+                    <button onClick={() => addCustomItem(setCustomWorks, customWorks)} className="w-full py-3 border-2 border-dashed border-border rounded-xl text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors flex items-center justify-center gap-2 text-sm font-bold print:hidden">
+                      <PlusCircle className="w-4 h-4" /> Добавить работу
+                    </button>
+
+                    <div className="p-4 bg-muted/30 border border-border rounded-xl flex justify-between items-center print:px-0 print:py-2 print:border-none print:border-t-2 print:border-black print:rounded-none">
+                      <span className="font-bold text-foreground">Подытог работы:</span>
+                      <span className="text-lg font-black text-foreground whitespace-nowrap print:text-base">{totalWorks.toLocaleString('ru-RU')} ₽</span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="p-5 bg-primary/10 border-2 border-primary/20 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4 print:p-0 print:pt-4 print:bg-transparent print:border-none print:border-t-4 print:border-black print:rounded-none print:break-inside-avoid">
+                  <span className="font-black text-xl text-foreground">ОБЩАЯ СУММА:</span>
+                  <span className="text-3xl font-black text-primary whitespace-nowrap print:text-2xl">{grandTotal.toLocaleString('ru-RU')} ₽</span>
+                </div>
+              </div>
+              
+              {pdfError && (
+                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-sm font-medium animate-in fade-in print:hidden">
+                  <span className="font-bold">⚠️ Функция скачивания PDF заблокирована вашим браузером.</span><br/>
+                  Откройте сайт в стандартном браузере (Chrome, Safari, Яндекс).
+                </div>
+              )}
+
+              <div className="flex flex-col sm:flex-row gap-4 animate-in slide-in-from-bottom-8 print:hidden mt-6">
+                <button onClick={handlePdfDownload} className="w-full sm:flex-1 bg-muted hover:bg-muted/80 text-foreground font-black py-4 px-6 rounded-xl border border-border shadow-lg transition-colors flex items-center justify-center gap-3 text-base sm:text-lg">
+                  <Download className="w-6 h-6" /> Скачать PDF
+                </button>
+                <button onClick={handleShare} className="w-full sm:flex-1 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 font-black py-4 px-6 rounded-xl shadow-lg transition-colors flex items-center justify-center gap-3 text-base sm:text-lg">
+                  <Share2 className="w-6 h-6" /> Поделиться
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {showShareModal && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-card border border-border rounded-3xl w-full max-w-sm p-6 shadow-2xl relative">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-black text-foreground">Куда отправить?</h3>
+              <button onClick={() => setShowShareModal(false)} className="p-2 bg-muted hover:bg-muted/80 rounded-full transition-colors">
+                <X className="w-5 h-5 text-muted-foreground" />
+              </button>
+            </div>
+            
+            <div className="space-y-3">
+              <a href={`https://t.me/share/url?url=&text=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-[#0088cc] text-white hover:bg-[#0088cc]/90 rounded-xl font-bold transition-colors shadow-md">
+                <Send className="w-6 h-6" /> Telegram
+              </a>
+              <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-[#25D366] text-white hover:bg-[#25D366]/90 rounded-xl font-bold transition-colors shadow-md">
+                <MessageCircle className="w-6 h-6" /> WhatsApp
+              </a>
+              <a href={`https://vk.com/share.php?url=https://voltpro.ru&title=Смета&comment=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-[#0077FF] text-white hover:bg-[#0077FF]/90 rounded-xl font-bold transition-colors shadow-md">
+                <Users className="w-6 h-6" /> ВКонтакте
+              </a>
+              <a href={`max://share?text=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-purple-600 text-white hover:bg-purple-700 rounded-xl font-bold transition-colors shadow-md">
+                <MessageSquare className="w-6 h-6" /> Мессенджер MAX
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ResultItem({ 
+  title, unit, qty, price, isEditable, isCustom = false, 
+  onChangePrice, onChangeTitle, onChangeQty, onRemove 
+}: { 
+  title: string, unit: string, qty: number, price: number, 
+  isEditable: boolean, isCustom?: boolean, 
+  onChangePrice: (val: number) => void, onChangeTitle?: (val: string) => void, 
+  onChangeQty?: (val: number) => void, onRemove?: () => void 
+}) {
+  const total = qty * price
+
+  return (
+    <div className="flex flex-col md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 items-start md:items-center p-4 bg-background border border-border rounded-xl print:py-1.5 print:px-0 print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:border-gray-300 print:rounded-none group relative print:break-inside-avoid">
+      
+      {isCustom && (
+        <button onClick={onRemove} className="md:hidden absolute right-2 top-2 p-2 text-muted-foreground hover:text-red-500 print:hidden transition-colors">
+          <Trash2 className="w-4 h-4" />
+        </button>
+      )}
+
+      <div className="md:col-span-5 print:col-span-5 flex items-start md:items-center gap-3 w-full pr-8 md:pr-0">
+        {!isCustom ? (
+          <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5 md:mt-0 print:hidden" />
+        ) : (
+          <button onClick={onRemove} className="hidden md:flex w-5 h-5 items-center justify-center text-muted-foreground hover:text-red-500 shrink-0 print:hidden transition-colors">
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
+        
+        {isCustom ? (
+          <div className="w-full">
+            <input type="text" value={title} onChange={(e) => { if (onChangeTitle) onChangeTitle(e.target.value) }} placeholder="Введите название..." className="w-full bg-transparent border-b border-border focus:border-primary outline-none py-1 text-sm font-medium text-foreground print:hidden placeholder:text-muted-foreground/50" />
+            <span className="hidden print:inline font-medium text-xs text-foreground">{title || 'Без названия'}</span>
+          </div>
+        ) : (
+          <span className="font-medium text-sm sm:text-base text-foreground leading-tight print:text-xs">{title}</span>
+        )}
+      </div>
+
+      <div className="md:col-span-7 print:col-span-7 grid grid-cols-2 md:grid-cols-7 print:grid print:grid-cols-7 gap-y-3 gap-x-2 md:gap-4 items-center w-full mt-2 md:mt-0 pt-3 border-t border-border md:border-0 md:pt-0 print:border-0 print:pt-0">
+        
+        <div className="col-span-1 md:col-span-3 print:col-span-3 flex flex-col print:block">
+          <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Цена</span>
+          {isEditable ? (
+            <div className="relative w-full max-w-[120px] print:hidden">
+              <input type="number" value={price || ''} onChange={(e) => { if (onChangePrice) onChangePrice(Number(e.target.value)) }} placeholder="0" className="w-full bg-muted border border-border rounded-lg py-1.5 pl-2 pr-7 text-xs sm:text-sm font-bold focus:ring-1 focus:ring-primary outline-none transition-colors" />
+              <span className="absolute right-2 top-1.5 text-xs text-muted-foreground">₽</span>
+            </div>
+          ) : (
+            <span className="font-bold text-xs sm:text-sm mt-1 md:mt-0 print:block whitespace-nowrap">{price.toLocaleString('ru-RU')} ₽</span>
+          )}
+          {isEditable && (
+             <span className="hidden print:block font-bold text-xs text-foreground whitespace-nowrap">
+                {price.toLocaleString('ru-RU')} ₽
+             </span>
+          )}
+        </div>
+
+        <div className="col-span-1 md:col-span-2 print:col-span-2 flex flex-col items-end md:items-center print:text-center print:block">
+          <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Кол-во</span>
+          {isCustom ? (
+            <div className="flex items-center justify-end md:justify-center gap-1 print:hidden">
+              <input type="number" value={qty || ''} onChange={(e) => { if (onChangeQty) onChangeQty(Number(e.target.value)) }} placeholder="1" className="w-12 sm:w-16 bg-muted border border-border rounded-lg py-1 px-1 sm:px-2 text-xs sm:text-sm font-bold text-center focus:ring-1 focus:ring-primary outline-none" />
+              <span className="text-xs sm:text-sm font-black">{unit}</span>
+            </div>
+          ) : (
+            <span className="font-black text-xs sm:text-sm whitespace-nowrap mt-1 md:mt-0">{qty} {unit}</span>
+          )}
+          {isCustom && (
+             <span className="hidden print:block font-black text-xs whitespace-nowrap">
+                {qty} {unit}
+             </span>
+          )}
+        </div>
+
+        <div className="col-span-2 md:col-span-2 print:col-span-2 flex items-center justify-between md:flex-col md:items-end print:text-right print:block pt-2 border-t border-border/50 md:border-0 md:pt-0 print:border-0 print:pt-0">
+          <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden">Итого</span>
+          <span className="font-black text-primary text-sm whitespace-nowrap print:text-black">{total.toLocaleString('ru-RU')} ₽</span>
+        </div>
+      </div>
+    </div>
+  )
+}
