@@ -26,7 +26,7 @@ function EstimatorPage() {
   const [region, setRegion] = useState('')
   const [roomType, setRoomType] = useState('Квартира (Новостройка)')
   const [area, setArea] = useState<number>(65)
-  const [description, setDescription] = useState('Квартира 65 кв м- зал, спальня, кухня, коридор, туалет, ванна, 3 одноклавишных выкл, 3 двухклавишных, 15 розеток, 3 люстры, 2 светильника IP-65, 20 распаечных коробок, счетчик, щиток на 12 модулей, ЯТП-12v')
+  const [description, setDescription] = useState('')
   
   const [useMyPrices, setUseMyPrices] = useState(false)
   const [includeWorks, setIncludeWorks] = useState(false)
