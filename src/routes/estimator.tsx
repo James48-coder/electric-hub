@@ -19,6 +19,7 @@ function EstimatorPage() {
   const [tariff, setTariff] = useState<Tariff>('free')
   const [isGenerating, setIsGenerating] = useState(false)
   const [showResult, setShowResult] = useState(false)
+  const [apiError, setApiError] = useState<string | null>(null)
   
   const [showShareModal, setShowShareModal] = useState(false)
   const [pdfError, setPdfError] = useState(false)
@@ -91,89 +92,52 @@ function EstimatorPage() {
     setIsGenerating(true)
     setShowResult(false)
     setPdfError(false)
-
-    const text = description.toLowerCase()
-    
-    const socketsCount = parseInt(text.match(/(\d+)\s*розет/)?.[1] || "0", 10) || Math.max(1, Math.ceil(area / 6))
-    const switchesOneGang = parseInt(text.match(/(\d+)\s*одноклавиш/)?.[1] || "0", 10)
-    const switchesTwoGang = parseInt(text.match(/(\d+)\s*двухклавиш/)?.[1] || "0", 10)
-    const totalSwitches = (switchesOneGang + switchesTwoGang) || parseInt(text.match(/(\d+)\s*выкл/)?.[1] || "0", 10) || 1
-    const lightsCount = parseInt(text.match(/(\d+)\s*люстр/)?.[1] || "0", 10) + parseInt(text.match(/(\d+)\s*светил/)?.[1] || "0", 10) || Math.max(1, Math.ceil(area / 5))
-
-    const calcCable3x25 = Math.round(15 + (socketsCount * 3.5) + (area * 0.2)) 
-    const calcCable3x15 = Math.round(15 + (totalSwitches * 3.5) + (lightsCount * 2.5) + (area * 0.15))
-    const calcAutomat16A = Math.max(1, Math.ceil(socketsCount / 4))
-    const calcAutomat10A = Math.max(1, Math.ceil(lightsCount / 8))
-    
-    const calcRcd = Math.max(1, Math.ceil(calcAutomat16A / 3))
-
-    const smartCustomMaterials = []
-    const modMatch = text.match(/(\d+)\s*модул/)
-    if (text.includes('щит') || text.includes('бокс')) {
-      smartCustomMaterials.push({ id: 'fb1', title: `Щит распределительный (на ${modMatch ? modMatch[1] : '12'} мод.)`, qty: 1, price: 0 })
-    }
-    if (text.includes('ятп')) {
-      smartCustomMaterials.push({ id: 'fb2', title: 'ЯТП 220/12В', qty: 1, price: 0 })
-    }
-    if (text.includes('счетчик') || text.includes('счётчик')) {
-      smartCustomMaterials.push({ id: 'fb3', title: 'Счетчик электроэнергии', qty: 1, price: 0 })
-    }
-    const boxMatch = text.match(/(\d+)\s*распаечн/)
-    if (boxMatch || text.includes('коробк')) {
-      smartCustomMaterials.push({ id: 'fb4', title: 'Распаечная коробка', qty: boxMatch ? parseInt(boxMatch[1]) : 5, price: 0 })
-    }
-    const ip65Match = text.match(/(\d+)\s*светил[а-я]*\s*ip-?65/i)
-    if (text.includes('ip65') || text.includes('ip-65')) {
-      smartCustomMaterials.push({ id: 'fb5', title: 'Светильник влагозащищенный IP65', qty: ip65Match ? parseInt(ip65Match[1]) : 2, price: 0 })
-    }
+    setApiError(null)
 
     try {
       const response = await fetch('https://functions.yandexcloud.net/d4ea349ivafiequjv2fi', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: description })
+        body: JSON.stringify({ prompt: description, area: area, roomType: roomType })
       });
 
-      if (!response.ok) throw new Error('Yandex GPT не ответил JSON форматом');
+      if (!response.ok) throw new Error('Сервер нейросети недоступен (ошибка Яндекса)');
       const data = await response.json();
       
       const cleanJsonString = data.result.split('```json').join('').split('```').join('').trim();
       const aiResult = JSON.parse(cleanJsonString);
 
       setEstimatedData({ 
-        cable3x25: aiResult.cable3x25 || calcCable3x25, 
-        cable3x15: aiResult.cable3x15 || calcCable3x15, 
-        rcdQty: aiResult.rcdQty || calcRcd, 
-        breaker16AQty: aiResult.breaker16AQty || calcAutomat16A, 
-        breaker10AQty: aiResult.breaker10AQty || calcAutomat10A 
+        cable3x25: aiResult.cable3x25 || 0, 
+        cable3x15: aiResult.cable3x15 || 0, 
+        rcdQty: aiResult.rcdQty || 0, 
+        breaker16AQty: aiResult.breaker16AQty || 0, 
+        breaker10AQty: aiResult.breaker10AQty || 0 
       });
 
-      const finalCustom = (aiResult.additionalMaterials && aiResult.additionalMaterials.length !== 0) 
-        ? aiResult.additionalMaterials.map((item: any, i: number) => ({ id: 'ai'+i, title: item.title, qty: item.qty, price: 0 }))
-        : smartCustomMaterials;
-
-      setCustomMaterials(finalCustom);
+      const finalMaterials = (aiResult.additionalMaterials && Array.isArray(aiResult.additionalMaterials)) 
+        ? aiResult.additionalMaterials.map((item: any, i: number) => ({ id: 'am'+i, title: item.title, qty: item.qty, price: item.price || 0 }))
+        : [];
+      setCustomMaterials(finalMaterials);
 
       setEstimatedWorks({
-        cableRouting: (aiResult.cable3x25 || calcCable3x25) + (aiResult.cable3x15 || calcCable3x15),
-        pointsInstall: socketsCount + totalSwitches + lightsCount,
-        shieldAssembly: (aiResult.breaker16AQty || calcAutomat16A) + (aiResult.breaker10AQty || calcAutomat10A) + (aiResult.rcdQty || calcRcd)
+        cableRouting: aiResult.cableRouting || 0,
+        pointsInstall: aiResult.pointsInstall || 0,
+        shieldAssembly: aiResult.shieldAssembly || 0
       });
+
+      const finalWorks = (aiResult.additionalWorks && Array.isArray(aiResult.additionalWorks)) 
+        ? aiResult.additionalWorks.map((item: any, i: number) => ({ id: 'aw'+i, title: item.title, qty: item.qty, price: item.price || 0 }))
+        : [];
+      setCustomWorks(finalWorks);
+      
+      setShowResult(true);
 
     } catch (error) {
-      console.warn("Сработал умный локальный алгоритм защиты от сбоев ИИ");
-      
-      setEstimatedData({ cable3x25: calcCable3x25, cable3x15: calcCable3x15, rcdQty: calcRcd, breaker16AQty: calcAutomat16A, breaker10AQty: calcAutomat10A });
-      setCustomMaterials(smartCustomMaterials);
-      setEstimatedWorks({
-        cableRouting: calcCable3x25 + calcCable3x15,
-        pointsInstall: socketsCount + totalSwitches + lightsCount,
-        shieldAssembly: calcAutomat16A + calcAutomat10A + calcRcd
-      });
+      console.error("Ошибка ИИ:", error);
+      setApiError('Не удалось сгенерировать смету. Убедитесь, что текст запроса понятен, или попробуйте через пару минут.');
     } finally {
-      setCustomWorks([]);
       setIsGenerating(false);
-      setShowResult(true);
     }
   }
 
@@ -358,12 +322,19 @@ function EstimatorPage() {
                 <div className="mt-3 flex items-start gap-2 px-1">
                   <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Кратко перечислите нужные элементы: количество розеток, выключателей (одно/двухклавишных), светильников, наличие щитка (укажите кол-во модулей), счетчика, ЯТП, распаечных коробок и т.д.
+                    Укажите розетки, выключатели, щиток, а также ОБЯЗАТЕЛЬНО материал стен (бетон, кирпич, пеноблок, гипсокартон) для правильного расчета штробления.
                   </p>
                 </div>
               </div>
 
-              <div className="pt-4">
+              {apiError && (
+                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-sm font-medium flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 shrink-0" />
+                  <p>{apiError}</p>
+                </div>
+              )}
+
+              <div className="pt-2">
                 <div className="p-1.5 rounded-2xl bg-gradient-to-r from-primary/30 via-primary/60 to-primary/30">
                   <button type="submit" disabled={isGenerating} className="w-full bg-background/95 backdrop-blur-sm hover:bg-primary hover:text-primary-foreground text-foreground font-black py-4 px-6 rounded-xl border border-border shadow-lg flex items-center justify-center gap-3 disabled:opacity-80 transition-all duration-300">
                     {isGenerating && (
