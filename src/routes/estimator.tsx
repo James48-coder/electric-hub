@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Bot, MapPin, Home as HomeIcon, Ruler, Settings, Lock, Sparkles, Loader2, FileText, Download, CheckCircle2, ChevronDown, AlertTriangle, Share2, X, Send, MessageCircle, Users, MessageSquare, PlusCircle, Trash2 } from 'lucide-react'
+import { Bot, MapPin, Home as HomeIcon, Ruler, Settings, Lock, Sparkles, Loader2, FileText, Download, CheckCircle2, ChevronDown, AlertTriangle, Share2, X, Send, MessageCircle, Users, MessageSquare, PlusCircle, Trash2, Info } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
 
 export const Route = createFileRoute('/estimator')({
@@ -25,9 +25,9 @@ function EstimatorPage() {
   const [pdfError, setPdfError] = useState(false)
 
   const [region, setRegion] = useState('')
-  const [roomType, setRoomType] = useState('Коммерческое помещение')
-  const [area, setArea] = useState<number>(24)
-  const [description, setDescription] = useState('Гараж, 1 выключатель, 2 розетки, 4 светильника')
+  const [roomType, setRoomType] = useState('Квартира (Новостройка)')
+  const [area, setArea] = useState<number>(65)
+  const [description, setDescription] = useState('Квартира 65 кв м- зал, спальня, кухня, коридор, туалет, ванна, 3 одноклавишных выкл, 3 двухклавишных, 15 розеток, 3 люстры, 2 светильника IP-65, 20 распаечных коробок, счетчик, щиток на 12 модулей, ЯТП-12v')
   
   const [useMyPrices, setUseMyPrices] = useState(false)
   const [includeWorks, setIncludeWorks] = useState(false)
@@ -46,7 +46,7 @@ function EstimatorPage() {
   const [customMaterials, setCustomMaterials] = useState<any[]>([])
   const [customWorks, setCustomWorks] = useState<any[]>([])
 
-  // === ПОДТЯГИВАНИЕ ЦЕН ИЗ ПРОФИЛЯ (LOCALSTORAGE) ===
+  // === ПОДТЯГИВАНИЕ ЦЕН ИЗ ПРОФИЛЯ ===
   useEffect(() => {
     if (useMyPrices) {
       const saved = localStorage.getItem('voltpro_prices')
@@ -88,57 +88,61 @@ function EstimatorPage() {
     setter(list.filter((item) => item.id !== id))
   }
 
-  // === БОЕВАЯ ГЕНЕРАЦИЯ СМЕТЫ ЧЕРЕЗ ИИ ===
+  // === БОЕВАЯ ГЕНЕРАЦИЯ СО СМАРТ-ПАРСЕРОМ ТЕКСТА ===
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsGenerating(true)
     setShowResult(false)
     setPdfError(false)
 
-    // 1. Страховочные расчеты (на случай падения интернета или отказа API)
+    // Умный локальный алгоритм (на случай если Яндекс затупит)
     const text = description.toLowerCase()
-    const socketsMatch = text.match(/(\d+)\s*розет/)
-    const switchesMatch = text.match(/(\d+)\s*выключат/)
-    const lightsMatch = text.match(/(\d+)\s*светил/)
+    
+    // Считаем точки
+    const socketsCount = parseInt(text.match(/(\d+)\s*розет/)?.[1] || "0", 10) || Math.max(1, Math.ceil(area / 6))
+    const switchesOneGang = parseInt(text.match(/(\d+)\s*одноклавиш/)?.[1] || "0", 10)
+    const switchesTwoGang = parseInt(text.match(/(\d+)\s*двухклавиш/)?.[1] || "0", 10)
+    const totalSwitches = (switchesOneGang + switchesTwoGang) || parseInt(text.match(/(\d+)\s*выкл/)?.[1] || "0", 10) || 1
+    const lightsCount = parseInt(text.match(/(\d+)\s*люстр/)?.[1] || "0", 10) + parseInt(text.match(/(\d+)\s*светил/)?.[1] || "0", 10) || Math.max(1, Math.ceil(area / 5))
 
-    const socketsCount = socketsMatch ? parseInt(socketsMatch[1], 10) : Math.max(1, Math.ceil(area / 6))
-    const switchesCount = switchesMatch ? parseInt(switchesMatch[1], 10) : 1
-    const lightsCount = lightsMatch ? parseInt(lightsMatch[1], 10) : Math.max(1, Math.ceil(area / 5))
-
-    const calcCable3x25 = Math.round(10 + (socketsCount * 3) + (area * 0.1)) 
-    const calcCable3x15 = Math.round(10 + (switchesCount * 3) + (lightsCount * 2) + (area * 0.1))
+    // Считаем кабель и автоматы
+    const calcCable3x25 = Math.round(15 + (socketsCount * 3.5) + (area * 0.2)) 
+    const calcCable3x15 = Math.round(15 + (totalSwitches * 3.5) + (lightsCount * 2.5) + (area * 0.15))
     const calcAutomat16A = Math.max(1, Math.ceil(socketsCount / 4))
-    const calcAutomat10A = Math.max(1, Math.ceil(lightsCount / 10))
-    const calcRcd = 1 
+    const calcAutomat10A = Math.max(1, Math.ceil(lightsCount / 8))
+    
+    // Адекватный расчет УЗО (1 УЗО на 3 автомата розеточных групп)
+    const calcRcd = Math.max(1, Math.ceil(calcAutomat16A / 3))
 
-    // 2. Жесткий промпт для YandexGPT с требованием вернуть только JSON
-    const aiPrompt = `Ты профессиональный сметчик-электромонтажник. 
-Рассчитай необходимое количество материалов по ПУЭ-7.
-Объект: ${roomType}, Площадь: ${area} м², Вводные: ${description}.
-ЗАПРЕЩЕНО использовать кабели ПВС/ШВВП. ОБЯЗАТЕЛЬНО УЗО на розетки.
-
-ВЕРНИ ТОЛЬКО JSON ОБЪЕКТ со следующими ключами и числовыми значениями (без текста, без форматирования markdown):
-{
-  "cable3x25": количество_метров,
-  "cable3x15": количество_метров,
-  "rcdQty": количество_штук,
-  "breaker16AQty": количество_штук,
-  "breaker10AQty": количество_штук
-}`
+    // Умный парсинг дополнительных материалов прямо из текста
+    const smartCustomMaterials = []
+    const modMatch = text.match(/(\d+)\s*модул/)
+    if (text.includes('щит') || text.includes('бокс')) {
+      smartCustomMaterials.push({ id: 'fb1', title: `Щит распределительный (на ${modMatch ? modMatch[1] : '12'} мод.)`, qty: 1, price: 0 })
+    }
+    if (text.includes('ятп')) {
+      smartCustomMaterials.push({ id: 'fb2', title: 'ЯТП 220/12В', qty: 1, price: 0 })
+    }
+    if (text.includes('счетчик') || text.includes('счётчик')) {
+      smartCustomMaterials.push({ id: 'fb3', title: 'Счетчик электроэнергии', qty: 1, price: 0 })
+    }
+    const boxMatch = text.match(/(\d+)\s*распаечн/)
+    if (boxMatch || text.includes('коробк')) {
+      smartCustomMaterials.push({ id: 'fb4', title: 'Распаечная коробка', qty: boxMatch ? parseInt(boxMatch[1]) : 5, price: 0 })
+    }
+    const ip65Match = text.match(/(\d+)\s*светил[а-я]*\s*ip-?65/i)
+    if (text.includes('ip65') || text.includes('ip-65')) {
+      smartCustomMaterials.push({ id: 'fb5', title: 'Светильник влагозащищенный IP65', qty: ip65Match ? parseInt(ip65Match[1]) : 2, price: 0 })
+    }
 
     try {
-      // 3. Запрос к нашей защищенной функции на Yandex Cloud
+      // Пытаемся спросить Яндекс
       const response = await fetch('https://functions.yandexcloud.net/d4ea349ivafiequjv2fi', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ prompt: aiPrompt })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: description })
       });
 
-      if (!response.ok) throw new Error('Ошибка ответа сервера Яндекса');
-
+      if (!response.ok) throw new Error('Yandex GPT не ответил JSON форматом');
       const data = await response.json();
-      
-      // Очищаем ответ нейросети от случайных символов (```json)
-      const cleanJsonString = data.result.replace(/
+      const cleanJsonString = data.result.replace(/```json/g, '').replace(/
