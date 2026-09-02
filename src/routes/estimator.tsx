@@ -12,7 +12,7 @@ const DEFAULT_PRICES = {
   cable3x25: 85, cable3x15: 65, rcd: 2500, breaker16A: 350, breaker10A: 350,
 }
 const DEFAULT_WORK_PRICES = {
-  cableRouting: 150, pointsInstall: 450, shieldAssembly: 500,
+  cableRouting: 150, pointsInstall: 450, shieldAssembly: 0, // Обнулили цену за щит
 }
 
 // Умный определитель единиц измерения
