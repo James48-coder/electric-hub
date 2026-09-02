@@ -15,6 +15,15 @@ const DEFAULT_WORK_PRICES = {
   cableRouting: 150, pointsInstall: 450, shieldAssembly: 500,
 }
 
+// Умный определитель единиц измерения
+const getUnit = (title: string, defaultUnit: string) => {
+  const lower = (title || "").toLowerCase();
+  if (lower.includes("штробл") || lower.includes("кабел") || lower.includes("провод") || lower.includes("гофр") || lower.includes("лотк") || lower.includes("лент")) {
+    return "м.";
+  }
+  return defaultUnit;
+}
+
 function EstimatorPage() {
   const [tariff, setTariff] = useState<Tariff>('free')
   const [isGenerating, setIsGenerating] = useState(false)
@@ -160,7 +169,7 @@ function EstimatorPage() {
     text += `• Автомат 16А: ${estimatedData.breaker16AQty} шт. = ${estimatedData.breaker16AQty * prices.breaker16A} ₽\n`
     text += `• Автомат 10А: ${estimatedData.breaker10AQty} шт. = ${estimatedData.breaker10AQty * prices.breaker10A} ₽\n`
     customMaterials.forEach(m => {
-      if(m.title) text += `• ${m.title}: ${m.qty} ед. = ${m.qty * m.price} ₽\n`
+      if(m.title) text += `• ${m.title}: ${m.qty} ${getUnit(m.title, 'шт.')} = ${m.qty * m.price} ₽\n`
     })
     text += `Итого материалы: ${totalMaterials.toLocaleString('ru-RU')} ₽\n\n`
 
@@ -170,7 +179,7 @@ function EstimatorPage() {
       text += `• Монтаж точек: ${estimatedWorks.pointsInstall} шт. = ${estimatedWorks.pointsInstall * workPrices.pointsInstall} ₽\n`
       text += `• Сборка щита: ${estimatedWorks.shieldAssembly} мод. = ${estimatedWorks.shieldAssembly * workPrices.shieldAssembly} ₽\n`
       customWorks.forEach(w => {
-        if(w.title) text += `• ${w.title}: ${w.qty} ед. = ${w.qty * w.price} ₽\n`
+        if(w.title) text += `• ${w.title}: ${w.qty} ${getUnit(w.title, 'ед.')} = ${w.qty * w.price} ₽\n`
       })
       text += `Итого работы: ${totalWorks.toLocaleString('ru-RU')} ₽\n\n`
     }
@@ -409,7 +418,7 @@ function EstimatorPage() {
                   
                   {customMaterials.map(item => (
                     <ResultItem 
-                      key={item.id} title={item.title} unit="ед." qty={item.qty} price={item.price} isEditable={true} isCustom={true}
+                      key={item.id} title={item.title} unit={getUnit(item.title, 'шт.')} qty={item.qty} price={item.price} isEditable={true} isCustom={true}
                       onChangeTitle={(val) => updateCustomItem(setCustomMaterials, customMaterials, item.id, 'title', val)}
                       onChangeQty={(val) => updateCustomItem(setCustomMaterials, customMaterials, item.id, 'qty', val)}
                       onChangePrice={(val) => updateCustomItem(setCustomMaterials, customMaterials, item.id, 'price', val)}
@@ -444,7 +453,7 @@ function EstimatorPage() {
                     
                     {customWorks.map(item => (
                       <ResultItem 
-                        key={item.id} title={item.title} unit="ед." qty={item.qty} price={item.price} isEditable={true} isCustom={true}
+                        key={item.id} title={item.title} unit={getUnit(item.title, 'ед.')} qty={item.qty} price={item.price} isEditable={true} isCustom={true}
                         onChangeTitle={(val) => updateCustomItem(setCustomWorks, customWorks, item.id, 'title', val)}
                         onChangeQty={(val) => updateCustomItem(setCustomWorks, customWorks, item.id, 'qty', val)}
                         onChangePrice={(val) => updateCustomItem(setCustomWorks, customWorks, item.id, 'price', val)}
