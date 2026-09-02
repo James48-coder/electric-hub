@@ -590,7 +590,7 @@ function ResultItem({
           <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Цена</span>
           {isEditable ? (
             <div className="relative w-full max-w-[120px] print:hidden">
-              <input type="number" value={price || ''} onChange={(e) => { if (onChangePrice) onChangePrice(Number(e.target.value)) }} placeholder="0" className="w-full bg-muted border border-border rounded-lg py-1.5 pl-2 pr-7 text-xs sm:text-sm font-bold focus:ring-1 focus:ring-primary outline-none transition-colors" />
+              <input type="number" value={price || ''} onChange={(e) => { if (onChangePrice) onChangePrice(Number(e.target.value)) }} placeholder="0" className="w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none bg-muted border border-border rounded-lg py-1.5 pl-2 pr-7 text-xs sm:text-sm font-bold focus:ring-1 focus:ring-primary outline-none transition-colors" />
               <span className="absolute right-2 top-1.5 text-xs text-muted-foreground">₽</span>
             </div>
           ) : (
@@ -607,8 +607,8 @@ function ResultItem({
           <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Кол-во</span>
           {isCustom ? (
             <div className="flex items-center justify-end md:justify-center gap-1 print:hidden">
-              <input type="number" value={qty || ''} onChange={(e) => { if (onChangeQty) onChangeQty(Number(e.target.value)) }} placeholder="1" className="w-12 sm:w-16 bg-muted border border-border rounded-lg py-1 px-1 sm:px-2 text-xs sm:text-sm font-bold text-center focus:ring-1 focus:ring-primary outline-none" />
-              <span className="text-xs sm:text-sm font-black">{unit}</span>
+              <input type="number" value={qty || ''} onChange={(e) => { if (onChangeQty) onChangeQty(Number(e.target.value)) }} placeholder="1" className="w-20 sm:w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none bg-muted border border-border rounded-lg py-1 px-2 text-xs sm:text-sm font-bold text-center focus:ring-1 focus:ring-primary outline-none" />
+              <span className="text-xs sm:text-sm font-black whitespace-nowrap">{unit}</span>
             </div>
           ) : (
             <span className="font-black text-xs sm:text-sm whitespace-nowrap pt-1.5">{qty} {unit}</span>
