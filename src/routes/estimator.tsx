@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Bot, MapPin, Home as HomeIcon, Ruler, Settings, Lock, Sparkles, Loader2, FileText, Download, CheckCircle2, ChevronDown, AlertTriangle, Share2, X, Send, MessageCircle, Users, MessageSquare, PlusCircle, Trash2, Info } from 'lucide-react'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 export const Route = createFileRoute('/estimator')({
   component: EstimatorPage,
@@ -212,7 +212,7 @@ function EstimatorPage() {
             #print-section { background-color: white !important; border: none !important; box-shadow: none !important; overflow: visible !important; padding: 0 !important; }
             #print-section * { color: black !important; border-color: #d1d5db !important; }
             #print-section div { background-color: transparent !important; }
-            input::placeholder { color: transparent !important; }
+            input::placeholder, textarea::placeholder { color: transparent !important; }
           }
         `}
       </style>
@@ -529,7 +529,7 @@ function ResultItem({
   const total = qty * price
 
   return (
-    <div className="flex flex-col md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 items-start md:items-center p-4 bg-background border border-border rounded-xl print:py-1.5 print:px-0 print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:border-gray-300 print:rounded-none group relative print:break-inside-avoid">
+    <div className="flex flex-col md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 items-start p-4 bg-background border border-border rounded-xl print:py-1.5 print:px-0 print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:border-gray-300 print:rounded-none group relative print:break-inside-avoid">
       
       {isCustom && (
         <button onClick={onRemove} className="md:hidden absolute right-2 top-2 p-2 text-muted-foreground hover:text-red-500 print:hidden transition-colors">
@@ -537,28 +537,44 @@ function ResultItem({
         </button>
       )}
 
-      <div className="md:col-span-5 print:col-span-5 flex items-start md:items-center gap-3 w-full pr-8 md:pr-0">
+      <div className="md:col-span-5 print:col-span-5 flex items-start gap-3 w-full pr-8 md:pr-0">
         {!isCustom ? (
-          <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5 md:mt-0 print:hidden" />
+          <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-1 print:hidden" />
         ) : (
-          <button onClick={onRemove} className="hidden md:flex w-5 h-5 items-center justify-center text-muted-foreground hover:text-red-500 shrink-0 print:hidden transition-colors">
+          <button onClick={onRemove} className="hidden md:flex w-5 h-5 items-center justify-center text-muted-foreground hover:text-red-500 shrink-0 mt-1 print:hidden transition-colors">
             <Trash2 className="w-4 h-4" />
           </button>
         )}
         
         {isCustom ? (
           <div className="w-full">
-            <input type="text" value={title} onChange={(e) => { if (onChangeTitle) onChangeTitle(e.target.value) }} placeholder="Введите название..." className="w-full bg-transparent border-b border-border focus:border-primary outline-none py-1 text-sm font-medium text-foreground print:hidden placeholder:text-muted-foreground/50" />
+            <textarea 
+              value={title} 
+              onChange={(e) => { 
+                if (onChangeTitle) onChangeTitle(e.target.value);
+                e.target.style.height = 'auto';
+                e.target.style.height = e.target.scrollHeight + 'px';
+              }} 
+              ref={(el) => {
+                if (el) {
+                  el.style.height = 'auto';
+                  el.style.height = el.scrollHeight + 'px';
+                }
+              }}
+              rows={1}
+              placeholder="Введите название..." 
+              className="w-full bg-transparent border-b border-border focus:border-primary outline-none py-1 text-sm sm:text-base font-medium text-foreground leading-snug print:hidden placeholder:text-muted-foreground/50 resize-none overflow-hidden" 
+            />
             <span className="hidden print:inline font-medium text-xs text-foreground">{title || 'Без названия'}</span>
           </div>
         ) : (
-          <span className="font-medium text-sm sm:text-base text-foreground leading-tight print:text-xs">{title}</span>
+          <span className="font-medium text-sm sm:text-base text-foreground leading-snug print:text-xs mt-1 md:mt-0 pt-0.5">{title}</span>
         )}
       </div>
 
-      <div className="md:col-span-7 print:col-span-7 grid grid-cols-2 md:grid-cols-7 print:grid print:grid-cols-7 gap-y-3 gap-x-2 md:gap-4 items-center w-full mt-2 md:mt-0 pt-3 border-t border-border md:border-0 md:pt-0 print:border-0 print:pt-0">
+      <div className="md:col-span-7 print:col-span-7 grid grid-cols-2 md:grid-cols-7 print:grid print:grid-cols-7 gap-y-3 gap-x-2 md:gap-4 items-start w-full pt-1 md:pt-0 border-t border-border md:border-0 print:border-0 print:pt-0">
         
-        <div className="col-span-1 md:col-span-3 print:col-span-3 flex flex-col print:block">
+        <div className="col-span-1 md:col-span-3 print:col-span-3 flex flex-col pt-1 print:block">
           <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Цена</span>
           {isEditable ? (
             <div className="relative w-full max-w-[120px] print:hidden">
@@ -566,16 +582,16 @@ function ResultItem({
               <span className="absolute right-2 top-1.5 text-xs text-muted-foreground">₽</span>
             </div>
           ) : (
-            <span className="font-bold text-xs sm:text-sm mt-1 md:mt-0 print:block whitespace-nowrap">{price.toLocaleString('ru-RU')} ₽</span>
+            <span className="font-bold text-xs sm:text-sm print:block whitespace-nowrap pt-1.5">{price.toLocaleString('ru-RU')} ₽</span>
           )}
           {isEditable && (
-             <span className="hidden print:block font-bold text-xs text-foreground whitespace-nowrap">
+             <span className="hidden print:block font-bold text-xs text-foreground whitespace-nowrap pt-1">
                 {price.toLocaleString('ru-RU')} ₽
              </span>
           )}
         </div>
 
-        <div className="col-span-1 md:col-span-2 print:col-span-2 flex flex-col items-end md:items-center print:text-center print:block">
+        <div className="col-span-1 md:col-span-2 print:col-span-2 flex flex-col items-end md:items-center pt-1 print:text-center print:block">
           <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Кол-во</span>
           {isCustom ? (
             <div className="flex items-center justify-end md:justify-center gap-1 print:hidden">
@@ -583,18 +599,18 @@ function ResultItem({
               <span className="text-xs sm:text-sm font-black">{unit}</span>
             </div>
           ) : (
-            <span className="font-black text-xs sm:text-sm whitespace-nowrap mt-1 md:mt-0">{qty} {unit}</span>
+            <span className="font-black text-xs sm:text-sm whitespace-nowrap pt-1.5">{qty} {unit}</span>
           )}
           {isCustom && (
-             <span className="hidden print:block font-black text-xs whitespace-nowrap">
+             <span className="hidden print:block font-black text-xs whitespace-nowrap pt-1">
                 {qty} {unit}
              </span>
           )}
         </div>
 
-        <div className="col-span-2 md:col-span-2 print:col-span-2 flex items-center justify-between md:flex-col md:items-end print:text-right print:block pt-2 border-t border-border/50 md:border-0 md:pt-0 print:border-0 print:pt-0">
+        <div className="col-span-2 md:col-span-2 print:col-span-2 flex items-center justify-between md:flex-col md:items-end pt-3 md:pt-1 print:text-right print:block border-t border-border/50 md:border-0 print:border-0">
           <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden">Итого</span>
-          <span className="font-black text-primary text-sm whitespace-nowrap print:text-black">{total.toLocaleString('ru-RU')} ₽</span>
+          <span className="font-black text-primary text-sm whitespace-nowrap print:text-black md:pt-1.5">{total.toLocaleString('ru-RU')} ₽</span>
         </div>
       </div>
     </div>
