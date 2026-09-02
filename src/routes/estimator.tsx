@@ -208,11 +208,14 @@ function EstimatorPage() {
         {`
           @media print {
             @page { margin: 10mm; }
-            html, body, #root { background-color: white !important; height: auto !important; }
-            #print-section { background-color: white !important; border: none !important; box-shadow: none !important; overflow: visible !important; padding: 0 !important; }
+            html, body, #root { background-color: white !important; height: auto !important; overflow: visible !important; }
+            .container { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; }
+            #print-section { background-color: white !important; border: none !important; box-shadow: none !important; overflow: visible !important; padding: 0 !important; width: 100% !important; }
             #print-section * { color: black !important; border-color: #d1d5db !important; }
             #print-section div { background-color: transparent !important; }
             input::placeholder, textarea::placeholder { color: transparent !important; }
+            ::-webkit-scrollbar { display: none !important; }
+            * { scrollbar-width: none !important; }
           }
         `}
       </style>
@@ -267,7 +270,7 @@ function EstimatorPage() {
                   <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Тип помещения</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><HomeIcon className="h-5 w-5 text-muted-foreground" /></div>
-                    <select required value={roomType} onChange={(e) => setRoomType(e.target.value)} className="w-full pl-12 pr-10 py-3.5 bg-background border border-border rounded-xl text-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none appearance-none cursor-pointer">
+                    <select required value={roomType} onChange={(e) => setRoomType(e.target.value)} className="w-full pl-12 pr-10 py-3.5 h-auto min-h-[3.5rem] bg-background border border-border rounded-xl text-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none appearance-none cursor-pointer whitespace-normal break-words text-sm sm:text-base">
                       <option value="Квартира (Новостройка)">Квартира (Новостройка)</option>
                       <option value="Квартира (Вторичка)">Квартира (Вторичка)</option>
                       <option value="Дом / Коттедж">Дом / Коттедж</option>
@@ -392,8 +395,8 @@ function EstimatorPage() {
                   <h4 className="text-sm font-bold text-foreground mb-4 uppercase tracking-widest border-l-4 border-primary pl-3 print:mb-2 print:text-xs">Материалы</h4>
                   
                   <div className="hidden md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 px-4 pb-2 border-b border-border print:px-0">
-                    <div className="md:col-span-5 print:col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Наименование</div>
-                    <div className="md:col-span-3 print:col-span-3 text-xs font-bold text-muted-foreground uppercase tracking-widest pl-2 print:pl-0">Цена за ед.</div>
+                    <div className="md:col-span-5 print:col-span-6 text-xs font-bold text-muted-foreground uppercase tracking-widest">Наименование</div>
+                    <div className="md:col-span-3 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest pl-2 print:pl-0">Цена за ед.</div>
                     <div className="md:col-span-2 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-center">Кол-во</div>
                     <div className="md:col-span-2 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-right">Итого</div>
                   </div>
@@ -429,8 +432,8 @@ function EstimatorPage() {
                     <h4 className="text-sm font-bold text-foreground mb-4 uppercase tracking-widest border-l-4 border-primary pl-3 print:mb-2 print:text-xs">Монтажные работы</h4>
                     
                     <div className="hidden md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 px-4 pb-2 border-b border-border print:px-0">
-                      <div className="md:col-span-5 print:col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Наименование работ</div>
-                      <div className="md:col-span-3 print:col-span-3 text-xs font-bold text-muted-foreground uppercase tracking-widest pl-2 print:pl-0">Цена за ед.</div>
+                      <div className="md:col-span-5 print:col-span-6 text-xs font-bold text-muted-foreground uppercase tracking-widest">Наименование работ</div>
+                      <div className="md:col-span-3 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest pl-2 print:pl-0">Цена за ед.</div>
                       <div className="md:col-span-2 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-center">Кол-во</div>
                       <div className="md:col-span-2 print:col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-widest text-right">Итого</div>
                     </div>
@@ -537,7 +540,7 @@ function ResultItem({
         </button>
       )}
 
-      <div className="md:col-span-5 print:col-span-5 flex items-start gap-3 w-full pr-8 md:pr-0">
+      <div className="md:col-span-5 print:col-span-6 flex items-start gap-3 w-full pr-8 md:pr-0">
         {!isCustom ? (
           <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-1 print:hidden" />
         ) : (
@@ -572,9 +575,9 @@ function ResultItem({
         )}
       </div>
 
-      <div className="md:col-span-7 print:col-span-7 grid grid-cols-2 md:grid-cols-7 print:grid print:grid-cols-7 gap-y-3 gap-x-2 md:gap-4 items-start w-full pt-1 md:pt-0 border-t border-border md:border-0 print:border-0 print:pt-0">
+      <div className="md:col-span-7 print:col-span-6 grid grid-cols-2 md:grid-cols-7 print:grid print:grid-cols-6 gap-y-3 gap-x-2 md:gap-4 items-start w-full pt-1 md:pt-0 border-t border-border md:border-0 print:border-0 print:pt-0">
         
-        <div className="col-span-1 md:col-span-3 print:col-span-3 flex flex-col pt-1 print:block">
+        <div className="col-span-1 md:col-span-3 print:col-span-2 flex flex-col pt-1 print:block">
           <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Цена</span>
           {isEditable ? (
             <div className="relative w-full max-w-[120px] print:hidden">
