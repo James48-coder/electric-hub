@@ -12,7 +12,7 @@ const DEFAULT_PRICES = {
   cable3x25: 85, cable3x15: 65, rcd: 2500, breaker16A: 350, breaker10A: 350,
 }
 const DEFAULT_WORK_PRICES = {
-  cableRouting: 150, pointsInstall: 450, shieldAssembly: 0, // Обнулили цену за щит
+  cableRouting: 150, pointsInstall: 450, shieldAssembly: 0, 
 }
 
 // Умный определитель единиц измерения
@@ -71,7 +71,7 @@ function EstimatorPage() {
           setWorkPrices({
             cableRouting: parsed.cableRouting || DEFAULT_WORK_PRICES.cableRouting,
             pointsInstall: parsed.pointsInstall || DEFAULT_WORK_PRICES.pointsInstall,
-            shieldAssembly: parsed.shieldAssembly || DEFAULT_WORK_PRICES.shieldAssembly,
+            shieldAssembly: 0, // Жесткий предохранитель: всегда обнуляем сборку щита при загрузке
           })
         } catch (e) {
           console.error('Ошибка чтения прайса', e)
@@ -177,7 +177,7 @@ function EstimatorPage() {
       text += `🛠 РАБОТЫ:\n`
       text += `• Прокладка линий: ${estimatedWorks.cableRouting} м. = ${estimatedWorks.cableRouting * workPrices.cableRouting} ₽\n`
       text += `• Монтаж точек: ${estimatedWorks.pointsInstall} шт. = ${estimatedWorks.pointsInstall * workPrices.pointsInstall} ₽\n`
-      text += `• Сборка щита: ${estimatedWorks.shieldAssembly} мод. = ${estimatedWorks.shieldAssembly * workPrices.shieldAssembly} ₽\n`
+      text += `• Сборка электрощита: ${estimatedWorks.shieldAssembly} мод. = ${estimatedWorks.shieldAssembly * workPrices.shieldAssembly} ₽\n`
       customWorks.forEach(w => {
         if(w.title) text += `• ${w.title}: ${w.qty} ${getUnit(w.title, 'ед.')} = ${w.qty * w.price} ₽\n`
       })
@@ -449,7 +449,7 @@ function EstimatorPage() {
 
                     <ResultItem title="Прокладка кабельных линий" unit="м." qty={estimatedWorks.cableRouting} price={workPrices.cableRouting} isEditable={true} onChangePrice={(val) => handleWorkPriceChange('cableRouting', val)} />
                     <ResultItem title="Монтаж установочных мест" unit="шт." qty={estimatedWorks.pointsInstall} price={workPrices.pointsInstall} isEditable={true} onChangePrice={(val) => handleWorkPriceChange('pointsInstall', val)} />
-                    <ResultItem title="Сборка и монтаж щита" unit="мод." qty={estimatedWorks.shieldAssembly} price={workPrices.shieldAssembly} isEditable={true} onChangePrice={(val) => handleWorkPriceChange('shieldAssembly', val)} />
+                    <ResultItem title="Сборка электрощита (за модуль)" unit="мод." qty={estimatedWorks.shieldAssembly} price={workPrices.shieldAssembly} isEditable={true} onChangePrice={(val) => handleWorkPriceChange('shieldAssembly', val)} />
                     
                     {customWorks.map(item => (
                       <ResultItem 
