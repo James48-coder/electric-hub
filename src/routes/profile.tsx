@@ -20,7 +20,7 @@ function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
 
-  // ЗАГРУЗКА ЦЕН ИЗ ПАМЯТИ БРАУЗЕРА ПРИ ОТКРЫТИИ
+  // ЗАГРУЗКА ЦЕН (В будущем здесь будет запрос к БД Timeweb)
   useEffect(() => {
     const saved = localStorage.getItem('voltpro_prices')
     if (saved) {
@@ -36,22 +36,39 @@ function ProfilePage() {
     setMyPrices(prev => ({ ...prev, [key]: Number(value) }))
   }
 
-  // СОХРАНЕНИЕ ЦЕН В ПАМЯТЬ БРАУЗЕРА
-  const handleSavePrices = () => {
-    if (currentTariff !== 'pro') return // Защита от хитрецов
+  // === ЛОГИКА СОХРАНЕНИЯ В БАЗУ ДАННЫХ ===
+  const handleSavePrices = async () => {
+    if (currentTariff !== 'pro') return // Защита на уровне интерфейса
 
     setIsSaving(true)
     setIsSaved(false)
     
-    // Сохраняем в локальное хранилище
-    localStorage.setItem('voltpro_prices', JSON.stringify(myPrices))
-    
-    // Анимация загрузки
-    setTimeout(() => {
-      setIsSaving(false)
+    try {
+      // 1. Имитация отправки данных на сервер (задержка сети 800мс)
+      // В будущем раскомментируй этот код для реального сохранения в БД Timeweb:
+      /*
+      const response = await fetch('/api/user/prices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(myPrices)
+      });
+      if (!response.ok) throw new Error('Ошибка сервера');
+      */
+      await new Promise(resolve => setTimeout(resolve, 800))
+
+      // 2. Для MVP пока сохраняем в локальное хранилище
+      localStorage.setItem('voltpro_prices', JSON.stringify(myPrices))
+      
+      // 3. Показываем галочку успеха
       setIsSaved(true)
       setTimeout(() => setIsSaved(false), 2500) // Убираем галочку через 2.5 сек
-    }, 600)
+
+    } catch (error) {
+      console.error('Ошибка при сохранении прайса:', error)
+      alert('Не удалось сохранить расценки. Проверьте подключение к сети.')
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   // Логика выхода
@@ -73,62 +90,7 @@ function ProfilePage() {
   return (
     <div className="container mx-auto max-w-7xl animate-in fade-in duration-500 pb-24 relative px-4 sm:px-6">
       
-      {/* 🛠 ДЕБАГ-ПАНЕЛЬ */}
-      <div className="mb-8 p-4 bg-muted/30 border-2 border-border rounded-2xl flex flex-wrap items-center gap-4">
-        <span className="text-xs font-black text-muted-foreground uppercase tracking-widest w-full sm:w-auto mb-1 sm:mb-0 text-center sm:text-left flex items-center justify-center sm:justify-start gap-2">
-          <Settings className="w-4 h-4" /> Тест:
-        </span>
-        
-        <button 
-          onClick={async () => {
-            try {
-              const res = await fetch('/api/ping');
-              const data = await res.json();
-              alert('УСПЕХ: ' + data.message);
-            } catch (e) {
-              alert('ОШИБКА 404: API не отвечает. Связь сломана.');
-            }
-          }}
-          className="flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 bg-emerald-500/10 text-emerald-500 border-2 border-emerald-500/50 hover:bg-emerald-500 hover:text-white"
-        >
-          Пинг API
-        </button>
-        
-        <button 
-          onClick={() => setCurrentTariff('free')} 
-          className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${
-            currentTariff === 'free' 
-            ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' 
-            : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'
-          }`}
-        >
-          Free
-        </button>
-        
-        <button 
-          onClick={() => setCurrentTariff('master')} 
-          className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${
-            currentTariff === 'master' 
-            ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' 
-            : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'
-          }`}
-        >
-          Master
-        </button>
-        
-        <button 
-          onClick={() => setCurrentTariff('pro')} 
-          className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${
-            currentTariff === 'pro' 
-            ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' 
-            : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'
-          }`}
-        >
-          PRO
-        </button>
-      </div>
-
-      <div className="mb-8 text-center sm:text-left">
+      <div className="mb-8 text-center sm:text-left mt-4 sm:mt-0">
         <h1 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight mb-2">Личный кабинет</h1>
         <p className="text-sm sm:text-base text-muted-foreground">Управление аккаунтом и подпиской</p>
       </div>
