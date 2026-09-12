@@ -51,7 +51,10 @@ export function AppSidebar() {
         <div className="my-2 border-t border-border/50"></div>
         
         <SidebarLink to="/estimator" icon={<Bot className="w-5 h-5" />} label="ИИ-сметчик" />
+        
+        {/* Временно скрыли Чат с ИИ до востребования
         <SidebarLink to="/chat" icon={<MessageSquare className="w-5 h-5" />} label="Чат с ИИ" />
+        */}
         
         <div className="my-2 border-t border-border/50"></div>
         
