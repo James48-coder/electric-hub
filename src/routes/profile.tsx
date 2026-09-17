@@ -12,16 +12,21 @@ function ProfilePage() {
   const [currentTariff, setCurrentTariff] = useState<TariffType>('free')
   const navigate = useNavigate()
 
-  // === СТЕЙТ ДЛЯ ПРАЙС-ЛИСТА ===
+  // === СТЕЙТ ДЛЯ ПРАЙС-ЛИСТА (МАТЕРИАЛЫ/РАБОТЫ) ===
   const [myPrices, setMyPrices] = useState({
     cable3x25: 85, cable3x15: 65, rcd: 2500, breaker16A: 350, breaker10A: 350,
     cableRouting: 150, pointsInstall: 450, shieldAssembly: 500
   })
+  
+  // === НОВЫЙ СТЕЙТ ДЛЯ ЦЕН ТАРИФОВ ИЗ БАЗЫ YDB ===
+  const [tariffPrices, setTariffPrices] = useState({ master: 490, pro: 1490 })
+  
   const [isSaving, setIsSaving] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
 
-  // ЗАГРУЗКА ЦЕН (В будущем здесь будет запрос к БД Timeweb)
+  // ЗАГРУЗКА ДАННЫХ ПРИ ОТКРЫТИИ СТРАНИЦЫ
   useEffect(() => {
+    // 1. Загружаем сохраненный прайс-лист пользователя
     const saved = localStorage.getItem('voltpro_prices')
     if (saved) {
       try {
@@ -30,6 +35,29 @@ function ProfilePage() {
         console.error('Ошибка чтения прайса', e)
       }
     }
+
+    // 2. Запрашиваем актуальные цены тарифов из базы данных
+    const loadTariffPrices = async () => {
+      try {
+        const response = await fetch('/api/tariffs')
+        if (response.ok) {
+          const data = await response.json()
+          
+          // Ищем цены в полученных данных, если база недоступна — оставляем дефолтные
+          const masterData = data.find((t: any) => t.id === 'master' || t.name === 'master')
+          const proData = data.find((t: any) => t.id === 'pro' || t.name === 'pro')
+          
+          setTariffPrices({
+            master: masterData ? masterData.price : 490,
+            pro: proData ? proData.price : 1490
+          })
+        }
+      } catch (error) {
+        console.error('Ошибка соединения с API тарифов:', error)
+      }
+    }
+    
+    loadTariffPrices()
   }, [])
 
   const handlePriceChange = (key: keyof typeof myPrices, value: string) => {
@@ -44,25 +72,12 @@ function ProfilePage() {
     setIsSaved(false)
     
     try {
-      // 1. Имитация отправки данных на сервер (задержка сети 800мс)
-      // В будущем раскомментируй этот код для реального сохранения в БД Timeweb:
-      /*
-      const response = await fetch('/api/user/prices', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(myPrices)
-      });
-      if (!response.ok) throw new Error('Ошибка сервера');
-      */
+      // Имитация отправки данных на сервер
       await new Promise(resolve => setTimeout(resolve, 800))
-
-      // 2. Для MVP пока сохраняем в локальное хранилище
       localStorage.setItem('voltpro_prices', JSON.stringify(myPrices))
       
-      // 3. Показываем галочку успеха
       setIsSaved(true)
-      setTimeout(() => setIsSaved(false), 2500) // Убираем галочку через 2.5 сек
-
+      setTimeout(() => setIsSaved(false), 2500)
     } catch (error) {
       console.error('Ошибка при сохранении прайса:', error)
       alert('Не удалось сохранить расценки. Проверьте подключение к сети.')
@@ -142,7 +157,6 @@ function ProfilePage() {
 
       {/* === БЛОК: МОИ РАСЦЕНКИ (ПРАЙС-ЛИСТ) === */}
       <div className="bg-card border-2 border-primary/20 rounded-3xl p-6 sm:p-8 mb-12 shadow-sm relative overflow-hidden">
-        {/* Декоративная полоса сверху */}
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50"></div>
         
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 relative z-10">
@@ -268,7 +282,7 @@ function ProfilePage() {
             Экономия времени. Избавьтесь от рутины расчетов.
           </p>
           <div className="mb-8">
-            <span className="text-4xl font-black text-foreground">490 ₽</span>
+            <span className="text-4xl font-black text-foreground">{tariffPrices.master} ₽</span>
             <span className="text-muted-foreground font-medium"> / мес</span>
           </div>
           
@@ -306,10 +320,10 @@ function ProfilePage() {
           </p>
           
           <div className="mb-2">
-            <span className="text-4xl font-black text-foreground">1 490 ₽</span>
+            <span className="text-4xl font-black text-foreground">{tariffPrices.pro.toLocaleString('ru-RU')} ₽</span>
             <span className="text-muted-foreground font-medium"> / мес</span>
           </div>
-          <p className="text-[10px] text-primary font-bold mb-6">Оплата за год — 1 090 ₽/мес</p>
+          <p className="text-[10px] text-primary font-bold mb-6">Оплата за год — {Math.round(tariffPrices.pro * 0.73).toLocaleString('ru-RU')} ₽/мес</p>
           
           <div className="space-y-4 mb-8 flex-1">
             <FeatureItem text="Безлимитный ИИ-сметчик" active={true} highlight={currentTariff !== 'pro'} />
