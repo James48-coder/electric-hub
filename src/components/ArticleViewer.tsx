@@ -1,10 +1,9 @@
 import React from 'react'
 
-// Описываем, из каких кирпичиков может состоять наша статья
 export type ArticleBlock =
   | { type: 'text'; content: string }
   | { type: 'image'; url: string; caption?: string }
-  | { type: 'youtube'; videoId: string }
+  | { type: 'video'; url: string } 
 
 export function ArticleViewer({ title, blocks }: { title: string, blocks: ArticleBlock[] }) {
   return (
@@ -15,23 +14,22 @@ export function ArticleViewer({ title, blocks }: { title: string, blocks: Articl
 
       <div className="space-y-6">
         {blocks.map((block, index) => {
-          // Если это ТЕКСТ
           if (block.type === 'text') {
             return (
-              <p key={index} className="text-base sm:text-lg text-muted-foreground leading-relaxed">
+              <p key={index} className="text-base sm:text-lg text-muted-foreground leading-relaxed whitespace-pre-wrap">
                 {block.content}
               </p>
             )
           }
 
-          // Если это КАРТИНКА (сама сожмется под размер телефона)
           if (block.type === 'image') {
             return (
-              <figure key={index} className="my-8">
+              <figure key={index} className="my-8 flex flex-col items-center">
                 <img
                   src={block.url}
                   alt={block.caption || 'Иллюстрация к статье'}
-                  className="w-full h-auto rounded-2xl shadow-sm border border-border object-cover"
+                  // ДОБАВЛЕНО: max-h-[600px] (ограничение высоты) и object-contain (вписывание без обрезки)
+                  className="w-full max-h-[600px] rounded-2xl shadow-sm border border-border object-contain bg-muted/10"
                 />
                 {block.caption && (
                   <figcaption className="text-center text-xs text-muted-foreground mt-3 font-medium">
@@ -42,18 +40,28 @@ export function ArticleViewer({ title, blocks }: { title: string, blocks: Articl
             )
           }
 
-          // Если это ВИДЕО (автоматически держит пропорции 16:9)
-          if (block.type === 'youtube') {
+          if (block.type === 'video') {
+            const isDirectVideo = block.url.toLowerCase().endsWith('.mp4');
+
             return (
               <div key={index} className="my-8 aspect-video w-full rounded-2xl overflow-hidden shadow-sm border border-border bg-muted">
-                <iframe
-                  className="w-full h-full"
-                  src={`https://www.youtube.com/embed/${block.videoId}`}
-                  title="YouTube video player"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
+                {isDirectVideo ? (
+                  <video 
+                    className="w-full h-full object-cover" 
+                    controls 
+                    src={block.url}
+                  >
+                    Ваш браузер не поддерживает встроенные видео.
+                  </video>
+                ) : (
+                  <iframe
+                    className="w-full h-full"
+                    src={block.url}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                )}
               </div>
             )
           }
