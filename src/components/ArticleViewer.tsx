@@ -8,9 +8,11 @@ export type ArticleBlock =
 export function ArticleViewer({ title, blocks }: { title: string, blocks: ArticleBlock[] }) {
   return (
     <article className="max-w-3xl mx-auto px-4 sm:px-6 py-8 animate-in fade-in duration-500">
-      <h1 className="text-2xl sm:text-4xl font-black text-foreground mb-8 tracking-tight">
-        {title}
-      </h1>
+      {title && (
+        <h1 className="text-2xl sm:text-4xl font-black text-foreground mb-8 tracking-tight">
+          {title}
+        </h1>
+      )}
 
       <div className="space-y-6">
         {blocks.map((block, index) => {
@@ -24,15 +26,14 @@ export function ArticleViewer({ title, blocks }: { title: string, blocks: Articl
 
           if (block.type === 'image') {
             return (
-              <figure key={index} className="my-8 flex flex-col items-center">
+              <figure key={index} className="my-4 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
                 <img
                   src={block.url}
                   alt={block.caption || 'Иллюстрация к статье'}
-                  // ДОБАВЛЕНО: max-h-[600px] (ограничение высоты) и object-contain (вписывание без обрезки)
-                  className="w-full max-h-[600px] rounded-2xl shadow-sm border border-border object-contain bg-muted/10"
+                  className="w-full max-h-[650px] object-cover"
                 />
                 {block.caption && (
-                  <figcaption className="text-center text-xs text-muted-foreground mt-3 font-medium">
+                  <figcaption className="p-3 text-center text-xs text-muted-foreground font-medium bg-muted/20">
                     {block.caption}
                   </figcaption>
                 )}
@@ -44,7 +45,7 @@ export function ArticleViewer({ title, blocks }: { title: string, blocks: Articl
             const isDirectVideo = block.url.toLowerCase().endsWith('.mp4');
 
             return (
-              <div key={index} className="my-8 aspect-video w-full rounded-2xl overflow-hidden shadow-sm border border-border bg-muted">
+              <div key={index} className="my-6 aspect-video w-full rounded-2xl overflow-hidden shadow-sm border border-border bg-muted">
                 {isDirectVideo ? (
                   <video 
                     className="w-full h-full object-cover" 
