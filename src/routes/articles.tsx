@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import React, { useState, useRef, useEffect } from 'react'
 import { Zap, Share2, Eye, MessageSquare, Heart, MoreHorizontal, X, Plus, Type, Image as ImageIcon, Video, Trash2, ChevronDown } from 'lucide-react'
-// Подключаем наш умный движок для отображения постов
 import { ArticleViewer, ArticleBlock } from '../components/ArticleViewer'
 
 export const Route = createFileRoute('/articles')({
@@ -12,12 +11,11 @@ function ArticlesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   
-  // Состояние нашего нового поста (начинается с одного пустого текстового блока)
   const [draftBlocks, setDraftBlocks] = useState<ArticleBlock[]>([
     { type: 'text', content: '' }
   ])
 
-  // Моковые посты в ленте (один обычный, один созданный через наш движок)
+  // Добавили свойство isLiked, чтобы отслеживать нажатие на лайк
   const [posts, setPosts] = useState([
     {
       id: 1,
@@ -28,12 +26,12 @@ function ArticlesPage() {
         { type: 'text', content: 'Привет! Это обновленная лента ВольтПро. Теперь сюда можно выкладывать полноценные статьи с картинками и видео.' } as ArticleBlock
       ],
       likes: 0,
+      isLiked: false,
       comments: 0,
       views: 12
     }
   ])
 
-  // Закрытие меню кликом снаружи
   const menuRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -45,7 +43,6 @@ function ArticlesPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  // Функции добавления новых блоков из меню
   const addBlock = (type: 'text' | 'image' | 'video') => {
     if (type === 'text') setDraftBlocks([...draftBlocks, { type: 'text', content: '' }])
     if (type === 'image') setDraftBlocks([...draftBlocks, { type: 'image', url: '', caption: '' }])
@@ -53,21 +50,17 @@ function ArticlesPage() {
     setIsMenuOpen(false)
   }
 
-  // Обновление содержимого блока
   const updateBlock = (index: number, field: string, value: string) => {
     const newBlocks = [...draftBlocks]
     newBlocks[index] = { ...newBlocks[index], [field]: value } as any
     setDraftBlocks(newBlocks)
   }
 
-  // Удаление блока
   const removeBlock = (index: number) => {
     setDraftBlocks(draftBlocks.filter((_, i) => i !== index))
   }
 
-  // Публикация поста
   const handlePublish = () => {
-    // Отфильтровываем пустые блоки перед публикацией
     const validBlocks = draftBlocks.filter(b => {
       if (b.type === 'text') return b.content.trim() !== ''
       if (b.type === 'image') return b.url.trim() !== ''
@@ -87,19 +80,40 @@ function ArticlesPage() {
       time: "Только что",
       blocks: validBlocks,
       likes: 0,
+      isLiked: false,
       comments: 0,
       views: 0
     }
 
     setPosts([newPost, ...posts])
     setIsModalOpen(false)
-    setDraftBlocks([{ type: 'text', content: '' }]) // Сбрасываем форму
+    setDraftBlocks([{ type: 'text', content: '' }])
+  }
+
+  // --- НОВАЯ ЛОГИКА ДЛЯ КНОПОК ---
+  
+  // Функция для лайков
+  const toggleLike = (postId: number) => {
+    setPosts(posts.map(post => {
+      if (post.id === postId) {
+        return { 
+          ...post, 
+          isLiked: !post.isLiked, 
+          likes: post.isLiked ? post.likes - 1 : post.likes + 1 
+        }
+      }
+      return post
+    }))
+  }
+
+  // Временная функция-заглушка для остальных кнопок
+  const showComingSoon = () => {
+    alert("Эта функция скоро будет доступна!")
   }
 
   return (
     <div className="container mx-auto max-w-3xl pb-24 px-4 sm:px-6 pt-8 animate-in fade-in duration-500">
       
-      {/* КНОПКА ОТКРЫТИЯ МОДАЛКИ */}
       <div 
         onClick={() => setIsModalOpen(true)}
         className="bg-card border border-border rounded-2xl p-4 sm:p-6 mb-8 flex items-center gap-4 cursor-pointer hover:border-primary/50 transition-colors shadow-sm"
@@ -110,15 +124,17 @@ function ArticlesPage() {
         <div className="text-muted-foreground flex-1">Опубликовать новую статью, фото или видео...</div>
       </div>
 
-      {/* ЛЕНТА ПОСТОВ */}
       <div className="space-y-6">
         {posts.map(post => (
           <div key={post.id} className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
             <div className="p-4 sm:p-6 border-b border-border/50 flex justify-between items-start">
               <div className="flex gap-3 items-center">
-                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary shrink-0 font-bold">
+                
+                {/* --- ОБНОВЛЕННАЯ АВАТАРКА "В" --- */}
+                <div className="w-11 h-11 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center text-white shrink-0 font-black text-xl shadow-md border-2 border-background ring-1 ring-primary/20">
                   В
                 </div>
+
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="font-bold text-foreground">{post.author}</h3>
@@ -127,19 +143,36 @@ function ArticlesPage() {
                   <p className="text-xs text-muted-foreground">{post.time}</p>
                 </div>
               </div>
-              <button className="text-muted-foreground hover:text-foreground"><MoreHorizontal className="w-5 h-5" /></button>
+              {/* Кнопка "три точки" */}
+              <button onClick={showComingSoon} className="text-muted-foreground hover:text-foreground p-2 rounded-full hover:bg-muted transition-colors">
+                <MoreHorizontal className="w-5 h-5" />
+              </button>
             </div>
             
-            {/* ИСПОЛЬЗУЕМ НАШ ДВИЖОК ДЛЯ ОТРИСОВКИ КОНТЕНТА */}
             <div className="px-2">
               <ArticleViewer title="" blocks={post.blocks} />
             </div>
 
             <div className="p-4 sm:p-6 border-t border-border/50 flex justify-between items-center bg-muted/20">
               <div className="flex gap-6">
-                <button className="flex items-center gap-2 text-muted-foreground hover:text-red-500 transition-colors"><Heart className="w-5 h-5" /> <span className="text-sm font-medium">{post.likes}</span></button>
-                <button className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"><MessageSquare className="w-5 h-5" /> <span className="text-sm font-medium">{post.comments}</span></button>
-                <button className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"><Share2 className="w-5 h-5" /></button>
+                {/* --- ОЖИВШАЯ КНОПКА ЛАЙКА --- */}
+                <button 
+                  onClick={() => toggleLike(post.id)}
+                  className={`flex items-center gap-2 transition-colors ${post.isLiked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'}`}
+                >
+                  <Heart className={`w-5 h-5 ${post.isLiked ? 'fill-current' : ''}`} /> 
+                  <span className="text-sm font-medium">{post.likes}</span>
+                </button>
+                
+                {/* Остальные кнопки */}
+                <button onClick={showComingSoon} className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
+                  <MessageSquare className="w-5 h-5" /> 
+                  <span className="text-sm font-medium">{post.comments}</span>
+                </button>
+                
+                <button onClick={showComingSoon} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                  <Share2 className="w-5 h-5" />
+                </button>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Eye className="w-4 h-4" /> <span className="text-sm font-medium">{post.views}</span>
@@ -149,7 +182,6 @@ function ArticlesPage() {
         ))}
       </div>
 
-      {/* === МОДАЛЬНОЕ ОКНО СОЗДАНИЯ СТАТЬИ === */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-card border border-border w-full max-w-2xl rounded-2xl shadow-xl flex flex-col max-h-[90vh]">
@@ -159,19 +191,16 @@ function ArticlesPage() {
               <button onClick={() => setIsModalOpen(false)} className="text-muted-foreground hover:text-foreground p-1 rounded-lg hover:bg-muted"><X className="w-5 h-5" /></button>
             </div>
 
-            {/* ТЕЛО МОДАЛКИ: СПИСОК БЛОКОВ */}
             <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-4 bg-muted/10">
               {draftBlocks.map((block, index) => (
                 <div key={index} className="relative group bg-background border border-border rounded-xl p-3 shadow-sm flex gap-3 items-start">
                   
-                  {/* Иконка типа блока */}
                   <div className="mt-2 text-muted-foreground">
                     {block.type === 'text' && <Type className="w-5 h-5" />}
                     {block.type === 'image' && <ImageIcon className="w-5 h-5 text-blue-500" />}
                     {block.type === 'video' && <Video className="w-5 h-5 text-red-500" />}
                   </div>
 
-                  {/* Поля ввода в зависимости от типа блока */}
                   <div className="flex-1 space-y-2">
                     {block.type === 'text' && (
                       <textarea
@@ -213,7 +242,6 @@ function ArticlesPage() {
                     )}
                   </div>
 
-                  {/* Кнопка удаления блока */}
                   <button 
                     onClick={() => removeBlock(index)}
                     className="text-muted-foreground hover:text-red-500 p-2 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -225,10 +253,7 @@ function ArticlesPage() {
               ))}
             </div>
 
-            {/* НИЖНЯЯ ПАНЕЛЬ С ВЫПАДАЮЩИМ МЕНЮ ВК-СТАЙЛ */}
             <div className="p-4 sm:p-6 border-t border-border flex justify-between items-center bg-card rounded-b-2xl">
-              
-              {/* Меню Создать/Добавить */}
               <div className="relative" ref={menuRef}>
                 <button 
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
