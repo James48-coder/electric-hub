@@ -56,6 +56,28 @@
 }
 
 /* --- ПРЕМИУМ-ТЕМЫ --- */
+
+/* НОВАЯ ТЕМА: НЕОНОВЫЙ СИНДИКАТ */
+.theme-cyberpunk {
+  /* Глубокий темный фон с фиолетовым отливом */
+  --background: #0a0510;
+  --foreground: #ffffff;
+  /* Полупрозрачные карточки для эффекта Glassmorphism */
+  --card: #160b24; 
+  --card-foreground: #ffffff;
+  --popover: #160b24;
+  --popover-foreground: #ffffff;
+  /* Яркий неоновый акцент (фуксия) */
+  --primary: #f000b8; 
+  --primary-foreground: #ffffff;
+  --accent: #2d1445;
+  --destructive: #ff003c;
+  /* Тонкие, еле заметные границы для объема */
+  --border: #3b1c5c;
+  /* Сильное скругление как на скринах */
+  --radius: 1.5rem; 
+}
+
 .theme-oled {
   --background: #000000;
   --foreground: #f4f4f5;
@@ -146,4 +168,12 @@ body {
 .bg-popover, select {
   background-color: var(--popover) !important;
   color: var(--popover-foreground) !important;
+}
+
+/* --- СПЕЦЭФФЕКТЫ ДЛЯ КИБЕРПАНКА --- */
+/* Класс для создания мощного градиентного фона на главной (как на скринах) */
+.bg-cyberpunk-gradient {
+  background: radial-gradient(circle at top right, #3b1c5c 0%, transparent 40%),
+              radial-gradient(circle at bottom left, #2d1445 0%, transparent 40%),
+              var(--background);
 }
