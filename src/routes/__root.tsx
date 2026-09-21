@@ -66,7 +66,6 @@ function RootComponent() {
   }, [isMobileMenuOpen]);
 
   return (
-    {/* ВОТ ЗДЕСЬ Я ЗАМЕНИЛ ТЕМУ НА theme-cyberpunk */}
     <ThemeProvider defaultTheme="theme-cyberpunk">
       <div className="flex min-h-screen w-full bg-background text-foreground selection:bg-primary selection:text-primary-foreground relative">
         
@@ -95,10 +94,6 @@ function RootComponent() {
               
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-4 mb-1 ml-3">Инструменты ИИ</p>
               <MobileNavLink to="/estimator" icon={<Bot className="w-5 h-5"/>} label="ИИ-сметчик" onClick={() => setIsMobileMenuOpen(false)} />
-              
-              {/* Временно скрыли Чат с ИИ до востребования
-              <MobileNavLink to="/chat" icon={<MessageSquare className="w-5 h-5"/>} label="Чат с ИИ" onClick={() => setIsMobileMenuOpen(false)} />
-              */}
               
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-4 mb-1 ml-3">Сообщество и аккаунт</p>
               <MobileNavLink to="/masters-chat" icon={<Users className="w-5 h-5"/>} label="Чат мастеров" onClick={() => setIsMobileMenuOpen(false)} />
