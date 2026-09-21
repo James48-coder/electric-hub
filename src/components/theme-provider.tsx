@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 export const THEMES = [
+  // Наша новая дефолтная тема добавлена первой
+  { id: "theme-cyberpunk", label: "Неоновый Синдикат", icon: "Hexagon", swatch: "#f000b8" },
   { id: "light", label: "Светлая", icon: "Sun", swatch: "#ffffff" },
   { id: "dark", label: "Тёмная", icon: "Moon", swatch: "#09090b" },
   { id: "contrast", label: "Контрастная", icon: "SunDim", swatch: "#fbbf24" },
@@ -25,7 +27,7 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-  theme: "dark",
+  theme: "theme-cyberpunk", // Изменили дефолт тут
   setTheme: () => null,
 };
 
@@ -33,7 +35,7 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
-  defaultTheme = "dark",
+  defaultTheme = "theme-cyberpunk", // И изменили дефолт тут
   storageKey = "voltpro-ui-theme",
   ...props
 }: ThemeProviderProps) {
