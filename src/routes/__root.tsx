@@ -66,7 +66,8 @@ function RootComponent() {
   }, [isMobileMenuOpen]);
 
   return (
-    <ThemeProvider defaultTheme="dark">
+    {/* ВОТ ЗДЕСЬ Я ЗАМЕНИЛ ТЕМУ НА theme-cyberpunk */}
+    <ThemeProvider defaultTheme="theme-cyberpunk">
       <div className="flex min-h-screen w-full bg-background text-foreground selection:bg-primary selection:text-primary-foreground relative">
         
         {/* МОБИЛЬНОЕ МЕНЮ */}
