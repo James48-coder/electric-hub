@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import React, { useState } from 'react'
-import ReactQuill from 'react-quill'
-import 'react-quill/dist/quill.snow.css'
+import ReactQuill from 'react-quill-new'
+import 'react-quill-new/dist/quill.snow.css'
 import { Save, Eye, LayoutTemplate, ShieldAlert } from 'lucide-react'
 
 export const Route = createFileRoute('/admin-editor')({
@@ -118,7 +118,6 @@ function AdminEditorPage() {
             {title || 'Заголовок вашей статьи'}
           </h2>
           
-          {/* Класс 'prose' активирует наши глобальные стили для медиа */}
           <div 
             className="prose prose-invert max-w-none relative z-10 text-foreground leading-relaxed text-base sm:text-lg"
             dangerouslySetInnerHTML={{ __html: content || '<p className="text-muted-foreground">Текст статьи пуст. Напишите что-нибудь, чтобы увидеть предпросмотр.</p>' }}
