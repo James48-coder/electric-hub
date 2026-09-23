@@ -12,6 +12,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "react-quill": "^2.0.0",
     "ydb-sdk": "^5.11.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.2",
@@ -70,6 +71,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@types/react-quill": "^2.0.14",
     "@eslint/js": "^9.32.0",
     "@lovable.dev/vite-tanstack-config": "^1.4.0",
     "@types/node": "^22.16.5",
