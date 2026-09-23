@@ -171,9 +171,31 @@ body {
 }
 
 /* --- СПЕЦЭФФЕКТЫ ДЛЯ КИБЕРПАНКА --- */
-/* Класс для создания мощного градиентного фона на главной (как на скринах) */
 .bg-cyberpunk-gradient {
   background: radial-gradient(circle at top right, #3b1c5c 0%, transparent 40%),
               radial-gradient(circle at bottom left, #2d1445 0%, transparent 40%),
               var(--background);
+}
+
+/* --- ГЛОБАЛЬНЫЕ ПРАВИЛА ДЛЯ СТАТЕЙ (МЕДИАТАГОВ) --- */
+/* Запрет на разрыв верстки большими картинками */
+.prose img {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: var(--radius);
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Адаптивные видео-контейнеры (YouTube/RuTube) */
+.prose iframe,
+.prose video {
+  width: 100% !important;
+  max-width: 100% !important;
+  aspect-ratio: 16 / 9;
+  height: auto !important;
+  border-radius: var(--radius);
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  background-color: var(--accent);
 }
