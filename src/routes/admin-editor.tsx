@@ -13,15 +13,14 @@ function AdminEditorPage() {
   const [content, setContent] = useState('')
   const [isPreview, setIsPreview] = useState(false)
 
-  // ИСПРАВЛЕННОЕ: Добавлены кнопки 'image' и 'video' в тулбар
+  // Убрана кнопка 'clean' (Tx), оставлено только нужное
   const modules = {
     toolbar: [
       [{ 'header': [1, 2, 3, false] }],
       ['bold', 'italic', 'underline', 'strike'],
       [{ 'color': [] }, { 'background': [] }],
       [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      ['link', 'image', 'video'], // Вот они!
-      ['clean']
+      ['link', 'image', 'video']
     ],
   }
 
@@ -32,7 +31,7 @@ function AdminEditorPage() {
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-6 animate-in fade-in duration-500 pb-24">
       
-      {/* ИСПРАВЛЕННОЕ: CSS для читаемости текста в редакторе */}
+      {/* ИСПРАВЛЕННЫЙ CSS ДЛЯ ТУЛТИПОВ (Всплывающих окон ввода URL) */}
       <style>{`
         .ql-toolbar { 
           background: var(--card); 
@@ -54,11 +53,45 @@ function AdminEditorPage() {
           color: var(--foreground); 
           padding: 1.5rem;
         }
-        /* Фиксы для темной темы, чтобы кнопки было видно */
+        
+        /* Цвета иконок панели */
         .ql-snow .ql-stroke { stroke: var(--foreground); }
         .ql-snow .ql-fill { fill: var(--foreground); }
         .ql-snow .ql-picker { color: var(--foreground); font-weight: bold; }
         .ql-snow .ql-picker-options { background-color: var(--card); border-color: var(--border); }
+        
+        /* ВОЗВРАЩАЕМ К ЖИЗНИ ОКНО ВВОДА ССЫЛОК И ВИДЕО */
+        .ql-snow .ql-tooltip {
+          background-color: var(--card) !important;
+          border: 1px solid var(--border) !important;
+          color: var(--foreground) !important;
+          border-radius: 0.75rem !important;
+          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+          z-index: 50 !important;
+          padding: 12px 16px !important;
+          left: 10px !important; /* Предотвращаем уход за экран */
+        }
+        .ql-snow .ql-tooltip input[type=text] {
+          background-color: var(--background) !important;
+          color: var(--foreground) !important;
+          border: 1px solid var(--border) !important;
+          border-radius: 0.5rem !important;
+          padding: 6px 12px !important;
+          outline: none !important;
+          font-size: 0.875rem !important;
+          width: 250px !important;
+        }
+        .ql-snow .ql-tooltip input[type=text]:focus {
+          border-color: var(--primary) !important;
+        }
+        .ql-snow .ql-tooltip a.ql-action::before {
+          color: var(--primary) !important;
+          font-weight: bold !important;
+          margin-left: 12px !important;
+        }
+        .ql-snow .ql-tooltip a.ql-preview {
+          color: var(--primary) !important;
+        }
       `}</style>
 
       {/* Шапка */}
