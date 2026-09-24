@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import React, { useState, useRef, useEffect } from 'react'
 import { Zap, Share2, Eye, MessageSquare, Heart, MoreHorizontal, X, Plus, Type, Image as ImageIcon, Video, Trash2, ChevronDown } from 'lucide-react'
 import { ArticleViewer, ArticleBlock } from '../components/ArticleViewer'
@@ -114,19 +114,22 @@ function ArticlesPage() {
   return (
     <div className="container mx-auto max-w-3xl pb-24 px-4 sm:px-6 pt-8 animate-in fade-in duration-500">
       
-      <div 
-        onClick={() => setIsModalOpen(true)}
-        className="bg-card border border-border rounded-2xl p-4 sm:p-6 mb-8 flex items-center gap-4 cursor-pointer hover:border-primary/50 transition-colors shadow-sm"
+      {/* ИСПРАВЛЕННАЯ КНОПКА: Теперь это реальная ссылка в админку */}
+      <Link 
+        to="/admin-editor"
+        className="bg-card border border-border rounded-2xl p-4 sm:p-6 mb-8 flex items-center gap-4 cursor-pointer hover:border-primary/50 hover:shadow-md transition-all shadow-sm w-full text-left group"
       >
-        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary shrink-0">
-          <Zap className="w-5 h-5" />
+        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary shrink-0 group-hover:scale-110 transition-transform">
+          <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
         </div>
-        <div className="text-muted-foreground flex-1">Опубликовать новую статью, фото или видео...</div>
-      </div>
+        <div className="text-muted-foreground flex-1 font-medium text-sm sm:text-base">
+          Написать полноценную статью в редакторе...
+        </div>
+      </Link>
 
       <div className="space-y-6">
         {posts.map(post => (
-          <div key={post.id} className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+          <div key={post.id} className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
             <div className="p-4 sm:p-6 border-b border-border/50 flex justify-between items-start">
               <div className="flex gap-3 items-center">
                 
