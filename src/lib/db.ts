@@ -1,14 +1,17 @@
-import { Driver, getCredentialsFromEnv } from 'ydb-sdk';
+import { Driver, getCredentialsFromEnv, getSACredentialsFromJson } from 'ydb-sdk';
 
 const endpoint = 'grpcs://ydb.serverless.yandexcloud.net:2135';
 const database = '/ru-central1/b1g668qoqsqc588tnrkf/etnuo4nuong9pf4kqful';
+
+// Получаем текст ключа из переменных окружения Timeweb
+const saJson = process.env.YDB_SA_JSON;
 
 // Инициализация драйвера YDB
 export const dbDriver = new Driver({
   endpoint,
   database,
-  // Автоматически подхватит авторизацию из переменных окружения
-  authService: getCredentialsFromEnv(),
+  // Если переменная есть — парсим её, иначе используем стандартный поиск файлов
+  authService: saJson ? getSACredentialsFromJson(saJson) : getCredentialsFromEnv(),
 });
 
 // Функция для безопасной инициализации соединения
