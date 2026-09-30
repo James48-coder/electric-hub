@@ -1,10 +1,31 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import React, { useState } from 'react'
 import ReactQuill from 'react-quill-new'
 import 'react-quill-new/dist/quill.snow.css'
 import { Save, Eye, LayoutTemplate, ShieldAlert } from 'lucide-react'
 
 export const Route = createFileRoute('/admin-editor')({
+  // === СИСТЕМА БЕЗОПАСНОСТИ (ПРОГРАММНЫЙ ЗАМОК) ===
+  beforeLoad: () => {
+    // 1. Ищем данные пользователя в памяти браузера
+    const authData = localStorage.getItem('voltpro_auth')
+    
+    // 2. Если данных нет (зашел гость) — выкидываем на главную
+    if (!authData) {
+      throw redirect({ to: '/' })
+    }
+
+    try {
+      const user = JSON.parse(authData)
+      // 3. Если авторизован, но роль не ADMIN (обычный электрик) — тоже на главную
+      if (user.role !== 'ADMIN') {
+        throw redirect({ to: '/' })
+      }
+    } catch (error) {
+      // Защита от сбоев: если данные сломаны, безопаснее не пустить
+      throw redirect({ to: '/' })
+    }
+  },
   component: AdminEditorPage,
 })
 
