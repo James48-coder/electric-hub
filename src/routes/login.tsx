@@ -21,18 +21,37 @@ function LoginRoute() {
     setMessage('')
 
     try {
-      // Имитируем работу сервера (задержка 1 секунда для показа спиннера)
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // Отправляем реальный запрос на наш серверный API
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          action: isLogin ? 'login' : 'register',
+          email, 
+          password, 
+          name 
+        })
+      })
 
-      // Выдаем успешное сообщение в зависимости от того, вход это или регистрация
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Ошибка при авторизации')
+      }
+
+      // Выдаем успешное сообщение
       if (isLogin) {
-        setMessage(`С возвращением! Заходим в аккаунт...`)
+        setMessage(`С возвращением, ${data.user.name}!`)
       } else {
         setMessage(`Супер! Аккаунт для ${email} успешно создан.`)
       }
 
-      // === ЗАПИСЫВАЕМ ПАМЯТЬ ОБ АВТОРИЗАЦИИ ===
-      localStorage.setItem('voltpro_auth', 'true')
+      // === ЗАПИСЫВАЕМ ПРАВИЛЬНЫЙ ФОРМАТ ===
+      // Сохраняем объект пользователя, чтобы защита админки работала корректно
+      localStorage.setItem('voltpro_auth', JSON.stringify(data.user))
+      
       // ОТПРАВЛЯЕМ СИГНАЛ ВСЕМ МЕНЮ, ЧТО МЫ ВОШЛИ
       window.dispatchEvent(new Event('auth-change'))
 
@@ -41,8 +60,8 @@ function LoginRoute() {
         navigate({ to: '/profile' })
       }, 1500)
       
-    } catch (err) {
-      setMessage('Ошибка соединения с сервером. Проверьте интернет.')
+    } catch (err: any) {
+      setMessage(err.message || 'Ошибка соединения с сервером. Проверьте интернет.')
     } finally {
       setIsLoading(false)
     }
