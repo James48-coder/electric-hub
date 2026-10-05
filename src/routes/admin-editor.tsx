@@ -7,22 +7,28 @@ import { Save, Eye, LayoutTemplate, ShieldAlert } from 'lucide-react'
 export const Route = createFileRoute('/admin-editor')({
   // === СИСТЕМА БЕЗОПАСНОСТИ (ПРОГРАММНЫЙ ЗАМОК) ===
   beforeLoad: () => {
-    // 1. Ищем данные пользователя в памяти браузера
-    const authData = localStorage.getItem('voltpro_auth')
-    
-    // 2. Если данных нет (зашел гость) — выкидываем на главную
-    if (!authData) {
-      throw redirect({ to: '/' })
-    }
-
     try {
+      // 1. Ищем данные пользователя в памяти браузера
+      const authData = localStorage.getItem('voltpro_auth')
+      
+      // 2. Если данных нет (зашел гость) — выкидываем на главную
+      if (!authData) {
+        throw redirect({ to: '/' })
+      }
+
       const user = JSON.parse(authData)
+      
       // 3. Если авторизован, но роль не ADMIN (обычный электрик) — тоже на главную
       if (user.role !== 'ADMIN') {
         throw redirect({ to: '/' })
       }
-    } catch (error) {
-      // Защита от сбоев: если данные сломаны, безопаснее не пустить
+      
+      // Если код дошел сюда — значит зашел ADMIN, пропускаем на страницу!
+    } catch (error: any) {
+      // КРИТИЧЕСКИ ВАЖНО: позволяем маршрутизатору выполнить редирект
+      if (error?.isRedirect) throw error;
+      
+      // Защита от любых других сбоев: если данные сломаны, безопаснее не пустить
       throw redirect({ to: '/' })
     }
   },
