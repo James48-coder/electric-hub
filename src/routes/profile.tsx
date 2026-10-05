@@ -126,11 +126,9 @@ function ProfilePage() {
       const data = await response.json()
 
       if (data.success) {
-        // Обновляем отображение на странице
         const updatedUser = { ...user!, name: newName, avatar: newName.charAt(0).toUpperCase() }
         setUser(updatedUser)
         
-        // Обновляем память браузера, чтобы при перезагрузке имя не сбросилось
         const authData = JSON.parse(localStorage.getItem('voltpro_auth') || '{}')
         localStorage.setItem('voltpro_auth', JSON.stringify({ ...authData, name: newName }))
         window.dispatchEvent(new Event('auth-change'))
@@ -169,7 +167,7 @@ function ProfilePage() {
           </div>
           
           <div className="flex-1 min-w-0">
-            {/* === БЛОК РЕДАКТИРОВАНИЯ ИМЕНИ === */}
+            {/* === ИСПРАВЛЕННЫЙ БЛОК РЕДАКТИРОВАНИЯ ИМЕНИ === */}
             {isEditingName ? (
               <div className="flex items-center gap-2 mb-1">
                 <input 
@@ -195,11 +193,11 @@ function ProfilePage() {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2 mb-1 group">
+              <div className="flex items-center gap-2 mb-1">
                 <h2 className="text-lg sm:text-xl font-black text-foreground truncate">{user.name}</h2>
                 <button 
                   onClick={() => setIsEditingName(true)} 
-                  className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                  className="p-1.5 text-muted-foreground bg-muted/50 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
                   title="Изменить имя"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
