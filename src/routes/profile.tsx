@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { User, Settings, LogOut, Zap, Shield, CreditCard, Coffee, HelpCircle, CheckCircle2, ChevronRight, Trash2, Briefcase, Save, Loader2, Lock } from 'lucide-react'
+import { Settings, LogOut, Zap, Shield, CreditCard, Coffee, HelpCircle, CheckCircle2, Trash2, Briefcase, Save, Loader2, Lock, LayoutTemplate } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
 
 export const Route = createFileRoute('/profile')({
@@ -12,13 +12,16 @@ function ProfilePage() {
   const [currentTariff, setCurrentTariff] = useState<TariffType>('free')
   const navigate = useNavigate()
 
+  // === СТЕЙТ ДЛЯ ДАННЫХ ПОЛЬЗОВАТЕЛЯ ИЗ БАЗЫ ===
+  const [user, setUser] = useState<{name: string, email: string, role: string, avatar: string, estimatesUsed: number, estimatesLimit: number} | null>(null)
+
   // === СТЕЙТ ДЛЯ ПРАЙС-ЛИСТА (МАТЕРИАЛЫ/РАБОТЫ) ===
   const [myPrices, setMyPrices] = useState({
     cable3x25: 85, cable3x15: 65, rcd: 2500, breaker16A: 350, breaker10A: 350,
     cableRouting: 150, pointsInstall: 450, shieldAssembly: 500
   })
   
-  // === НОВЫЙ СТЕЙТ ДЛЯ ЦЕН ТАРИФОВ ИЗ БАЗЫ YDB ===
+  // === СТЕЙТ ДЛЯ ЦЕН ТАРИФОВ ИЗ БАЗЫ YDB ===
   const [tariffPrices, setTariffPrices] = useState({ master: 490, pro: 1490 })
   
   const [isSaving, setIsSaving] = useState(false)
@@ -26,7 +29,31 @@ function ProfilePage() {
 
   // ЗАГРУЗКА ДАННЫХ ПРИ ОТКРЫТИИ СТРАНИЦЫ
   useEffect(() => {
-    // 1. Загружаем сохраненный прайс-лист пользователя
+    // 1. Загружаем реальные данные пользователя из памяти (записанные после входа)
+    const authData = localStorage.getItem('voltpro_auth')
+    if (authData) {
+      try {
+        const parsedData = JSON.parse(authData)
+        // Генерируем первую букву имени для аватарки
+        const firstLetter = parsedData.name ? parsedData.name.charAt(0).toUpperCase() : (parsedData.email ? parsedData.email.charAt(0).toUpperCase() : 'U')
+        
+        setUser({
+          name: parsedData.name || 'Пользователь',
+          email: parsedData.email,
+          role: parsedData.role || 'USER',
+          avatar: firstLetter,
+          estimatesUsed: 0, // Заглушка до внедрения бэкенда тарифов
+          estimatesLimit: 10 // Заглушка до внедрения бэкенда тарифов
+        })
+      } catch (e) {
+        console.error('Ошибка чтения данных профиля', e)
+      }
+    } else {
+      // Если данных нет, выкидываем на главную
+      navigate({ to: '/' })
+    }
+
+    // 2. Загружаем сохраненный прайс-лист пользователя
     const saved = localStorage.getItem('voltpro_prices')
     if (saved) {
       try {
@@ -36,14 +63,12 @@ function ProfilePage() {
       }
     }
 
-    // 2. Запрашиваем актуальные цены тарифов из базы данных
+    // 3. Запрашиваем актуальные цены тарифов (пока мок, позже подключим YDB)
     const loadTariffPrices = async () => {
       try {
         const response = await fetch('/api/tariffs')
         if (response.ok) {
           const data = await response.json()
-          
-          // Ищем цены в полученных данных, если база недоступна — оставляем дефолтные
           const masterData = data.find((t: any) => t.id === 'master' || t.name === 'master')
           const proData = data.find((t: any) => t.id === 'pro' || t.name === 'pro')
           
@@ -53,12 +78,12 @@ function ProfilePage() {
           })
         }
       } catch (error) {
-        console.error('Ошибка соединения с API тарифов:', error)
+        // Оставляем дефолтные цены, если API недоступно
       }
     }
     
     loadTariffPrices()
-  }, [])
+  }, [navigate])
 
   const handlePriceChange = (key: keyof typeof myPrices, value: string) => {
     setMyPrices(prev => ({ ...prev, [key]: Number(value) }))
@@ -66,13 +91,12 @@ function ProfilePage() {
 
   // === ЛОГИКА СОХРАНЕНИЯ В БАЗУ ДАННЫХ ===
   const handleSavePrices = async () => {
-    if (currentTariff !== 'pro') return // Защита на уровне интерфейса
+    if (currentTariff !== 'pro') return 
 
     setIsSaving(true)
     setIsSaved(false)
     
     try {
-      // Имитация отправки данных на сервер
       await new Promise(resolve => setTimeout(resolve, 800))
       localStorage.setItem('voltpro_prices', JSON.stringify(myPrices))
       
@@ -93,14 +117,8 @@ function ProfilePage() {
     navigate({ to: '/' })
   }
 
-  // Моковые данные пользователя
-  const user = {
-    name: "Иван Иванов",
-    email: "ivan.electro@mail.ru",
-    avatar: "И",
-    estimatesUsed: 8,
-    estimatesLimit: 10
-  }
+  // Если данные еще не загрузились, показываем пустой экран, чтобы не мигала старая верстка
+  if (!user) return <div className="min-h-screen"></div>;
 
   return (
     <div className="container mx-auto max-w-7xl animate-in fade-in duration-500 pb-24 relative px-4 sm:px-6">
@@ -113,14 +131,15 @@ function ProfilePage() {
       {/* ВЕРХНЯЯ ПАНЕЛЬ: ПРОФИЛЬ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         
-        {/* Карточка пользователя */}
+        {/* КАРТОЧКА ПОЛЬЗОВАТЕЛЯ (ТЕПЕРЬ С РЕАЛЬНЫМИ ДАННЫМИ) */}
         <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex items-center gap-6 relative overflow-hidden">
           <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 bg-primary/10 rounded-full flex items-center justify-center text-2xl sm:text-3xl font-black text-primary relative z-10 border-4 border-background shadow-sm">
             {user.avatar}
-            {currentTariff === 'pro' && (
+            {/* Если у юзера роль ADMIN, показываем значок щита на аватарке */}
+            {user.role === 'ADMIN' && (
               <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1">
-                <div className="bg-primary text-primary-foreground w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center">
-                  <Shield className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                <div className="bg-amber-500 text-white w-4 h-4 sm:w-6 sm:h-6 rounded-full flex items-center justify-center shadow-sm">
+                  <Shield className="w-3 h-3 sm:w-4 sm:h-4" />
                 </div>
               </div>
             )}
@@ -129,29 +148,47 @@ function ProfilePage() {
             <h2 className="text-lg sm:text-xl font-black text-foreground mb-1 truncate">{user.name}</h2>
             <p className="text-xs sm:text-sm text-muted-foreground mb-4">{user.email}</p>
             <div className="flex gap-2">
-              <button className="flex-1 bg-background border border-border py-2 rounded-lg text-xs font-bold text-foreground hover:border-primary/50 hover:text-primary transition-colors">
-                Настройки
-              </button>
-              <button onClick={handleLogout} className="px-3 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white py-2 rounded-lg transition-colors">
-                <LogOut className="w-4 h-4" />
+              <button onClick={handleLogout} className="flex-1 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-2">
+                <LogOut className="w-4 h-4" /> Выйти из аккаунта
               </button>
             </div>
           </div>
         </div>
 
-        {/* Поддержка */}
-        <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-center">
-          <div className="flex items-center gap-3 mb-2">
-            <HelpCircle className="w-5 h-5 text-muted-foreground shrink-0" />
-            <h3 className="font-bold text-foreground">Помощь</h3>
+        {/* ПРАВАЯ КАРТОЧКА: АДМИНКА ИЛИ ПОДДЕРЖКА */}
+        {user.role === 'ADMIN' ? (
+           // КНОПКА АДМИНА (ВИДНА ТОЛЬКО ТЕБЕ)
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-6 shadow-sm flex flex-col justify-center">
+            <div className="flex items-center gap-3 mb-2">
+              <Shield className="w-5 h-5 text-amber-500 shrink-0" />
+              <h3 className="font-bold text-amber-700">Владелец платформы</h3>
+            </div>
+            <p className="text-xs text-amber-700/80 mb-4 leading-relaxed">
+              У вас есть права администратора. Вы можете публиковать экспертные SEO-статьи в базу знаний.
+            </p>
+            <button 
+              onClick={() => navigate({ to: '/admin-editor' })}
+              className="w-full bg-amber-500 hover:bg-amber-600 text-white py-2 rounded-lg text-sm font-bold transition-colors shadow-sm flex items-center justify-center gap-2"
+            >
+              <LayoutTemplate className="w-4 h-4" />
+              Панель администратора
+            </button>
           </div>
-          <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
-            Возникли вопросы по расчетам, функционалу или тарифам? Мы на связи.
-          </p>
-          <button className="w-full bg-background border border-border py-2 rounded-lg text-xs font-bold text-foreground hover:bg-muted transition-colors">
-            Написать в поддержку
-          </button>
-        </div>
+        ) : (
+          // СТАНДАРТНАЯ ПОДДЕРЖКА (ВИДНА ОБЫЧНЫМ МАСТЕРАМ)
+          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-center">
+            <div className="flex items-center gap-3 mb-2">
+              <HelpCircle className="w-5 h-5 text-muted-foreground shrink-0" />
+              <h3 className="font-bold text-foreground">Помощь</h3>
+            </div>
+            <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+              Возникли вопросы по расчетам, функционалу или тарифам? Мы на связи.
+            </p>
+            <button className="w-full bg-background border border-border py-2 rounded-lg text-xs font-bold text-foreground hover:bg-muted transition-colors">
+              Написать в поддержку
+            </button>
+          </div>
+        )}
 
       </div>
 
