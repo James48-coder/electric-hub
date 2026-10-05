@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Settings, LogOut, Zap, Shield, CreditCard, Coffee, HelpCircle, CheckCircle2, Trash2, Briefcase, Save, Loader2, Lock, LayoutTemplate } from 'lucide-react'
+import { LogOut, Zap, Shield, CreditCard, Coffee, HelpCircle, CheckCircle2, Trash2, Briefcase, Save, Loader2, Lock, LayoutTemplate, Edit2, Check, X } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
 
 export const Route = createFileRoute('/profile')({
@@ -12,29 +12,27 @@ function ProfilePage() {
   const [currentTariff, setCurrentTariff] = useState<TariffType>('free')
   const navigate = useNavigate()
 
-  // === СТЕЙТ ДЛЯ ДАННЫХ ПОЛЬЗОВАТЕЛЯ ИЗ БАЗЫ ===
   const [user, setUser] = useState<{name: string, email: string, role: string, avatar: string, estimatesUsed: number, estimatesLimit: number} | null>(null)
+  
+  // === СТЕЙТЫ ДЛЯ РЕДАКТИРОВАНИЯ ИМЕНИ ===
+  const [isEditingName, setIsEditingName] = useState(false)
+  const [editNameValue, setEditNameValue] = useState('')
+  const [isUpdatingName, setIsUpdatingName] = useState(false)
 
-  // === СТЕЙТ ДЛЯ ПРАЙС-ЛИСТА (МАТЕРИАЛЫ/РАБОТЫ) ===
   const [myPrices, setMyPrices] = useState({
     cable3x25: 85, cable3x15: 65, rcd: 2500, breaker16A: 350, breaker10A: 350,
     cableRouting: 150, pointsInstall: 450, shieldAssembly: 500
   })
   
-  // === СТЕЙТ ДЛЯ ЦЕН ТАРИФОВ ИЗ БАЗЫ YDB ===
   const [tariffPrices, setTariffPrices] = useState({ master: 490, pro: 1490 })
-  
   const [isSaving, setIsSaving] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
 
-  // ЗАГРУЗКА ДАННЫХ ПРИ ОТКРЫТИИ СТРАНИЦЫ
   useEffect(() => {
-    // 1. Загружаем реальные данные пользователя из памяти (записанные после входа)
     const authData = localStorage.getItem('voltpro_auth')
     if (authData) {
       try {
         const parsedData = JSON.parse(authData)
-        // Генерируем первую букву имени для аватарки
         const firstLetter = parsedData.name ? parsedData.name.charAt(0).toUpperCase() : (parsedData.email ? parsedData.email.charAt(0).toUpperCase() : 'U')
         
         setUser({
@@ -42,28 +40,24 @@ function ProfilePage() {
           email: parsedData.email,
           role: parsedData.role || 'USER',
           avatar: firstLetter,
-          estimatesUsed: 0, // Заглушка до внедрения бэкенда тарифов
-          estimatesLimit: 10 // Заглушка до внедрения бэкенда тарифов
+          estimatesUsed: 0,
+          estimatesLimit: 10
         })
+        setEditNameValue(parsedData.name || 'Пользователь')
       } catch (e) {
         console.error('Ошибка чтения данных профиля', e)
       }
     } else {
-      // Если данных нет, выкидываем на главную
       navigate({ to: '/' })
     }
 
-    // 2. Загружаем сохраненный прайс-лист пользователя
     const saved = localStorage.getItem('voltpro_prices')
     if (saved) {
       try {
         setMyPrices(JSON.parse(saved))
-      } catch (e) {
-        console.error('Ошибка чтения прайса', e)
-      }
+      } catch (e) {}
     }
 
-    // 3. Запрашиваем актуальные цены тарифов (пока мок, позже подключим YDB)
     const loadTariffPrices = async () => {
       try {
         const response = await fetch('/api/tariffs')
@@ -77,11 +71,8 @@ function ProfilePage() {
             pro: proData ? proData.price : 1490
           })
         }
-      } catch (error) {
-        // Оставляем дефолтные цены, если API недоступно
-      }
+      } catch (error) {}
     }
-    
     loadTariffPrices()
   }, [navigate])
 
@@ -89,35 +80,70 @@ function ProfilePage() {
     setMyPrices(prev => ({ ...prev, [key]: Number(value) }))
   }
 
-  // === ЛОГИКА СОХРАНЕНИЯ В БАЗУ ДАННЫХ ===
   const handleSavePrices = async () => {
     if (currentTariff !== 'pro') return 
-
     setIsSaving(true)
     setIsSaved(false)
-    
     try {
       await new Promise(resolve => setTimeout(resolve, 800))
       localStorage.setItem('voltpro_prices', JSON.stringify(myPrices))
-      
       setIsSaved(true)
       setTimeout(() => setIsSaved(false), 2500)
     } catch (error) {
-      console.error('Ошибка при сохранении прайса:', error)
-      alert('Не удалось сохранить расценки. Проверьте подключение к сети.')
+      alert('Не удалось сохранить расценки.')
     } finally {
       setIsSaving(false)
     }
   }
 
-  // Логика выхода
   const handleLogout = () => {
     localStorage.removeItem('voltpro_auth')
     window.dispatchEvent(new Event('auth-change'))
     navigate({ to: '/' })
   }
 
-  // Если данные еще не загрузились, показываем пустой экран, чтобы не мигала старая верстка
+  // === ЛОГИКА СОХРАНЕНИЯ НОВОГО ИМЕНИ В YDB ===
+  const handleSaveName = async () => {
+    const newName = editNameValue.trim()
+    if (!newName || newName === user?.name) {
+      setIsEditingName(false)
+      return
+    }
+
+    setIsUpdatingName(true)
+    try {
+      const response = await fetch('https://functions.yandexcloud.net/d4erd6lhieqorscbm1qb', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_profile',
+          email: user?.email,
+          name: newName
+        })
+      })
+
+      if (!response.ok) throw new Error('Ошибка сервера')
+      const data = await response.json()
+
+      if (data.success) {
+        // Обновляем отображение на странице
+        const updatedUser = { ...user!, name: newName, avatar: newName.charAt(0).toUpperCase() }
+        setUser(updatedUser)
+        
+        // Обновляем память браузера, чтобы при перезагрузке имя не сбросилось
+        const authData = JSON.parse(localStorage.getItem('voltpro_auth') || '{}')
+        localStorage.setItem('voltpro_auth', JSON.stringify({ ...authData, name: newName }))
+        window.dispatchEvent(new Event('auth-change'))
+        
+        setIsEditingName(false)
+      }
+    } catch (error) {
+      alert('Не удалось обновить имя. Проверьте интернет.')
+    } finally {
+      setIsUpdatingName(false)
+    }
+  }
+
   if (!user) return <div className="min-h-screen"></div>;
 
   return (
@@ -128,14 +154,11 @@ function ProfilePage() {
         <p className="text-sm sm:text-base text-muted-foreground">Управление аккаунтом и подпиской</p>
       </div>
 
-      {/* ВЕРХНЯЯ ПАНЕЛЬ: ПРОФИЛЬ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         
-        {/* КАРТОЧКА ПОЛЬЗОВАТЕЛЯ (ТЕПЕРЬ С РЕАЛЬНЫМИ ДАННЫМИ) */}
         <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex items-center gap-6 relative overflow-hidden">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 bg-primary/10 rounded-full flex items-center justify-center text-2xl sm:text-3xl font-black text-primary relative z-10 border-4 border-background shadow-sm">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 bg-primary/10 rounded-full flex items-center justify-center text-2xl sm:text-3xl font-black text-primary relative z-10 border-4 border-background shadow-sm transition-all duration-300">
             {user.avatar}
-            {/* Если у юзера роль ADMIN, показываем значок щита на аватарке */}
             {user.role === 'ADMIN' && (
               <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1">
                 <div className="bg-amber-500 text-white w-4 h-4 sm:w-6 sm:h-6 rounded-full flex items-center justify-center shadow-sm">
@@ -144,8 +167,46 @@ function ProfilePage() {
               </div>
             )}
           </div>
+          
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg sm:text-xl font-black text-foreground mb-1 truncate">{user.name}</h2>
+            {/* === БЛОК РЕДАКТИРОВАНИЯ ИМЕНИ === */}
+            {isEditingName ? (
+              <div className="flex items-center gap-2 mb-1">
+                <input 
+                  type="text" 
+                  value={editNameValue} 
+                  onChange={(e) => setEditNameValue(e.target.value)}
+                  className="bg-background border border-primary/50 rounded-lg px-3 py-1.5 text-sm sm:text-base font-bold focus:outline-none focus:ring-2 focus:ring-primary/50 w-full max-w-[200px]"
+                  autoFocus
+                />
+                <button 
+                  onClick={handleSaveName} 
+                  disabled={isUpdatingName} 
+                  className="p-1.5 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg transition-colors"
+                >
+                  {isUpdatingName ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                </button>
+                <button 
+                  onClick={() => { setIsEditingName(false); setEditNameValue(user.name); }} 
+                  disabled={isUpdatingName} 
+                  className="p-1.5 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 mb-1 group">
+                <h2 className="text-lg sm:text-xl font-black text-foreground truncate">{user.name}</h2>
+                <button 
+                  onClick={() => setIsEditingName(true)} 
+                  className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                  title="Изменить имя"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+            
             <p className="text-xs sm:text-sm text-muted-foreground mb-4">{user.email}</p>
             <div className="flex gap-2">
               <button onClick={handleLogout} className="flex-1 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-2">
@@ -155,9 +216,7 @@ function ProfilePage() {
           </div>
         </div>
 
-        {/* ПРАВАЯ КАРТОЧКА: АДМИНКА ИЛИ ПОДДЕРЖКА */}
         {user.role === 'ADMIN' ? (
-           // КНОПКА АДМИНА (ВИДНА ТОЛЬКО ТЕБЕ)
           <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-6 shadow-sm flex flex-col justify-center">
             <div className="flex items-center gap-3 mb-2">
               <Shield className="w-5 h-5 text-amber-500 shrink-0" />
@@ -175,7 +234,6 @@ function ProfilePage() {
             </button>
           </div>
         ) : (
-          // СТАНДАРТНАЯ ПОДДЕРЖКА (ВИДНА ОБЫЧНЫМ МАСТЕРАМ)
           <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-center">
             <div className="flex items-center gap-3 mb-2">
               <HelpCircle className="w-5 h-5 text-muted-foreground shrink-0" />
@@ -192,7 +250,6 @@ function ProfilePage() {
 
       </div>
 
-      {/* === БЛОК: МОИ РАСЦЕНКИ (ПРАЙС-ЛИСТ) === */}
       <div className="bg-card border-2 border-primary/20 rounded-3xl p-6 sm:p-8 mb-12 shadow-sm relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50"></div>
         
@@ -225,7 +282,6 @@ function ProfilePage() {
         </div>
 
         <div className="relative">
-          {/* 🔒 ПАНЕЛЬ БЛОКИРОВКИ ДЛЯ НЕ-PRO ТАРИФОВ */}
           {currentTariff !== 'pro' && (
             <div className="absolute inset-0 z-20 backdrop-blur-[3px] bg-background/50 rounded-2xl flex flex-col items-center justify-center p-6 border border-border/50">
               <div className="w-14 h-14 bg-background border-2 border-primary/20 text-primary rounded-full flex items-center justify-center mb-4 shadow-lg">
@@ -246,7 +302,6 @@ function ProfilePage() {
           )}
 
           <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 transition-opacity duration-300 ${currentTariff !== 'pro' ? 'opacity-30 pointer-events-none select-none' : ''}`}>
-            {/* Колонка 1: Материалы */}
             <div className="space-y-3">
               <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest border-l-4 border-primary pl-3 mb-4">Материалы</h4>
               <PriceInput label="Кабель ВВГнг(А)-LS 3x2.5 (м)" value={myPrices.cable3x25} onChange={(val) => handlePriceChange('cable3x25', val)} />
@@ -256,7 +311,6 @@ function ProfilePage() {
               <PriceInput label="Автомат 10А (шт)" value={myPrices.breaker10A} onChange={(val) => handlePriceChange('breaker10A', val)} />
             </div>
 
-            {/* Колонка 2: Работы */}
             <div className="space-y-3">
               <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest border-l-4 border-primary pl-3 mb-4">Монтажные работы</h4>
               <PriceInput label="Прокладка кабельных линий (м)" value={myPrices.cableRouting} onChange={(val) => handlePriceChange('cableRouting', val)} />
@@ -266,27 +320,17 @@ function ProfilePage() {
           </div>
         </div>
       </div>
-      {/* === КОНЕЦ БЛОКА ПРАЙС-ЛИСТА === */}
 
-      {/* НИЖНЯЯ ПАНЕЛЬ: ВИТРИНА ТАРИФОВ */}
       <div className="mb-10 text-center">
-        <h2 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight mb-3">
-          Инвестируйте в свое время
-        </h2>
-        <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
-          Делегируйте рутину ВольтПро и забирайте объекты быстрее конкурентов.
-        </p>
+        <h2 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight mb-3">Инвестируйте в свое время</h2>
+        <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">Делегируйте рутину ВольтПро и забирайте объекты быстрее конкурентов.</p>
       </div>
 
-      {/* СЕТКА ТАРИФОВ */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-10">
         
-        {/* === ТАРИФ FREE === */}
         <div className={`bg-card border-2 rounded-3xl p-6 sm:p-8 flex flex-col relative transition-all ${currentTariff === 'free' ? 'border-primary shadow-md' : 'border-border shadow-sm'}`}>
           <h3 className="text-2xl font-black text-foreground mb-2">Free</h3>
-          <p className="text-sm text-muted-foreground mb-6 sm:h-10">
-            Базовый набор для простых задач.
-          </p>
+          <p className="text-sm text-muted-foreground mb-6 sm:h-10">Базовый набор для простых задач.</p>
           <div className="mb-8">
             <span className="text-4xl font-black text-foreground">0 ₽</span>
             <span className="text-muted-foreground font-medium"> / мес</span>
@@ -303,21 +347,16 @@ function ProfilePage() {
             disabled={currentTariff === 'free'}
             onClick={() => setCurrentTariff('free')}
             className={`w-full py-4 rounded-xl text-sm font-bold transition-colors ${
-              currentTariff === 'free' 
-              ? 'bg-muted text-muted-foreground cursor-not-allowed' 
-              : 'bg-background border border-border text-foreground hover:border-primary hover:text-primary'
+              currentTariff === 'free' ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-background border border-border text-foreground hover:border-primary hover:text-primary'
             }`}
           >
             {currentTariff === 'free' ? 'Текущий тариф' : 'Перейти на Free'}
           </button>
         </div>
 
-        {/* === ТАРИФ MASTER === */}
         <div className={`bg-card border-2 rounded-3xl p-6 sm:p-8 flex flex-col relative transition-all ${currentTariff === 'master' ? 'border-primary shadow-md' : 'border-border shadow-sm hover:shadow-md'}`}>
           <h3 className="text-2xl font-black text-foreground mb-2">Master</h3>
-          <p className="text-sm text-muted-foreground mb-6 sm:h-10">
-            Экономия времени. Избавьтесь от рутины расчетов.
-          </p>
+          <p className="text-sm text-muted-foreground mb-6 sm:h-10">Экономия времени. Избавьтесь от рутины расчетов.</p>
           <div className="mb-8">
             <span className="text-4xl font-black text-foreground">{tariffPrices.master} ₽</span>
             <span className="text-muted-foreground font-medium"> / мес</span>
@@ -334,27 +373,21 @@ function ProfilePage() {
             disabled={currentTariff === 'master'}
             onClick={() => setCurrentTariff('master')}
             className={`w-full py-4 rounded-xl text-sm font-bold transition-all ${
-              currentTariff === 'master' 
-              ? 'bg-primary/20 text-primary cursor-not-allowed border border-primary/20' 
-              : 'bg-primary text-primary-foreground hover:opacity-90 shadow-sm'
+              currentTariff === 'master' ? 'bg-primary/20 text-primary cursor-not-allowed border border-primary/20' : 'bg-primary text-primary-foreground hover:opacity-90 shadow-sm'
             }`}
           >
             {currentTariff === 'master' ? 'Текущий тариф' : 'Выбрать Master'}
           </button>
         </div>
 
-        {/* === ТАРИФ PRO === */}
         <div className={`border-2 rounded-3xl p-6 sm:p-8 flex flex-col relative transition-all ${currentTariff === 'pro' ? 'bg-primary/5 border-primary shadow-lg' : 'bg-primary/5 border-primary/30 shadow-md hover:shadow-lg'}`}>
           <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-widest py-1.5 px-4 rounded-bl-xl">
             Для профессионалов
           </div>
-          
           <h3 className="text-2xl font-black text-primary mb-2 flex items-center gap-2">
             PRO <Zap className="w-5 h-5" fill="currentColor" />
           </h3>
-          <p className="text-sm text-muted-foreground mb-6 sm:h-10">
-            Сдавайте объекты быстрее конкурентов.
-          </p>
+          <p className="text-sm text-muted-foreground mb-6 sm:h-10">Сдавайте объекты быстрее конкурентов.</p>
           
           <div className="mb-2">
             <span className="text-4xl font-black text-foreground">{tariffPrices.pro.toLocaleString('ru-RU')} ₽</span>
@@ -373,9 +406,7 @@ function ProfilePage() {
             disabled={currentTariff === 'pro'}
             onClick={() => setCurrentTariff('pro')}
             className={`w-full py-4 rounded-xl text-sm font-bold transition-all ${
-              currentTariff === 'pro' 
-              ? 'bg-primary text-primary-foreground cursor-not-allowed shadow-md opacity-90' 
-              : 'bg-primary text-primary-foreground hover:opacity-90 shadow-md'
+              currentTariff === 'pro' ? 'bg-primary text-primary-foreground cursor-not-allowed shadow-md opacity-90' : 'bg-primary text-primary-foreground hover:opacity-90 shadow-md'
             }`}
           >
             {currentTariff === 'pro' ? 'Текущий тариф' : 'Оформить PRO'}
@@ -384,7 +415,6 @@ function ProfilePage() {
 
       </div>
 
-      {/* ОПУЩЕННЫЙ ВНИЗ БЛОК (ОПЛАТА / ДОНАТ / ЛИМИТЫ) */}
       <div className="max-w-md mx-auto w-full">
         {currentTariff === 'master' ? (
           <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-center">
