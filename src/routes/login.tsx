@@ -21,7 +21,8 @@ function LoginRoute() {
     setMessage('')
 
     try {
-      const response = await fetch('/api/auth', {
+      // БЬЕМ НАПРЯМУЮ В ЯНДЕКС ФУНКЦИЮ!
+      const response = await fetch('https://functions.yandexcloud.net/d4erd6lhieqorscbm1qb', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -34,18 +35,16 @@ function LoginRoute() {
         })
       })
 
-      // Читаем сырой текст сервера ПЕРЕД тем, как переводить его в JSON
       const text = await response.text()
       
       let data;
       try {
         data = JSON.parse(text)
       } catch (e) {
-        // Если сервер прислал пустоту или HTML-ошибку сборки, выводим её на экран!
-        throw new Error(`Сервер ответил криво. Содержимое: ${text ? text.substring(0, 100) : 'Пустой ответ (0 байт)'}`)
+        throw new Error(`Ошибка сервера Яндекса: ${text ? text.substring(0, 100) : 'Пустой ответ'}`)
       }
 
-      if (!response.ok) {
+      if (!response.ok || data.error) {
         throw new Error(data.error || 'Ошибка при авторизации')
       }
 
@@ -55,9 +54,11 @@ function LoginRoute() {
         setMessage(`Супер! Аккаунт для ${email} успешно создан.`)
       }
 
+      // Сохраняем данные авторизации
       localStorage.setItem('voltpro_auth', JSON.stringify(data.user))
       window.dispatchEvent(new Event('auth-change'))
 
+      // Переход в профиль
       setTimeout(() => {
         navigate({ to: '/profile' })
       }, 1500)
