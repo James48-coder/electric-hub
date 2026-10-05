@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import { Zap, Mail, Lock, LogIn, UserPlus, Loader2 } from 'lucide-react'
+import { Zap, Mail, Lock, LogIn, UserPlus, Loader2, Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/login')({
@@ -13,6 +13,7 @@ function LoginRoute() {
   const [name, setName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,7 +22,6 @@ function LoginRoute() {
     setMessage('')
 
     try {
-      // БЬЕМ НАПРЯМУЮ В ЯНДЕКС ФУНКЦИЮ!
       const response = await fetch('https://functions.yandexcloud.net/d4erd6lhieqorscbm1qb', {
         method: 'POST',
         headers: {
@@ -54,11 +54,9 @@ function LoginRoute() {
         setMessage(`Супер! Аккаунт для ${email} успешно создан.`)
       }
 
-      // Сохраняем данные авторизации
       localStorage.setItem('voltpro_auth', JSON.stringify(data.user))
       window.dispatchEvent(new Event('auth-change'))
 
-      // Переход в профиль
       setTimeout(() => {
         navigate({ to: '/profile' })
       }, 1500)
@@ -68,6 +66,11 @@ function LoginRoute() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleForgotPassword = (e: React.MouseEvent) => {
+    e.preventDefault()
+    alert('Модуль восстановления пароля через Email скоро будет подключен!')
   }
 
   return (
@@ -134,14 +137,37 @@ function LoginRoute() {
                   <Lock className="h-5 w-5 text-slate-400 shrink-0" />
                 </div>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="appearance-none block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl text-slate-900 bg-white placeholder:text-slate-400 focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
+                  className="appearance-none block w-full pl-10 pr-12 py-2.5 border border-slate-300 rounded-xl text-slate-900 bg-white placeholder:text-slate-400 focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
                   placeholder="••••••••"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
               </div>
+              
+              {/* Ссылка "Забыли пароль?" показывается только при входе */}
+              {isLogin && (
+                <div className="mt-2 flex justify-end">
+                  <button
+                    onClick={handleForgotPassword}
+                    className="text-sm font-medium text-amber-600 hover:text-amber-500 transition-colors"
+                  >
+                    Забыли пароль?
+                  </button>
+                </div>
+              )}
             </div>
 
             <button
@@ -161,7 +187,7 @@ function LoginRoute() {
 
           <div className="mt-6">
             <button
-              onClick={() => { setIsLogin(!isLogin); setMessage(''); }}
+              onClick={() => { setIsLogin(!isLogin); setMessage(''); setShowPassword(false); }}
               className="w-full flex justify-center py-3 px-4 border-2 border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
             >
               {isLogin ? 'Создать новый аккаунт' : 'Войти в существующий аккаунт'}
