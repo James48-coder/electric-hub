@@ -21,7 +21,6 @@ function LoginRoute() {
     setMessage('')
 
     try {
-      // Отправляем реальный запрос на наш серверный API
       const response = await fetch('/api/auth', {
         method: 'POST',
         headers: {
@@ -35,27 +34,30 @@ function LoginRoute() {
         })
       })
 
-      const data = await response.json()
+      // Читаем сырой текст сервера ПЕРЕД тем, как переводить его в JSON
+      const text = await response.text()
+      
+      let data;
+      try {
+        data = JSON.parse(text)
+      } catch (e) {
+        // Если сервер прислал пустоту или HTML-ошибку сборки, выводим её на экран!
+        throw new Error(`Сервер ответил криво. Содержимое: ${text ? text.substring(0, 100) : 'Пустой ответ (0 байт)'}`)
+      }
 
       if (!response.ok) {
         throw new Error(data.error || 'Ошибка при авторизации')
       }
 
-      // Выдаем успешное сообщение
       if (isLogin) {
         setMessage(`С возвращением, ${data.user.name}!`)
       } else {
         setMessage(`Супер! Аккаунт для ${email} успешно создан.`)
       }
 
-      // === ЗАПИСЫВАЕМ ПРАВИЛЬНЫЙ ФОРМАТ ===
-      // Сохраняем объект пользователя, чтобы защита админки работала корректно
       localStorage.setItem('voltpro_auth', JSON.stringify(data.user))
-      
-      // ОТПРАВЛЯЕМ СИГНАЛ ВСЕМ МЕНЮ, ЧТО МЫ ВОШЛИ
       window.dispatchEvent(new Event('auth-change'))
 
-      // Перекидываем пользователя в Личный кабинет через 1.5 секунды
       setTimeout(() => {
         navigate({ to: '/profile' })
       }, 1500)
@@ -81,7 +83,6 @@ function LoginRoute() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md shrink-0">
         <div className="bg-white py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-slate-100">
 
-          {/* Блок вывода сообщений */}
           {message && (
             <div className={`mb-4 p-3 rounded-xl text-sm text-center font-medium ${message.includes('успешн') || message.includes('возвращением') ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>
               {message}
