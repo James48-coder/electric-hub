@@ -13,9 +13,11 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Изначально берем статус авторизации прямо из памяти, чтобы не было "вылетов" при переходе
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('voltpro_auth') !== null;
+  });
 
-  // === ИНСТРУМЕНТЫ РОУТЕРА ===
   const currentPath = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const isInitialMount = useRef(true);
@@ -26,7 +28,6 @@ function RootComponent() {
       isInitialMount.current = false;
       const savedRoute = localStorage.getItem('voltpro_last_route');
       
-      // Если PWA/браузер открыл главную страницу, но в памяти есть другой маршрут — перекидываем туда
       if (savedRoute && savedRoute !== '/' && currentPath === '/') {
         navigate({ to: savedRoute, replace: true });
       }
@@ -37,18 +38,17 @@ function RootComponent() {
   useEffect(() => {
     if (currentPath) {
       localStorage.setItem('voltpro_last_route', currentPath);
+      // При каждом переходе проверяем, не разлогинился ли юзер
+      setIsAuthenticated(localStorage.getItem('voltpro_auth') !== null);
     }
   }, [currentPath]);
 
+  // === 3. СЛУШАТЕЛЬ СОСТОЯНИЯ (Открытое меню / Вход / Выход) ===
   useEffect(() => {
-    // Функция проверки метки в памяти браузера
     const checkAuth = () => {
-      setIsAuthenticated(localStorage.getItem('voltpro_auth') === 'true');
+      setIsAuthenticated(localStorage.getItem('voltpro_auth') !== null);
     };
     
-    checkAuth(); // Проверяем при загрузке
-
-    // Слушаем изменения авторизации в реальном времени
     window.addEventListener('storage', checkAuth);
     window.addEventListener('auth-change', checkAuth);
 
