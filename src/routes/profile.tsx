@@ -167,7 +167,6 @@ function ProfilePage() {
           </div>
           
           <div className="flex-1 min-w-0">
-            {/* === ИСПРАВЛЕННЫЙ БЛОК РЕДАКТИРОВАНИЯ ИМЕНИ === */}
             {isEditingName ? (
               <div className="flex items-center gap-2 mb-1">
                 <input 
@@ -220,8 +219,9 @@ function ProfilePage() {
               <Shield className="w-5 h-5 text-amber-500 shrink-0" />
               <h3 className="font-bold text-amber-700">Владелец платформы</h3>
             </div>
+            {/* ИСПРАВЛЕН ТЕКСТ (Баг №2) */}
             <p className="text-xs text-amber-700/80 mb-4 leading-relaxed">
-              У вас есть права администратора. Вы можете публиковать экспертные SEO-статьи в базу знаний.
+              У вас есть права администратора. Вы можете публиковать экспертные SEO-статьи в раздел «Статьи».
             </p>
             <button 
               onClick={() => navigate({ to: '/admin-editor' })}
@@ -477,11 +477,14 @@ function FeatureItem({ text, active, highlight = false }: { text: string, active
   )
 }
 
+// === ИСПРАВЛЕННЫЙ БЛОК ДЛЯ МОБИЛОК (Баг №1) ===
 function PriceInput({ label, value, onChange }: { label: string, value: number, onChange: (val: string) => void }) {
   return (
-    <div className="flex items-center justify-between gap-4 p-3 bg-background border border-border rounded-xl hover:border-primary/30 transition-colors">
-      <span className="text-sm font-medium text-foreground leading-tight">{label}</span>
-      <div className="relative w-24 shrink-0">
+    <div className="flex items-center justify-between gap-3 p-3 bg-background border border-border rounded-xl hover:border-primary/30 transition-colors w-full overflow-hidden">
+      <span className="text-xs sm:text-sm font-medium text-foreground leading-snug flex-1 min-w-0 pr-2 break-words">
+        {label}
+      </span>
+      <div className="relative w-20 sm:w-24 shrink-0">
         <input 
           type="number" 
           value={value || ''} 
