@@ -11,7 +11,6 @@ export function Header() {
   const notifRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // Обработчик закрытия окон при клике мимо них
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
@@ -71,7 +70,7 @@ export function Header() {
         </div>
 
         <div className="ml-auto flex items-center gap-2">
-          {/* Search Mobile Button (Лупа) */}
+          {/* Search Mobile Button */}
           <button
             aria-label="Поиск"
             className="grid h-11 w-11 place-items-center rounded-xl text-foreground active:scale-95 lg:hidden hover:bg-muted/50 transition-colors"
@@ -79,12 +78,12 @@ export function Header() {
             <Search className="h-5 w-5" />
           </button>
 
-          {/* Mobile Theme Toggle (Кнопка тем для мобильных - строго между лупой и колокольчиком) */}
+          {/* Mobile Theme Toggle */}
           <div className="lg:hidden flex items-center">
             <ThemeToggle />
           </div>
 
-          {/* Notifications Dropdown (Колокольчик) */}
+          {/* Notifications Dropdown */}
           <div className="relative" ref={notifRef}>
             <button
               aria-label="Уведомления"
