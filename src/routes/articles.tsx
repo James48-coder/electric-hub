@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import React, { useState, useEffect } from 'react'
-import { Zap, Share2, Eye, MessageSquare, Heart, MoreHorizontal, Loader2 } from 'lucide-react'
+import { Share2, Eye, MessageSquare, Heart, MoreHorizontal, Loader2, Trash2 } from 'lucide-react'
 
 export const Route = createFileRoute('/articles')({
   component: ArticlesPage,
@@ -9,6 +9,21 @@ export const Route = createFileRoute('/articles')({
 function ArticlesPage() {
   const [posts, setPosts] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  // === ПРОВЕРКА РОЛИ ПРИ ЗАГРУЗКЕ ===
+  useEffect(() => {
+    const authData = localStorage.getItem('voltpro_auth')
+    if (authData) {
+      try {
+        const user = JSON.parse(authData)
+        if (user.role === 'ADMIN') {
+          setIsAdmin(true)
+        }
+      } catch (e) {}
+    }
+  }, [])
 
   // === ЗАГРУЗКА СТАТЕЙ ИЗ YANDEX CLOUD ===
   useEffect(() => {
@@ -22,16 +37,14 @@ function ArticlesPage() {
 
         const data = await response.json()
         if (data.articles) {
-          // Форматируем полученные данные для ленты
           const formattedPosts = data.articles.map((article: any) => ({
             id: article.id,
             author: "ВольтПро",
             role: "АДМИНИСТРАТОР",
-            // Делаем простую дату
             time: new Date(article.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }),
             title: article.title,
-            htmlContent: article.content, // HTML из ReactQuill
-            likes: Math.floor(Math.random() * 50) + 10, // Фейковые лайки для красоты
+            htmlContent: article.content,
+            likes: Math.floor(Math.random() * 50) + 10,
             isLiked: false,
             comments: Math.floor(Math.random() * 10),
             views: Math.floor(Math.random() * 500) + 50
@@ -47,6 +60,35 @@ function ArticlesPage() {
 
     fetchArticles()
   }, [])
+
+  // === ФУНКЦИЯ УДАЛЕНИЯ СТАТЬИ ===
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Вы уверены, что хотите удалить эту статью? Это действие нельзя отменить.')) {
+      return;
+    }
+
+    setDeletingId(id);
+    try {
+      const response = await fetch('https://functions.yandexcloud.net/d4erd6lhieqorscbm1qb', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete_article', id: id })
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // Убираем статью из интерфейса без перезагрузки страницы
+        setPosts(posts.filter(post => post.id !== id));
+      } else {
+        alert('Не удалось удалить статью.');
+      }
+    } catch (error) {
+      alert('Ошибка соединения с сервером.');
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   const toggleLike = (postId: string) => {
     setPosts(posts.map(post => {
@@ -66,18 +108,6 @@ function ArticlesPage() {
   return (
     <div className="container mx-auto max-w-3xl pb-24 px-4 sm:px-6 pt-8 animate-in fade-in duration-500">
       
-      <Link 
-        to="/admin-editor"
-        className="bg-card border border-border rounded-2xl p-4 sm:p-6 mb-8 flex items-center gap-4 cursor-pointer hover:border-primary/50 hover:shadow-md transition-all shadow-sm w-full text-left group"
-      >
-        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary shrink-0 group-hover:scale-110 transition-transform">
-          <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
-        </div>
-        <div className="text-muted-foreground flex-1 font-medium text-sm sm:text-base">
-          Написать полноценную статью в редакторе...
-        </div>
-      </Link>
-
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
           <Loader2 className="w-8 h-8 animate-spin mb-4 text-primary" />
@@ -109,7 +139,6 @@ function ArticlesPage() {
                 </button>
               </div>
               
-              {/* ВЫВОД СТАТЬИ ИЗ БД */}
               <div className="p-4 sm:p-6">
                 <h2 className="text-2xl font-black mb-4 text-foreground">{post.title}</h2>
                 <div 
@@ -119,7 +148,7 @@ function ArticlesPage() {
               </div>
 
               <div className="p-4 sm:p-6 border-t border-border/50 flex justify-between items-center bg-muted/20">
-                <div className="flex gap-6">
+                <div className="flex gap-6 items-center flex-1">
                   <button 
                     onClick={() => toggleLike(post.id)}
                     className={`flex items-center gap-2 transition-colors ${post.isLiked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'}`}
@@ -136,8 +165,22 @@ function ArticlesPage() {
                   <button onClick={showComingSoon} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
                     <Share2 className="w-5 h-5" />
                   </button>
+
+                  {/* КНОПКА УДАЛЕНИЯ ТОЛЬКО ДЛЯ АДМИНА */}
+                  {isAdmin && (
+                    <button 
+                      onClick={() => handleDelete(post.id)} 
+                      disabled={deletingId === post.id}
+                      className="flex items-center gap-2 ml-auto text-muted-foreground hover:text-destructive transition-colors px-3 py-1 rounded-lg hover:bg-destructive/10"
+                      title="Удалить статью"
+                    >
+                      {deletingId === post.id ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
+                    </button>
+                  )}
+
                 </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
+                
+                <div className="flex items-center gap-2 text-muted-foreground ml-6">
                   <Eye className="w-4 h-4" /> <span className="text-sm font-medium">{post.views}</span>
                 </div>
               </div>
