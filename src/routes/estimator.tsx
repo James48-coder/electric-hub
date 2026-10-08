@@ -31,8 +31,7 @@ function EstimatorPage() {
   const [showPaywall, setShowPaywall] = useState(false)
   const [paywallReason, setPaywallReason] = useState<PaywallReason>('free')
   
-  // Ставим 9 для удобства тестирования (нажмешь 1 раз — и лимит исчерпан)
-  const [estimatesUsed, setEstimatesUsed] = useState(9) 
+  const [estimatesUsed, setEstimatesUsed] = useState(0) 
   const MAX_ESTIMATES_MASTER = 10
 
   const [isGenerating, setIsGenerating] = useState(false)
@@ -64,6 +63,7 @@ function EstimatorPage() {
   const [customMaterials, setCustomMaterials] = useState<any[]>([])
   const [customWorks, setCustomWorks] = useState<any[]>([])
 
+  // Чтение сохраненных цен
   useEffect(() => {
     if (useMyPrices) {
       const saved = localStorage.getItem('voltpro_prices')
@@ -92,6 +92,35 @@ function EstimatorPage() {
     }
   }, [useMyPrices])
 
+  // === СИНХРОНИЗАЦИЯ ЛИМИТОВ С СЕРВЕРОМ ===
+  useEffect(() => {
+    if (tariff === 'master') {
+      const fetchLimits = async () => {
+        try {
+          const token = localStorage.getItem('voltpro_token') || '';
+          // URL будет заменен на реальную функцию получения профиля/лимитов на следующем шаге
+          const response = await fetch('https://functions.yandexcloud.net/ТВОЯ_ФУНКЦИЯ_ПРОВЕРКИ_ЛИМИТОВ', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.estimatesUsed !== undefined) {
+              setEstimatesUsed(data.estimatesUsed);
+            }
+          }
+        } catch (error) {
+          console.error('Ошибка загрузки лимитов из YDB:', error);
+        }
+      };
+      fetchLimits();
+    }
+  }, [tariff]);
+
   const handlePriceChange = (key: keyof typeof prices, value: number) => setPrices(prev => ({ ...prev, [key]: value }))
   const handleWorkPriceChange = (key: keyof typeof workPrices, value: number) => setWorkPrices(prev => ({ ...prev, [key]: value }))
 
@@ -102,7 +131,7 @@ function EstimatorPage() {
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    // === ПРОВЕРКА ЛИМИТОВ ДЛЯ ТАРИФА MASTER ===
+    // ПРОВЕРКА ЛИМИТОВ ДЛЯ ТАРИФА MASTER ПЕРЕД ЗАПРОСОМ
     if (tariff === 'master' && estimatesUsed >= MAX_ESTIMATES_MASTER) {
       setPaywallReason('limit')
       setShowPaywall(true)
@@ -115,15 +144,23 @@ function EstimatorPage() {
     setApiError(null)
 
     try {
+      const token = localStorage.getItem('voltpro_token') || '';
+      
       const response = await fetch('https://functions.yandexcloud.net/d4ea349ivafiequjv2fi', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ prompt: description, area: area, roomType: roomType })
       });
 
-      if (!response.ok) throw new Error('Сервер нейросети недоступен (ошибка Яндекса)');
-      const data = await response.json();
+      if (!response.ok) {
+        if (response.status === 403) throw new Error('Лимит генераций исчерпан. Обновите тариф.');
+        throw new Error('Сервер нейросети недоступен (ошибка Яндекса)');
+      }
       
+      const data = await response.json();
       const cleanJsonString = data.result.split('```json').join('').split('```').join('').trim();
       const aiResult = JSON.parse(cleanJsonString);
 
@@ -153,13 +190,17 @@ function EstimatorPage() {
       
       setShowResult(true);
 
-      // Списываем 1 генерацию, если тариф Master
+      // ОБНОВЛЕНИЕ СЧЕТЧИКА ПОСЛЕ УСПЕШНОЙ ГЕНЕРАЦИИ
       if (tariff === 'master') {
-        setEstimatesUsed(prev => prev + 1)
+        if (data.newEstimatesUsed !== undefined) {
+          setEstimatesUsed(data.newEstimatesUsed);
+        } else {
+          setEstimatesUsed(prev => prev + 1);
+        }
       }
 
-    } catch (error) {
-      setApiError('Не удалось сгенерировать смету. Убедитесь, что текст запроса понятен, или попробуйте через пару минут.');
+    } catch (error: any) {
+      setApiError(error.message || 'Не удалось сгенерировать смету. Убедитесь, что текст запроса понятен.');
     } finally {
       setIsGenerating(false);
     }
@@ -216,7 +257,6 @@ function EstimatorPage() {
   }
 
   const handlePdfDownload = () => {
-    // === БЛОКИРОВКА ПЕЧАТИ (ДОСТУПНО ТОЛЬКО PRO) ===
     if (tariff !== 'pro') {
       setPaywallReason('pdf')
       setShowPaywall(true)
@@ -288,7 +328,6 @@ function EstimatorPage() {
         <div className="space-y-6">
           <div className="bg-card border border-border rounded-3xl p-4 sm:p-8 shadow-sm print:hidden">
             
-            {/* ИНДИКАТОР ЛИМИТОВ ДЛЯ MASTER */}
             {tariff === 'master' && (
               <div className="mb-8 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
@@ -525,8 +564,6 @@ function EstimatorPage() {
               )}
 
               <div className="flex flex-col sm:flex-row gap-4 animate-in slide-in-from-bottom-8 print:hidden mt-6">
-                
-                {/* ИЗМЕНЕННАЯ КНОПКА PDF С ЗАМКОМ ДЛЯ НЕ-PRO */}
                 <button onClick={handlePdfDownload} className={`w-full sm:flex-1 font-black py-4 px-6 rounded-xl border shadow-lg transition-colors flex items-center justify-center gap-3 text-base sm:text-lg ${tariff === 'pro' ? 'bg-muted hover:bg-muted/80 border-border text-foreground' : 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-500 hover:bg-amber-500/20'}`}>
                   {tariff === 'pro' ? (
                     <><Download className="w-6 h-6" /> Скачать PDF</>
@@ -544,7 +581,6 @@ function EstimatorPage() {
         </div>
       )}
 
-      {/* УМНОЕ МОДАЛЬНОЕ ОКНО PAYWALL */}
       {showPaywall && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200 print:hidden">
           <div className="bg-card border-2 border-primary/20 rounded-3xl w-full max-w-md p-6 sm:p-8 shadow-2xl relative">
@@ -589,7 +625,6 @@ function EstimatorPage() {
         </div>
       )}
 
-      {/* МОДАЛЬНОЕ ОКНО ШАРИНГА */}
       {showShareModal && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200 print:hidden">
           <div className="bg-card border border-border rounded-3xl w-full max-w-sm p-6 shadow-2xl relative">
