@@ -1,12 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Bot, MapPin, Home as HomeIcon, Ruler, Settings, Lock, Sparkles, Loader2, FileText, Download, CheckCircle2, ChevronDown, AlertTriangle, Share2, X, Send, MessageCircle, Users, MessageSquare, PlusCircle, Trash2, Info } from 'lucide-react'
-import React, { useState, useEffect, useRef } from 'react'
+import { Bot, MapPin, Home as HomeIcon, Ruler, Settings, Lock, Sparkles, Loader2, FileText, Download, CheckCircle2, ChevronDown, AlertTriangle, Share2, X, Send, MessageCircle, Users, MessageSquare, PlusCircle, Trash2, Info, Zap } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
 
 export const Route = createFileRoute('/estimator')({
   component: EstimatorPage,
 })
 
 type Tariff = 'free' | 'master' | 'pro'
+type PaywallReason = 'free' | 'limit' | 'pdf'
 
 const DEFAULT_PRICES = {
   cable3x25: 85, cable3x15: 65, rcd: 2500, breaker16A: 350, breaker10A: 350,
@@ -15,7 +16,6 @@ const DEFAULT_WORK_PRICES = {
   cableRouting: 150, pointsInstall: 450, shieldAssembly: 0, 
 }
 
-// Умный определитель единиц измерения
 const getUnit = (title: string, defaultUnit: string) => {
   const lower = (title || "").toLowerCase();
   if (lower.includes("штробл") || lower.includes("кабел") || lower.includes("провод") || lower.includes("гофр") || lower.includes("лотк") || lower.includes("лент")) {
@@ -26,6 +26,15 @@ const getUnit = (title: string, defaultUnit: string) => {
 
 function EstimatorPage() {
   const [tariff, setTariff] = useState<Tariff>('free')
+  
+  // === СТЕЙТЫ ДЛЯ PAYWALL И ЛИМИТОВ ===
+  const [showPaywall, setShowPaywall] = useState(false)
+  const [paywallReason, setPaywallReason] = useState<PaywallReason>('free')
+  
+  // Ставим 19 для удобства тестирования (нажмешь 1 раз — и лимит исчерпан)
+  const [estimatesUsed, setEstimatesUsed] = useState(19) 
+  const MAX_ESTIMATES_MASTER = 20
+
   const [isGenerating, setIsGenerating] = useState(false)
   const [showResult, setShowResult] = useState(false)
   const [apiError, setApiError] = useState<string | null>(null)
@@ -71,7 +80,7 @@ function EstimatorPage() {
           setWorkPrices({
             cableRouting: parsed.cableRouting || DEFAULT_WORK_PRICES.cableRouting,
             pointsInstall: parsed.pointsInstall || DEFAULT_WORK_PRICES.pointsInstall,
-            shieldAssembly: 0, // Жесткий предохранитель: всегда обнуляем сборку щита при загрузке
+            shieldAssembly: 0, 
           })
         } catch (e) {
           console.error('Ошибка чтения прайса', e)
@@ -86,18 +95,20 @@ function EstimatorPage() {
   const handlePriceChange = (key: keyof typeof prices, value: number) => setPrices(prev => ({ ...prev, [key]: value }))
   const handleWorkPriceChange = (key: keyof typeof workPrices, value: number) => setWorkPrices(prev => ({ ...prev, [key]: value }))
 
-  const addCustomItem = (setter: any, list: any[]) => {
-    setter([...list, { id: Date.now().toString(), title: '', qty: 1, price: 0 }])
-  }
-  const updateCustomItem = (setter: any, list: any[], id: string, field: string, value: any) => {
-    setter(list.map((item) => item.id === id ? { ...item, [field]: value } : item))
-  }
-  const removeCustomItem = (setter: any, list: any[], id: string) => {
-    setter(list.filter((item) => item.id !== id))
-  }
+  const addCustomItem = (setter: any, list: any[]) => setter([...list, { id: Date.now().toString(), title: '', qty: 1, price: 0 }])
+  const updateCustomItem = (setter: any, list: any[], id: string, field: string, value: any) => setter(list.map((item) => item.id === id ? { ...item, [field]: value } : item))
+  const removeCustomItem = (setter: any, list: any[], id: string) => setter(list.filter((item) => item.id !== id))
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // === ПРОВЕРКА ЛИМИТОВ ДЛЯ ТАРИФА MASTER ===
+    if (tariff === 'master' && estimatesUsed >= MAX_ESTIMATES_MASTER) {
+      setPaywallReason('limit')
+      setShowPaywall(true)
+      return
+    }
+
     setIsGenerating(true)
     setShowResult(false)
     setPdfError(false)
@@ -142,8 +153,12 @@ function EstimatorPage() {
       
       setShowResult(true);
 
+      // Списываем 1 генерацию, если тариф Master
+      if (tariff === 'master') {
+        setEstimatesUsed(prev => prev + 1)
+      }
+
     } catch (error) {
-      console.error("Ошибка ИИ:", error);
       setApiError('Не удалось сгенерировать смету. Убедитесь, что текст запроса понятен, или попробуйте через пару минут.');
     } finally {
       setIsGenerating(false);
@@ -201,6 +216,13 @@ function EstimatorPage() {
   }
 
   const handlePdfDownload = () => {
+    // === БЛОКИРОВКА ПЕЧАТИ (ДОСТУПНО ТОЛЬКО PRO) ===
+    if (tariff !== 'pro') {
+      setPaywallReason('pdf')
+      setShowPaywall(true)
+      return
+    }
+
     setPdfError(false)
     try {
       if (typeof window.print !== 'function') { setPdfError(true); return; }
@@ -229,12 +251,13 @@ function EstimatorPage() {
         `}
       </style>
 
+      {/* ПАНЕЛЬ ТЕСТИРОВАНИЯ ТАРИФОВ */}
       <div className="mb-8 p-4 bg-muted/30 border-2 border-border rounded-2xl flex flex-wrap items-center gap-4 print:hidden">
         <span className="text-xs font-black text-muted-foreground uppercase tracking-widest w-full sm:w-auto mb-1 sm:mb-0 text-center sm:text-left flex items-center justify-center sm:justify-start gap-2">
           <Settings className="w-4 h-4" /> Тест тарифов:
         </span>
         <button onClick={() => { setTariff('free'); setShowResult(false); }} className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${tariff === 'free' ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'}`}>Free</button>
-        <button onClick={() => setTariff('master')} className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${tariff === 'master' ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'}`}>Master</button>
+        <button onClick={() => { setTariff('master'); setShowResult(false); }} className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${tariff === 'master' ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'}`}>Master</button>
         <button onClick={() => setTariff('pro')} className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-black rounded-xl transition-all duration-300 ${tariff === 'pro' ? 'bg-primary text-primary-foreground shadow-lg ring-4 ring-primary/30 scale-105' : 'bg-background border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary/50'}`}>PRO</button>
       </div>
 
@@ -257,7 +280,7 @@ function EstimatorPage() {
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-foreground mb-4">ИИ-сметчик недоступен на Базовом тарифе</h2>
           <p className="text-muted-foreground mb-8 max-w-md mx-auto">Для автоматической генерации смет по ГОСТ и ПУЭ требуется тариф Master или PRO.</p>
-          <button className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 px-8 rounded-xl transition-colors shadow-lg shadow-orange-500/20">
+          <button onClick={() => { setPaywallReason('free'); setShowPaywall(true); }} className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 px-8 rounded-xl transition-colors shadow-lg shadow-orange-500/20">
             Улучшить тариф
           </button>
         </div>
@@ -265,6 +288,22 @@ function EstimatorPage() {
         <div className="space-y-6">
           <div className="bg-card border border-border rounded-3xl p-4 sm:p-8 shadow-sm print:hidden">
             
+            {/* ИНДИКАТОР ЛИМИТОВ ДЛЯ MASTER */}
+            {tariff === 'master' && (
+              <div className="mb-8 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <Bot className="w-6 h-6 text-amber-500 shrink-0" />
+                  <div>
+                    <span className="text-sm font-bold text-amber-600 dark:text-amber-500 block">Остаток генераций: {MAX_ESTIMATES_MASTER - estimatesUsed} из {MAX_ESTIMATES_MASTER}</span>
+                    <span className="text-xs text-amber-600/70">Тариф Master</span>
+                  </div>
+                </div>
+                <div className="w-full sm:w-48 h-2.5 bg-background border border-amber-500/20 rounded-full overflow-hidden shrink-0">
+                  <div className="h-full bg-amber-500 transition-all duration-500" style={{ width: `${(estimatesUsed / MAX_ESTIMATES_MASTER) * 100}%` }}></div>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleGenerate} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -486,9 +525,16 @@ function EstimatorPage() {
               )}
 
               <div className="flex flex-col sm:flex-row gap-4 animate-in slide-in-from-bottom-8 print:hidden mt-6">
-                <button onClick={handlePdfDownload} className="w-full sm:flex-1 bg-muted hover:bg-muted/80 text-foreground font-black py-4 px-6 rounded-xl border border-border shadow-lg transition-colors flex items-center justify-center gap-3 text-base sm:text-lg">
-                  <Download className="w-6 h-6" /> Скачать PDF
+                
+                {/* ИЗМЕНЕННАЯ КНОПКА PDF С ЗАМКОМ ДЛЯ НЕ-PRO */}
+                <button onClick={handlePdfDownload} className={`w-full sm:flex-1 font-black py-4 px-6 rounded-xl border shadow-lg transition-colors flex items-center justify-center gap-3 text-base sm:text-lg ${tariff === 'pro' ? 'bg-muted hover:bg-muted/80 border-border text-foreground' : 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-500 hover:bg-amber-500/20'}`}>
+                  {tariff === 'pro' ? (
+                    <><Download className="w-6 h-6" /> Скачать PDF</>
+                  ) : (
+                    <><Lock className="w-5 h-5 shrink-0" /> Экспорт (PRO)</>
+                  )}
                 </button>
+
                 <button onClick={handleShare} className="w-full sm:flex-1 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 font-black py-4 px-6 rounded-xl shadow-lg transition-colors flex items-center justify-center gap-3 text-base sm:text-lg">
                   <Share2 className="w-6 h-6" /> Поделиться
                 </button>
@@ -498,8 +544,58 @@ function EstimatorPage() {
         </div>
       )}
 
+      {/* УМНОЕ МОДАЛЬНОЕ ОКНО PAYWALL */}
+      {showPaywall && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200 print:hidden">
+          <div className="bg-card border-2 border-primary/20 rounded-3xl w-full max-w-md p-6 sm:p-8 shadow-2xl relative">
+            <button onClick={() => setShowPaywall(false)} className="absolute top-4 right-4 p-2 bg-muted hover:bg-muted/80 rounded-full transition-colors">
+              <X className="w-5 h-5 text-muted-foreground" />
+            </button>
+            
+            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-6 shadow-inner">
+              {paywallReason === 'pdf' ? <Download className="w-8 h-8" /> : <Zap className="w-8 h-8" />}
+            </div>
+            
+            <h3 className="text-2xl font-black text-foreground mb-3">
+              {paywallReason === 'free' && 'Премиум инструмент'}
+              {paywallReason === 'limit' && 'Лимит исчерпан'}
+              {paywallReason === 'pdf' && 'Доступно в PRO'}
+            </h3>
+            
+            <p className="text-muted-foreground mb-8 text-sm sm:text-base leading-relaxed">
+              {paywallReason === 'free' && 'ИИ-сметчик — это профессиональный инструмент. Оформите подписку, чтобы делегировать рутину нейросети.'}
+              {paywallReason === 'limit' && 'В тарифе Master доступно 20 генераций смет в месяц. Для безлимитного доступа перейдите на тариф PRO.'}
+              {paywallReason === 'pdf' && 'Экспорт фирменных смет в PDF доступен только профессионалам. В тарифе Master можно только просматривать сметы на экране.'}
+            </p>
+
+            <div className="space-y-4">
+              {(paywallReason === 'free' || paywallReason === 'limit') && (
+                <button onClick={() => { setTariff('pro'); setShowPaywall(false); }} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black py-4 px-6 rounded-xl shadow-lg shadow-primary/25 transition-all flex items-center justify-center gap-2">
+                  <Zap className="w-5 h-5" /> Перейти на PRO — 1490 ₽/мес
+                </button>
+              )}
+              {paywallReason === 'pdf' && (
+                <button onClick={() => { setTariff('pro'); setShowPaywall(false); }} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black py-4 px-6 rounded-xl shadow-lg shadow-primary/25 transition-all flex items-center justify-center gap-2">
+                  <Download className="w-5 h-5" /> Открыть экспорт в PRO
+                </button>
+              )}
+              {paywallReason === 'free' && (
+                <button onClick={() => { setTariff('master'); setShowPaywall(false); }} className="w-full bg-background border-2 border-border hover:border-primary/50 text-foreground font-bold py-3.5 px-6 rounded-xl transition-all">
+                  Выбрать Master (490 ₽/мес)
+                </button>
+              )}
+            </div>
+            
+            <p className="text-xs text-center text-muted-foreground mt-6">
+              Скоро: Эксклюзивная версия 3.1 Pro
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* МОДАЛЬНОЕ ОКНО ШАРИНГА */}
       {showShareModal && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200 print:hidden">
           <div className="bg-card border border-border rounded-3xl w-full max-w-sm p-6 shadow-2xl relative">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-black text-foreground">Куда отправить?</h3>
