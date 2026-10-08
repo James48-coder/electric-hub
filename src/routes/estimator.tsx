@@ -49,6 +49,8 @@ function EstimatorPage() {
   const [useMyPrices, setUseMyPrices] = useState(false)
   const [includeWorks, setIncludeWorks] = useState(false)
 
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+
   const [estimatedData, setEstimatedData] = useState({
     cable3x25: 0, cable3x15: 0, rcdQty: 0, breaker16AQty: 0, breaker10AQty: 0,
   })
@@ -62,6 +64,19 @@ function EstimatorPage() {
 
   const [customMaterials, setCustomMaterials] = useState<any[]>([])
   const [customWorks, setCustomWorks] = useState<any[]>([])
+
+  // Чтение профиля пользователя (чтобы узнать email для YDB)
+  useEffect(() => {
+    const authData = localStorage.getItem('voltpro_auth');
+    if (authData) {
+      try {
+        const parsed = JSON.parse(authData);
+        if (parsed.email) setUserEmail(parsed.email);
+      } catch (e) {
+        console.error('Ошибка чтения профиля');
+      }
+    }
+  }, []);
 
   // Чтение сохраненных цен
   useEffect(() => {
@@ -94,17 +109,14 @@ function EstimatorPage() {
 
   // === СИНХРОНИЗАЦИЯ ЛИМИТОВ С СЕРВЕРОМ ===
   useEffect(() => {
-    if (tariff === 'master') {
+    if (tariff === 'master' && userEmail) {
       const fetchLimits = async () => {
         try {
-          const token = localStorage.getItem('voltpro_token') || '';
-          // URL будет заменен на реальную функцию получения профиля/лимитов на следующем шаге
-          const response = await fetch('https://functions.yandexcloud.net/ТВОЯ_ФУНКЦИЯ_ПРОВЕРКИ_ЛИМИТОВ', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            }
+          // Обращаемся к серверу Яндекса, передаем email в формате JSON
+          const response = await fetch('https://functions.yandexcloud.net/d4ea349ivafiequjv2fi', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'get_limits', email: userEmail })
           });
           
           if (response.ok) {
@@ -119,7 +131,7 @@ function EstimatorPage() {
       };
       fetchLimits();
     }
-  }, [tariff]);
+  }, [tariff, userEmail]);
 
   const handlePriceChange = (key: keyof typeof prices, value: number) => setPrices(prev => ({ ...prev, [key]: value }))
   const handleWorkPriceChange = (key: keyof typeof workPrices, value: number) => setWorkPrices(prev => ({ ...prev, [key]: value }))
@@ -144,15 +156,17 @@ function EstimatorPage() {
     setApiError(null)
 
     try {
-      const token = localStorage.getItem('voltpro_token') || '';
-      
       const response = await fetch('https://functions.yandexcloud.net/d4ea349ivafiequjv2fi', {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ prompt: description, area: area, roomType: roomType })
+        headers: { 'Content-Type': 'application/json' },
+        // ПЕРЕДАЕМ EMAIL, ЧТОБЫ СЕРВЕР ЗНАЛ КОМУ СПИСАТЬ ЛИМИТ
+        body: JSON.stringify({ 
+          action: 'generate',
+          prompt: description, 
+          area: area, 
+          roomType: roomType,
+          email: userEmail 
+        })
       });
 
       if (!response.ok) {
