@@ -31,9 +31,9 @@ function EstimatorPage() {
   const [showPaywall, setShowPaywall] = useState(false)
   const [paywallReason, setPaywallReason] = useState<PaywallReason>('free')
   
-  // Ставим 19 для удобства тестирования (нажмешь 1 раз — и лимит исчерпан)
-  const [estimatesUsed, setEstimatesUsed] = useState(19) 
-  const MAX_ESTIMATES_MASTER = 20
+  // Ставим 9 для удобства тестирования (нажмешь 1 раз — и лимит исчерпан)
+  const [estimatesUsed, setEstimatesUsed] = useState(9) 
+  const MAX_ESTIMATES_MASTER = 10
 
   const [isGenerating, setIsGenerating] = useState(false)
   const [showResult, setShowResult] = useState(false)
@@ -564,7 +564,7 @@ function EstimatorPage() {
             
             <p className="text-muted-foreground mb-8 text-sm sm:text-base leading-relaxed">
               {paywallReason === 'free' && 'ИИ-сметчик — это профессиональный инструмент. Оформите подписку, чтобы делегировать рутину нейросети.'}
-              {paywallReason === 'limit' && 'В тарифе Master доступно 20 генераций смет в месяц. Для безлимитного доступа перейдите на тариф PRO.'}
+              {paywallReason === 'limit' && 'В тарифе Master доступно 10 генераций смет в месяц. Для безлимитного доступа перейдите на тариф PRO.'}
               {paywallReason === 'pdf' && 'Экспорт фирменных смет в PDF доступен только профессионалам. В тарифе Master можно только просматривать сметы на экране.'}
             </p>
 
@@ -585,10 +585,6 @@ function EstimatorPage() {
                 </button>
               )}
             </div>
-            
-            <p className="text-xs text-center text-muted-foreground mt-6">
-              Скоро: Эксклюзивная версия 3.1 Pro
-            </p>
           </div>
         </div>
       )}
