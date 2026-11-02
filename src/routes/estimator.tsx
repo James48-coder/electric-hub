@@ -110,26 +110,9 @@ function EstimatorPage() {
   // === СИНХРОНИЗАЦИЯ ЛИМИТОВ С СЕРВЕРОМ ===
   useEffect(() => {
     if (tariff === 'master' && userEmail) {
-      const fetchLimits = async () => {
-        try {
-          // Обращаемся к серверу Яндекса, передаем email в формате JSON
-          const response = await fetch('https://functions.yandexcloud.net/d4ea349ivafiequjv2fi', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'get_limits', email: userEmail })
-          });
-          
-          if (response.ok) {
-            const data = await response.json();
-            if (data.estimatesUsed !== undefined) {
-              setEstimatesUsed(data.estimatesUsed);
-            }
-          }
-        } catch (error) {
-          console.error('Ошибка загрузки лимитов из YDB:', error);
-        }
-      };
-      fetchLimits();
+      // ЛОКАЛЬНАЯ ЗАГЛУШКА: Временно отключаем запрос к Яндексу для теста
+      // Устанавливаем 0 использованных смет при загрузке страницы
+      setEstimatesUsed(0);
     }
   }, [tariff, userEmail]);
 
@@ -156,27 +139,26 @@ function EstimatorPage() {
     setApiError(null)
 
     try {
-      const response = await fetch('https://functions.yandexcloud.net/d4ea349ivafiequjv2fi', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        // ПЕРЕДАЕМ EMAIL, ЧТОБЫ СЕРВЕР ЗНАЛ КОМУ СПИСАТЬ ЛИМИТ
-        body: JSON.stringify({ 
-          action: 'generate',
-          prompt: description, 
-          area: area, 
-          roomType: roomType,
-          email: userEmail 
-        })
-      });
+      // === ЛОКАЛЬНАЯ ЗАГЛУШКА (МОК-СЕРВЕР) ===
+      // Имитируем задержку нейросети на 1.5 секунды для реалистичности
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
-      if (!response.ok) {
-        if (response.status === 403) throw new Error('Лимит генераций исчерпан. Обновите тариф.');
-        throw new Error('Сервер нейросети недоступен (ошибка Яндекса)');
-      }
+      // Имитируем успешный ответ: прибавляем +1 к использованным сметам
+      const data = { newEstimatesUsed: estimatesUsed + 1 };
       
-      const data = await response.json();
-      const cleanJsonString = data.result.split('```json').join('').split('```').join('').trim();
-      const aiResult = JSON.parse(cleanJsonString);
+      // Имитируем готовую смету от YandexGPT
+      const aiResult = {
+        cable3x25: 60, cable3x15: 20, rcdQty: 1, breaker16AQty: 3, breaker10AQty: 2,
+        additionalMaterials: [
+          { title: "Гофра ПВХ 20мм (м)", qty: 60, price: 25 },
+          { title: "Подрозетники по бетону (шт)", qty: 15, price: 40 }
+        ],
+        cableRouting: 60, pointsInstall: 15, shieldAssembly: 24,
+        additionalWorks: [
+          { title: "Штробление (бетон)", qty: 20, price: 300 }
+        ]
+      };
+      // === КОНЕЦ ЗАГЛУШКИ ===
 
       setEstimatedData({ 
         cable3x25: aiResult.cable3x25 || 0, 
@@ -186,9 +168,7 @@ function EstimatorPage() {
         breaker10AQty: aiResult.breaker10AQty || 0 
       });
 
-      const finalMaterials = (aiResult.additionalMaterials && Array.isArray(aiResult.additionalMaterials)) 
-        ? aiResult.additionalMaterials.map((item: any, i: number) => ({ id: 'am'+i, title: item.title, qty: item.qty, price: item.price || 0 }))
-        : [];
+      const finalMaterials = aiResult.additionalMaterials.map((item: any, i: number) => ({ id: 'am'+i, title: item.title, qty: item.qty, price: item.price || 0 }));
       setCustomMaterials(finalMaterials);
 
       setEstimatedWorks({
@@ -197,24 +177,18 @@ function EstimatorPage() {
         shieldAssembly: aiResult.shieldAssembly || 0
       });
 
-      const finalWorks = (aiResult.additionalWorks && Array.isArray(aiResult.additionalWorks)) 
-        ? aiResult.additionalWorks.map((item: any, i: number) => ({ id: 'aw'+i, title: item.title, qty: item.qty, price: item.price || 0 }))
-        : [];
+      const finalWorks = aiResult.additionalWorks.map((item: any, i: number) => ({ id: 'aw'+i, title: item.title, qty: item.qty, price: item.price || 0 }));
       setCustomWorks(finalWorks);
       
       setShowResult(true);
 
       // ОБНОВЛЕНИЕ СЧЕТЧИКА ПОСЛЕ УСПЕШНОЙ ГЕНЕРАЦИИ
       if (tariff === 'master') {
-        if (data.newEstimatesUsed !== undefined) {
-          setEstimatesUsed(data.newEstimatesUsed);
-        } else {
-          setEstimatesUsed(prev => prev + 1);
-        }
+        setEstimatesUsed(data.newEstimatesUsed);
       }
 
     } catch (error: any) {
-      setApiError(error.message || 'Не удалось сгенерировать смету. Убедитесь, что текст запроса понятен.');
+      setApiError(error.message || 'Не удалось сгенерировать смету.');
     } finally {
       setIsGenerating(false);
     }
