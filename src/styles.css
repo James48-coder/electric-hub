@@ -40,6 +40,51 @@
   --radius: 0.5rem;
 }
 
+/* --- ПРЕМИУМ-ТЕМЫ (НОВЫЕ) --- */
+
+/* НОВАЯ ТЕМА 1: КИБЕР-ВОЛЬТ (Технологичный неон) */
+.theme-cyberpunk {
+  /* Очень темный графит с синим отливом (не чисто черный) */
+  --background: #090c10;
+  --foreground: #e5e7eb;
+  /* Панели стекломорфизма */
+  --card: #111827; 
+  --card-foreground: #ffffff;
+  --popover: #111827;
+  --popover-foreground: #ffffff;
+  /* Яркий электрический циан (cyan) как основной акцент */
+  --primary: #22d3ee; 
+  --primary-foreground: #082f49; /* Темный текст на светлом фоне кнопки */
+  /* Акцентный цвет для вторичных элементов (темно-синий) */
+  --accent: #1e3a8a;
+  --destructive: #ef4444;
+  /* Границы полупрозрачные для объема */
+  --border: #1f2937;
+  --radius: 1rem; 
+}
+
+/* НОВАЯ ТЕМА 2: ИНДУСТРИАЛЬНЫЙ FLUKE (Суровый монтаж) */
+.theme-fluke {
+  /* Глубокий матовый темно-серый (как корпус инструмента) */
+  --background: #18181b;
+  --foreground: #f4f4f5;
+  /* Панели на тон светлее */
+  --card: #27272a;
+  --card-foreground: #f4f4f5;
+  --popover: #27272a;
+  --popover-foreground: #f4f4f5;
+  /* Тот самый сигнальный желто-янтарный цвет Fluke/DeWalt */
+  --primary: #f59e0b;
+  --primary-foreground: #18181b; /* Черный текст на желтом фоне */
+  /* Нейтральный серый для неактивных кнопок */
+  --accent: #3f3f46;
+  --destructive: #ef4444;
+  /* Строгие жесткие рамки */
+  --border: #3f3f46;
+  --radius: 0.25rem; /* Почти квадратные углы для брутальности */
+}
+
+/* --- СТАРЫЕ АЛЬТЕРНАТИВНЫЕ ТЕМЫ --- */
 .contrast {
   --background: #000000;
   --foreground: #ffffff;
@@ -53,29 +98,6 @@
   --destructive: #ff0000;
   --border: #fbbf24;
   --radius: 0;
-}
-
-/* --- ПРЕМИУМ-ТЕМЫ --- */
-
-/* НОВАЯ ТЕМА: НЕОНОВЫЙ СИНДИКАТ */
-.theme-cyberpunk {
-  /* Глубокий темный фон с фиолетовым отливом */
-  --background: #0a0510;
-  --foreground: #ffffff;
-  /* Полупрозрачные карточки для эффекта Glassmorphism */
-  --card: #160b24; 
-  --card-foreground: #ffffff;
-  --popover: #160b24;
-  --popover-foreground: #ffffff;
-  /* Яркий неоновый акцент (фуксия) */
-  --primary: #f000b8; 
-  --primary-foreground: #ffffff;
-  --accent: #2d1445;
-  --destructive: #ff003c;
-  /* Тонкие, еле заметные границы для объема */
-  --border: #3b1c5c;
-  /* Сильное скругление как на скринах */
-  --radius: 1.5rem; 
 }
 
 .theme-oled {
@@ -168,13 +190,6 @@ body {
 .bg-popover, select {
   background-color: var(--popover) !important;
   color: var(--popover-foreground) !important;
-}
-
-/* --- СПЕЦЭФФЕКТЫ ДЛЯ КИБЕРПАНКА --- */
-.bg-cyberpunk-gradient {
-  background: radial-gradient(circle at top right, #3b1c5c 0%, transparent 40%),
-              radial-gradient(circle at bottom left, #2d1445 0%, transparent 40%),
-              var(--background);
 }
 
 /* --- ГЛОБАЛЬНЫЕ ПРАВИЛА ДЛЯ СТАТЕЙ (МЕДИАТАГОВ) --- */
