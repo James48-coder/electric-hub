@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Bot, MapPin, Home as HomeIcon, Ruler, Settings, Lock, Sparkles, Loader2, FileText, Download, CheckCircle2, ChevronDown, AlertTriangle, Share2, X, Send, MessageCircle, Users, MessageSquare, PlusCircle, Trash2, Info, Zap } from 'lucide-react'
+import { Bot, MapPin, Home as HomeIcon, Ruler, Settings, Lock, Sparkles, Loader2, FileText, Download, CheckCircle2, ChevronDown, AlertTriangle, Share2, X, Send, MessageCircle, Users, MessageSquare, PlusCircle, Trash2, Info, Zap, Copy } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
 
 export const Route = createFileRoute('/estimator')({
@@ -616,7 +616,7 @@ function EstimatorPage() {
             </div>
             
             <div className="space-y-3">
-              <a href={`https://t.me/share/url?url=&text=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-[#0088cc] text-white hover:bg-[#0088cc]/90 rounded-xl font-bold transition-colors shadow-md">
+              <a href={`https://t.me/share/url?url=https://voltpro.ru&text=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-[#0088cc] text-white hover:bg-[#0088cc]/90 rounded-xl font-bold transition-colors shadow-md">
                 <Send className="w-6 h-6" /> Telegram
               </a>
               <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-[#25D366] text-white hover:bg-[#25D366]/90 rounded-xl font-bold transition-colors shadow-md">
@@ -625,9 +625,13 @@ function EstimatorPage() {
               <a href={`https://vk.com/share.php?url=https://voltpro.ru&title=Смета&comment=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-[#0077FF] text-white hover:bg-[#0077FF]/90 rounded-xl font-bold transition-colors shadow-md">
                 <Users className="w-6 h-6" /> ВКонтакте
               </a>
-              <a href={`max://share?text=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-purple-600 text-white hover:bg-purple-700 rounded-xl font-bold transition-colors shadow-md">
-                <MessageSquare className="w-6 h-6" /> Мессенджер MAX
-              </a>
+              <button onClick={() => {
+                navigator.clipboard.writeText(getShareText());
+                setShowShareModal(false);
+                alert('Смета скопирована в буфер обмена!');
+              }} className="flex items-center gap-3 w-full p-4 bg-gray-600 text-white hover:bg-gray-700 rounded-xl font-bold transition-colors shadow-md">
+                <Copy className="w-6 h-6" /> Скопировать текст
+              </button>
             </div>
           </div>
         </div>
