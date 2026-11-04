@@ -1,50 +1,15 @@
 import { createRootRoute, Outlet, ScrollRestoration, Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { ThemeProvider, useTheme } from "@/components/theme-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/header";
 import { AppSidebar } from "@/components/app-sidebar"; 
 import { Footer } from "@/components/footer";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import React, { useState, useEffect, useRef } from "react";
-import { Menu, X, Calculator, Waypoints, MessageSquare, User, Home, BookOpen, Bot, Zap, FileText, Users, HelpCircle, Palette } from "lucide-react";
+import { Menu, X, Calculator, Waypoints, User, Home, BookOpen, Bot, Zap, FileText, Users, HelpCircle } from "lucide-react";
 
 export const Route = createRootRoute({
   component: RootComponent,
 });
-
-function ThemeSwitcher() {
-  const { theme, setTheme } = useTheme();
-
-  return (
-    <div className="flex flex-col gap-2 mt-4 mb-2">
-      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-3">Тема оформления</p>
-      <div className="grid grid-cols-1 gap-2 px-2">
-        <button 
-          onClick={() => setTheme("theme-cyberpunk")}
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors border ${theme === 'theme-cyberpunk' ? 'bg-primary/10 border-primary text-primary font-bold' : 'bg-transparent border-transparent text-muted-foreground hover:bg-muted'}`}
-        >
-          <div className="w-4 h-4 rounded-full bg-cyan-400 shrink-0 shadow-[0_0_8px_rgba(34,211,238,0.8)]"></div>
-          <span className="text-sm">Кибер-Вольт</span>
-        </button>
-
-        <button 
-          onClick={() => setTheme("theme-fluke")}
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors border ${theme === 'theme-fluke' ? 'bg-amber-500/10 border-amber-500 text-amber-500 font-bold' : 'bg-transparent border-transparent text-muted-foreground hover:bg-muted'}`}
-        >
-          <div className="w-4 h-4 rounded-sm bg-amber-500 shrink-0"></div>
-          <span className="text-sm">Индустриальный Fluke</span>
-        </button>
-
-        <button 
-          onClick={() => setTheme("light")}
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors border ${theme === 'light' ? 'bg-gray-200 border-gray-400 text-gray-900 font-bold dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100' : 'bg-transparent border-transparent text-muted-foreground hover:bg-muted'}`}
-        >
-          <div className="w-4 h-4 border-2 border-gray-400 shrink-0 rounded-full bg-white"></div>
-          <span className="text-sm">На объекте (Контраст)</span>
-        </button>
-      </div>
-    </div>
-  );
-}
 
 function RootComponent() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -141,21 +106,12 @@ function RootComponent() {
               />
               
               <MobileNavLink to="/faq" icon={<HelpCircle className="w-5 h-5"/>} label="Частые вопросы" onClick={() => setIsMobileMenuOpen(false)} />
-              
-              {/* ПЕРЕКЛЮЧАТЕЛЬ ТЕМ */}
-              <div className="mt-4 pt-4 border-t border-border">
-                <ThemeSwitcher />
-              </div>
             </div>
           </div>
         )}
 
         <div className="hidden md:flex flex-col w-64 shrink-0 border-r border-border bg-card">
           <AppSidebar />
-          {/* ПЕРЕКЛЮЧАТЕЛЬ ТЕМ В ДЕСКТОПНОМ МЕНЮ */}
-          <div className="p-4 border-t border-border bg-card mt-auto">
-             <ThemeSwitcher />
-          </div>
         </div>
         
         <div className="flex flex-1 flex-col overflow-hidden w-full relative">
