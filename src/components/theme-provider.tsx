@@ -1,79 +1,78 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react"
 
-export const THEMES = [
-  // Наша новая дефолтная тема добавлена первой
-  { id: "theme-cyberpunk", label: "Неоновый Синдикат", icon: "Hexagon", swatch: "#f000b8" },
-  { id: "light", label: "Светлая", icon: "Sun", swatch: "#ffffff" },
-  { id: "dark", label: "Тёмная", icon: "Moon", swatch: "#09090b" },
-  { id: "contrast", label: "Контрастная", icon: "SunDim", swatch: "#fbbf24" },
-  { id: "theme-oled", label: "OLED Pro", icon: "Monitor", swatch: "#000000" },
-  { id: "theme-scandi", label: "Сканди Тех", icon: "Square", swatch: "#f8fafc" },
-  { id: "theme-terminal", label: "Терминал", icon: "Terminal", swatch: "#10b981" },
-  { id: "theme-ocean", label: "Неоновый Океан", icon: "Waves", swatch: "#06b6d4" },
-  { id: "theme-teal", label: "Тёмная Бирюза", icon: "Hexagon", swatch: "#2dd4bf" },
-];
-
-type Theme = string;
+type Theme = "light" | "dark" | "theme-cyberpunk" | "theme-fluke" | "contrast" | "theme-oled" | "theme-scandi" | "theme-terminal" | "theme-ocean" | "theme-teal"
 
 type ThemeProviderProps = {
-  children: React.ReactNode;
-  defaultTheme?: Theme;
-  storageKey?: string;
-};
+  children: React.ReactNode
+  defaultTheme?: Theme
+  storageKey?: string
+}
 
 type ThemeProviderState = {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-};
+  theme: Theme
+  setTheme: (theme: Theme) => void
+}
 
 const initialState: ThemeProviderState = {
-  theme: "theme-cyberpunk", // Изменили дефолт тут
+  theme: "theme-cyberpunk",
   setTheme: () => null,
-};
+}
 
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
+const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
 
 export function ThemeProvider({
   children,
-  defaultTheme = "theme-cyberpunk", // И изменили дефолт тут
-  storageKey = "voltpro-ui-theme",
+  defaultTheme = "theme-cyberpunk",
+  storageKey = "vite-ui-theme",
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(
-    () => (typeof window !== "undefined" ? (localStorage.getItem(storageKey) as Theme) : null) || defaultTheme
-  );
+    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
+  )
 
   useEffect(() => {
-    const root = window.document.documentElement;
-    const body = window.document.body;
-    
-    // Сбрасываем все классы перед применением нового
-    const allThemes = THEMES.map(t => t.id);
-    root.classList.remove(...allThemes, "system");
-    body.classList.remove(...allThemes, "system");
-    
-    root.classList.add(theme);
-    body.classList.add(theme);
-  }, [theme]);
+    const root = window.document.documentElement
+
+    // Убираем все возможные классы тем
+    root.classList.remove(
+      "light", "dark", "theme-cyberpunk", "theme-fluke", 
+      "contrast", "theme-oled", "theme-scandi", 
+      "theme-terminal", "theme-ocean", "theme-teal"
+    )
+
+    // Если выбрана светлая тема, добавляем только класс 'light'
+    if (theme === "light") {
+        root.classList.add("light")
+    } else {
+        // Для всех остальных добавляем класс темы и ОБЯЗАТЕЛЬНО класс 'dark' 
+        // для корректной работы Tailwind dark mode
+        root.classList.add("dark")
+        if (theme !== "dark") {
+            root.classList.add(theme)
+        }
+    }
+  }, [theme])
 
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
+      localStorage.setItem(storageKey, theme)
+      setTheme(theme)
     },
-  };
+  }
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>
       {children}
     </ThemeProviderContext.Provider>
-  );
+  )
 }
 
 export const useTheme = () => {
-  const context = useContext(ThemeProviderContext);
+  const context = useContext(ThemeProviderContext)
+
   if (context === undefined)
-    throw new Error("useTheme must be used within a ThemeProvider");
-  return context;
-};
+    throw new Error("useTheme must be used within a ThemeProvider")
+
+  return context
+}
