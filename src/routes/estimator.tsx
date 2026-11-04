@@ -614,3 +614,124 @@ function EstimatorPage() {
                 <X className="w-5 h-5 text-muted-foreground" />
               </button>
             </div>
+            
+            <div className="space-y-3">
+              <a href={`https://t.me/share/url?url=&text=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-[#0088cc] text-white hover:bg-[#0088cc]/90 rounded-xl font-bold transition-colors shadow-md">
+                <Send className="w-6 h-6" /> Telegram
+              </a>
+              <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-[#25D366] text-white hover:bg-[#25D366]/90 rounded-xl font-bold transition-colors shadow-md">
+                <MessageCircle className="w-6 h-6" /> WhatsApp
+              </a>
+              <a href={`https://vk.com/share.php?url=https://voltpro.ru&title=Смета&comment=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-[#0077FF] text-white hover:bg-[#0077FF]/90 rounded-xl font-bold transition-colors shadow-md">
+                <Users className="w-6 h-6" /> ВКонтакте
+              </a>
+              <a href={`max://share?text=${encodeURIComponent(getShareText())}`} target="_blank" rel="noreferrer" onClick={() => setShowShareModal(false)} className="flex items-center gap-3 w-full p-4 bg-purple-600 text-white hover:bg-purple-700 rounded-xl font-bold transition-colors shadow-md">
+                <MessageSquare className="w-6 h-6" /> Мессенджер MAX
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ResultItem({ 
+  title, unit, qty, price, isEditable, isCustom = false, 
+  onChangePrice, onChangeTitle, onChangeQty, onRemove 
+}: { 
+  title: string, unit: string, qty: number, price: number, 
+  isEditable: boolean, isCustom?: boolean, 
+  onChangePrice: (val: number) => void, onChangeTitle?: (val: string) => void, 
+  onChangeQty?: (val: number) => void, onRemove?: () => void 
+}) {
+  const total = qty * price
+
+  return (
+    <div className="flex flex-col md:grid md:grid-cols-12 print:grid print:grid-cols-12 gap-4 items-start p-4 bg-background border border-border rounded-xl print:py-1.5 print:px-0 print:border-b print:border-t-0 print:border-l-0 print:border-r-0 print:border-gray-300 print:rounded-none group relative print:break-inside-avoid">
+      
+      {isCustom && (
+        <button onClick={onRemove} className="md:hidden absolute right-2 top-2 p-2 text-muted-foreground hover:text-red-500 print:hidden transition-colors">
+          <Trash2 className="w-4 h-4" />
+        </button>
+      )}
+
+      <div className="md:col-span-5 print:col-span-6 flex items-start gap-3 w-full pr-8 md:pr-0">
+        {!isCustom ? (
+          <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-1 print:hidden" />
+        ) : (
+          <button onClick={onRemove} className="hidden md:flex w-5 h-5 items-center justify-center text-muted-foreground hover:text-red-500 shrink-0 mt-1 print:hidden transition-colors">
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
+        
+        {isCustom ? (
+          <div className="w-full">
+            <textarea 
+              value={title} 
+              onChange={(e) => { 
+                if (onChangeTitle) onChangeTitle(e.target.value);
+                e.target.style.height = 'auto';
+                e.target.style.height = e.target.scrollHeight + 'px';
+              }} 
+              ref={(el) => {
+                if (el) {
+                  el.style.height = 'auto';
+                  el.style.height = el.scrollHeight + 'px';
+                }
+              }}
+              rows={1}
+              placeholder="Введите название..." 
+              className="w-full bg-transparent border-b border-border focus:border-primary outline-none py-1 text-sm sm:text-base font-medium text-foreground leading-snug print:hidden placeholder:text-muted-foreground/50 resize-none overflow-hidden" 
+            />
+            <span className="hidden print:inline font-medium text-xs text-foreground">{title || 'Без названия'}</span>
+          </div>
+        ) : (
+          <span className="font-medium text-sm sm:text-base text-foreground leading-snug print:text-xs mt-1 md:mt-0 pt-0.5">{title}</span>
+        )}
+      </div>
+
+      <div className="md:col-span-7 print:col-span-6 grid grid-cols-2 md:grid-cols-7 print:grid print:grid-cols-6 gap-y-3 gap-x-2 md:gap-4 items-start w-full pt-1 md:pt-0 border-t border-border md:border-0 print:border-0 print:pt-0">
+        
+        <div className="col-span-1 md:col-span-3 print:col-span-2 flex flex-col pt-1 print:block">
+          <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Цена</span>
+          {isEditable ? (
+            <div className="relative w-full max-w-[120px] print:hidden">
+              <input type="number" value={price || ''} onChange={(e) => { if (onChangePrice) onChangePrice(Number(e.target.value)) }} placeholder="0" className="w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none bg-muted border border-border rounded-lg py-1.5 pl-2 pr-7 text-xs sm:text-sm font-bold focus:ring-1 focus:ring-primary outline-none transition-colors" />
+              <span className="absolute right-2 top-1.5 text-xs text-muted-foreground">₽</span>
+            </div>
+          ) : (
+            <span className="font-bold text-xs sm:text-sm print:block whitespace-nowrap pt-1.5">{price.toLocaleString('ru-RU')} ₽</span>
+          )}
+          {isEditable && (
+             <span className="hidden print:block font-bold text-xs text-foreground whitespace-nowrap pt-1">
+                {price.toLocaleString('ru-RU')} ₽
+             </span>
+          )}
+        </div>
+
+        <div className="col-span-1 md:col-span-2 print:col-span-2 flex flex-col items-end md:items-center pt-1 print:text-center print:block">
+          <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden mb-1">Кол-во</span>
+          {isCustom ? (
+            <div className="flex items-center justify-end md:justify-center gap-1 print:hidden">
+              <input type="number" value={qty || ''} onChange={(e) => { if (onChangeQty) onChangeQty(Number(e.target.value)) }} placeholder="1" className="w-20 sm:w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none bg-muted border border-border rounded-lg py-1 px-2 text-xs sm:text-sm font-bold text-center focus:ring-1 focus:ring-primary outline-none" />
+              <span className="text-xs sm:text-sm font-black whitespace-nowrap">{unit}</span>
+            </div>
+          ) : (
+            <span className="font-black text-xs sm:text-sm whitespace-nowrap pt-1.5">{qty} {unit}</span>
+          )}
+          {isCustom && (
+             <span className="hidden print:block font-black text-xs whitespace-nowrap pt-1">
+                {qty} {unit}
+             </span>
+          )}
+        </div>
+
+        <div className="col-span-2 md:col-span-2 print:col-span-2 flex items-center justify-between md:flex-col md:items-end pt-3 md:pt-1 print:text-right print:block border-t border-border/50 md:border-0 print:border-0">
+          <span className="text-[10px] text-muted-foreground uppercase md:hidden print:hidden">Итого</span>
+          <span className="font-black text-primary text-sm whitespace-nowrap print:text-black md:pt-1.5">{total.toLocaleString('ru-RU')} ₽</span>
+        </div>
+      </div>
+    </div>
+  )
+}
